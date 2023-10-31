@@ -19,7 +19,7 @@ router.get("/set/:id", (req, res) => {
     return false;
   }
   pool.query(
-    'SELECT s.set_id, s.name, s.description, s.date_created, s.date_modified, s.category, f.term, f.definition, f.flashcard_id, u.username, rf.confidence, u.user_id, CASE WHEN lf.flashcard_id IS NOT NULL THEN true ELSE false END AS liked FROM sets sLEFT JOIN flashcards f ON s.set_id = f.set_idJOIN users u ON s.user_id = u.user_idLEFT JOIN "reviewsFlashcards" rf ON rf.set_id = s.set_id AND rf.flashcard_id = f.flashcard_idLEFT JOIN "likedFlashcards" lf ON u.user_id = lf.user_id AND f.flashcard_id = lf.flashcard_idWHERE s.set_id = $1',
+    'SELECT s.set_id, s.name, s.description, s.date_created, s.date_modified, s.category, f.term, f.definition, f.flashcard_id, u.username, rf.confidence, u.user_id, CASE WHEN lf.flashcard_id IS NOT NULL THEN true ELSE false END AS liked FROM sets s LEFT JOIN flashcards f ON s.set_id = f.set_id JOIN users u ON s.user_id = u.user_id LEFT JOIN "reviewsFlashcards" rf ON rf.set_id = s.set_id AND rf.flashcard_id = f.flashcard_id LEFT JOIN "likedFlashcards" lf ON u.user_id = lf.user_id AND f.flashcard_id = lf.flashcard_id WHERE s.set_id = $1',
     [set_id],
     (err, result) => {
       if (err) {
