@@ -36,7 +36,7 @@ app.use(
     limit: process.env.BODY_LIMIT || "5mb",
   })
 );
-app.settings("*", cors());
+app.options("*", cors());
 app.use(express.json());
 
 app.use("/v1", authRoutes);
