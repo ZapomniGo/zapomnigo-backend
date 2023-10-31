@@ -19,16 +19,7 @@ router.get("/set/:id", (req, res) => {
     return false;
   }
   pool.query(
-    `SELECT 
-      s.set_id, s.name, s.description, s.date_created, s.date_modified, s.category,
-      f.term, f.definition, f.flashcard_id, u.username, rf.confidence, u.user_id,
-      CASE WHEN lf.flashcard_id IS NOT NULL THEN true ELSE false END AS liked
-    FROM sets s
-    LEFT JOIN flashcards f ON s.set_id = f.set_id
-    JOIN users u ON s.user_id = u.user_id
-    LEFT JOIN "reviewsFlashcards" rf ON rf.set_id = s.set_id AND rf.flashcard_id = f.flashcard_id
-    LEFT JOIN "likedFlashcards" lf ON u.user_id = lf.user_id AND f.flashcard_id = lf.flashcard_id
-    WHERE s.set_id = $1`,
+    'SELECT s.set_id, s.name, s.description, s.date_created, s.date_modified, s.category, f.term, f.definition, f.flashcard_id, u.username, rf.confidence, u.user_id, CASE WHEN lf.flashcard_id IS NOT NULL THEN true ELSE false END AS liked FROM sets sLEFT JOIN flashcards f ON s.set_id = f.set_idJOIN users u ON s.user_id = u.user_idLEFT JOIN "reviewsFlashcards" rf ON rf.set_id = s.set_id AND rf.flashcard_id = f.flashcard_idLEFT JOIN "likedFlashcards" lf ON u.user_id = lf.user_id AND f.flashcard_id = lf.flashcard_idWHERE s.set_id = $1',
     [set_id],
     (err, result) => {
       if (err) {
@@ -44,7 +35,6 @@ router.get("/set/:id", (req, res) => {
     }
   );
 });
-
 
 router.get("/sets/user", authorizeToken, (req, res) => {
   pool.query(
@@ -637,7 +627,7 @@ router.put("/sets", authorizeToken, (req, res) => {
 });
 
 router.patch("/set", authorizeToken, (req, res) => {
-  console.log("хе"+req.body.flashcards.length);
+  console.log("хе" + req.body.flashcards.length);
   if (
     !req.body.set_id ||
     !req.body.title ||
@@ -701,7 +691,7 @@ router.patch("/set", authorizeToken, (req, res) => {
   );
   req.body.flashcards.forEach((flashcard) => {
     //some of the flashcards are new and some are old. You have to update the old ones and insert the new ones
-    if (Number(flashcard.flashcard_id)<2000) {
+    if (Number(flashcard.flashcard_id) < 2000) {
       pool.query(
         "UPDATE flashcards SET term=$1, definition=$2 WHERE flashcard_id=$3",
         [flashcard.term, flashcard.definition, flashcard.flashcard_id],
@@ -713,7 +703,7 @@ router.patch("/set", authorizeToken, (req, res) => {
           }
         }
       );
-    }else {
+    } else {
       pool.query(
         "INSERT INTO flashcards (term, definition, set_id) VALUES ($1, $2, $3)",
         [flashcard.term, flashcard.definition, req.body.set_id],
@@ -723,9 +713,8 @@ router.patch("/set", authorizeToken, (req, res) => {
 
             res.status(500).end();
             return false;
-          }else{
-            console.log("хе"+flashcard.flashcard_id);
-           
+          } else {
+            console.log("хе" + flashcard.flashcard_id);
           }
         }
       );
