@@ -10,7 +10,7 @@ const foldersRoutes = require("./v1_routes/folders");
 const flashcardsRoutes = require("./v1_routes/flashcards");
 const statisticsRoutes = require("./v1_routes/statistics");
 const utilsRoutes = require("./v1_routes/utils");
-import helmet from "helmet";
+const _helmet = require("helmet");
 
 const port = process.env.PORT || 5500;
 app.use(helmet());
