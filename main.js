@@ -12,6 +12,7 @@ const statisticsRoutes = require("./v1_routes/statistics");
 const utilsRoutes = require("./v1_routes/utils");
 
 const port = process.env.PORT || 5500;
+app.use(helmet());
 app.use(
   bodyParser.urlencoded({
     limit: "5mb",
@@ -25,9 +26,7 @@ app.use(
     limit: process.env.BODY_LIMIT || "5mb",
   })
 );
-app.use(cors());
 app.use(express.json());
-app.options("*", cors());
 
 app.use("/v1", authRoutes);
 app.use("/v1", setsRoutes);
