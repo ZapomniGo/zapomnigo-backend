@@ -24,7 +24,7 @@ app.use(
 
 app.use(
   cors({
-    origin: "https://mesembria-client-e8e2f2c0ffab.herokuapp.com/",
+    origin: "https://mesembria-client-e8e2f2c0ffab.herokuapp.com",
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   })
 );
