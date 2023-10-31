@@ -152,6 +152,7 @@ router.post("/sets/combine", authorizeToken, (req, res) => {
       return false;
     }
     //create the new set, its name should be a combination of the names of the sets that are being combined. Use the sets array
+      //TODO():  Add creation of ULID on demand and insert the value for set_id
     pool.query(
       "INSERT INTO sets (name, description, date_created, date_modified, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING set_id",
       [
