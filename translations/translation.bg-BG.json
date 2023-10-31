@@ -256,7 +256,7 @@
   "button.Copy": "Копирай",
   "button.addToFolder": "Добави към папка",
   "button.Remove": "Премахни",
-  "label.addToFolderDescription":"Можеш да добавиш един сет към няколко папки",
+  "label.addToFolderDescription": "Можеш да добавиш един сет към няколко папки",
   "label.Imported": "Импортирано",
   "label.define": "дефинириай",
   "label.andYouKnow": "и знаете",
@@ -265,5 +265,8 @@
   "label.writeCorrectAnswer": "Напишете правилния отговор: ",
   "button.IWasRight": "Бях прав",
   "success.Done": "Готово",
-  "success.flippedAll": "Обърнахте картите"
+  "success.flippedAll": "Обърнахте картите",
+  "success.addedToFolder": "Успешно добавяне в папка",
+  "button.Flip": "Обърни",
+  "button.Dislike": "Махни харесване"
 }

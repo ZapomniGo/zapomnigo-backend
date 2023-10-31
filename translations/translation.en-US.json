@@ -263,6 +263,6 @@
   "label.andYouKnow": "and you know",
   "button.Remove": "Remove",
   "label.Deselect": "Deselect",
-  "success.flippedAll": "Flipped the cards"
-
+  "success.flippedAll": "Flipped the cards",
+  "success.addedToFolder": "Successfully added to folder"
 }
