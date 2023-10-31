@@ -1,6 +1,6 @@
 const express = require("express");
 const pool = require("./utils/dbConfig");
-const fs = require('fs');
+const fs = require("fs");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
@@ -29,7 +29,6 @@ app.use(cors());
 app.use(express.json());
 app.options("*", cors());
 
-
 app.use("/v1", authRoutes);
 app.use("/v1", setsRoutes);
 app.use("/v1", foldersRoutes);
@@ -37,11 +36,9 @@ app.use("/v1", flashcardsRoutes);
 app.use("/v1", statisticsRoutes);
 app.use("/v1", utilsRoutes);
 
-
-
-
-
-
-app.listen(5500, () => {
-  console.log(`Server listening on the port::${5500}`, process.env.DATABASE_URL);
+app.listen(process.env.PORT || 5000, () => {
+  console.log(
+    `Server listening on the port::${process.env.PORT}`,
+    process.env.DATABASE_URL
+  );
 });
