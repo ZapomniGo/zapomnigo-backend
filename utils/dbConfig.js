@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const { Pool } = require("pg");
 const connectionString = process.env.DATABASE_URL;
 
@@ -6,6 +6,7 @@ const pool = new Pool({
   connectionString,
   idleTimeoutMillis: 24 * 60 * 60 * 1000,
   max: 1000,
+  ssl: true,
 });
 
 pool.connect((err) => {

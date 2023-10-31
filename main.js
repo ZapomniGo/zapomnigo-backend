@@ -43,5 +43,5 @@ app.use("/v1", utilsRoutes);
 
 
 app.listen(5500, () => {
-  console.log(`Server listening on the port::${5500}`);
+  console.log(`Server listening on the port::${5500}`, process.env.DATABASE_URL);
 });
