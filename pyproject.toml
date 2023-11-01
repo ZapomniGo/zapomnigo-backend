@@ -11,9 +11,11 @@ python = "3.11.4"
 flask = "^3.0.0"
 python-dotenv = "^1.0.0"
 sqlalchemy = "^2.0.22"
-psycopg2-binary = "^2.9.9"
 alembic = "^1.12.1"
 flask-expects-json = "^1.7.0"
+flask-migrate = "^4.0.5"
+psycopg2-binary = "^2.9.9"
+flask-sqlalchemy = "^3.1.1"
 
 [tool.poetry.scripts]
 start = "src.main:start"
