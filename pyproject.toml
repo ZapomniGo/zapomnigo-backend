@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "mesembria"
+name = "zapomnigo"
 version = "0.1.0"
-description = "mesembria python api"
+description = "zapomnigo python api"
 authors = ["Ivan Obreshkov <ivanobreshkov12@gmail.com>"]
 license = "MIT"
 readme = "README.md"
