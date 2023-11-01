@@ -26,5 +26,5 @@ poetry add package-name
 ## How to start development server: 
 By default, it is running on port 5000.
 ```bash
-cd src/ && flask run --debug
+poetry run start
 ```
