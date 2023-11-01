@@ -10,3 +10,11 @@ def create_app(config_class=DevConfig) -> Flask:
     Routes.register_blueprints(app)
 
     return app
+
+
+def start() -> None:
+    create_app().run(host="0.0.0.0", debug=True, load_dotenv=True)
+
+
+if __name__ == '__main__':
+    start()

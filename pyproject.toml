@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "zapomnigo"
+name = "src"
 version = "0.1.0"
 description = "zapomnigo python api"
 authors = ["Ivan Obreshkov <ivanobreshkov12@gmail.com>"]
@@ -15,6 +15,8 @@ psycopg2-binary = "^2.9.9"
 alembic = "^1.12.1"
 flask-expects-json = "^1.7.0"
 
+[tool.poetry.scripts]
+start = "src.main:start"
 
 [build-system]
 requires = ["poetry-core"]
