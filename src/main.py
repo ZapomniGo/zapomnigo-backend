@@ -1,6 +1,7 @@
 from flask import Flask
 
 from src.config import DevConfig, ProdConfig, IS_OFFLINE
+from src.database.models.base import db
 from src.routes import Routes
 
 
@@ -13,6 +14,12 @@ def create_app() -> Flask:
         app.config.from_object(ProdConfig)
 
     Routes.register_blueprints(app)
+    db.init_app(app)
+
+    # Creates tables in the database based on the models if they don't exist
+    # If you don't see the tables you should fill them with data
+    with app.app_context():
+        db.create_all()
 
     return app
 
