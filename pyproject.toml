@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "src"
+version = "0.1.0"
+description = "zapomnigo python api"
+authors = ["Ivan Obreshkov <ivanobreshkov12@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.4"
+flask = "^3.0.0"
+python-dotenv = "^1.0.0"
+sqlalchemy = "^2.0.22"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.12.1"
+flask-expects-json = "^1.7.0"
+
+[tool.poetry.scripts]
+start = "src.main:start"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
