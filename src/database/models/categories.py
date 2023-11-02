@@ -13,3 +13,4 @@ class Categories(db.Model):
 
     # Creates a bidirectional relationship between tables
     sets: Mapped["Sets"] = relationship(back_populates="categories", cascade="all")
+    folders: Mapped["Folders"] = relationship(back_populates="categories", cascade="all")
