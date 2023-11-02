@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from src.config import DevConfig, ProdConfig, IS_OFFLINE
 from src.database.models.base import db
 from src.routes import Routes
+from src.utilities.exception_handlers import ExceptionHandlers
 
 migrate = Migrate(directory="database/migrations")
 
@@ -17,6 +18,7 @@ def create_app() -> Flask:
         app.config.from_object(ProdConfig)
 
     Routes.register_blueprints(app)
+    app.register_error_handler(Exception,ExceptionHandlers.handle_uncaught_exception)
     db.init_app(app)
     migrate.init_app(app, db)
     # Creates tables in the database based on the models if they don't exist
