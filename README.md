@@ -28,3 +28,21 @@ By default, it is running on port 5000.
 ```bash
 poetry run start
 ```
+
+# Working with migrations
+### If you have never created migrations and you don't have the migrations folder:
+1. Run `export FLASK_APP=main:create_app`
+2. Run `flask db init` in the `/src` folder
+
+### Making changes to the tables
+* Make changes to the classes located in the `/database/models` folder
+* After you have made a change do: 
+
+```bash
+flask db migrate -m "Migration message"
+```
+ * To apply the changes described by the migration script to the database do:
+
+```bash
+flask db upgrade
+```
