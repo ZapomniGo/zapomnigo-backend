@@ -22,3 +22,4 @@ class Users(db.Model):
     subscription_models: Mapped["SubscriptionModels"] = relationship(back_populates="users", cascade="all")
     organizations_users: Mapped["OrganizationsUsers"] = relationship(back_populates="users", cascade="all")
     sets: Mapped["Sets"] = relationship(back_populates="users", cascade="all")
+    comments: Mapped["Comments"] = relationship(back_populates="users", cascade="all")

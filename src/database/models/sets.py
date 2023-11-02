@@ -19,3 +19,4 @@ class Sets(db.Model):
     # Creates a bidirectional relationship between tables
     users: Mapped["Users"] = relationship(back_populates="sets", cascade="all")
     categories: Mapped["Categories"] = relationship(back_populates="sets", cascade="all")
+    sets: Mapped["Comments"] = relationship(back_populates="sets", cascade="all")
