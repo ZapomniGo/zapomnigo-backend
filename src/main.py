@@ -1,8 +1,11 @@
 from flask import Flask
+from flask_migrate import Migrate
 
 from src.config import DevConfig, ProdConfig, IS_OFFLINE
 from src.database.models.base import db
 from src.routes import Routes
+
+migrate = Migrate(directory="database/migrations")
 
 
 def create_app() -> Flask:
@@ -15,9 +18,8 @@ def create_app() -> Flask:
 
     Routes.register_blueprints(app)
     db.init_app(app)
-
+    migrate.init_app(app, db)
     # Creates tables in the database based on the models if they don't exist
-    # If you don't see the tables you should fill them with data
     with app.app_context():
         db.create_all()
 
