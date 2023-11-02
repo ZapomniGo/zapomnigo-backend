@@ -5,8 +5,6 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
 
-from src.database.models import SubscriptionModels
-
 
 @dataclass
 class Users(db.Model):
