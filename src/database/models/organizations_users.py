@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -11,4 +11,4 @@ class OrganizationsUsers:
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"))
     users: Mapped["Users"] = relationship(back_populates="organizations_users", cascade="all")
     organizations: Mapped["Organizations"] = relationship(back_populates="organizations_users", cascade="all")
-
+    __table_args = (UniqueConstraint("organization_id","user_id"))
