@@ -15,3 +15,4 @@ class Flashcards(db.Model):
 
     # Creates a bidirectional relationship between tables
     sets: Mapped["Sets"] = relationship(back_populates="flashcards", cascade="all")
+    liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="flashcards", cascade="all")

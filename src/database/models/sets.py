@@ -24,3 +24,4 @@ class Sets(db.Model):
     flashcards: Mapped["Flashcards"] = relationship(back_populates="sets", cascade="all")
     liked_sets: Mapped["LikedSets"] = relationship(back_populates="sets", cascade="all")
     reviews_sets: Mapped["ReviewsSets"] = relationship(back_populates="sets", cascade="all")
+    liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="sets", cascade="all")
