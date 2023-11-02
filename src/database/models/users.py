@@ -21,3 +21,4 @@ class Users(db.Model):
     # Creates a bidirectional relationship between tables
     subscription_models: Mapped["SubscriptionModels"] = relationship(back_populates="users", cascade="all")
     organizations_users: Mapped["OrganizationsUsers"] = relationship(back_populates="users", cascade="all")
+    sets: Mapped["Sets"] = relationship(back_populates="users", cascade="all")
