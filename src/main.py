@@ -17,7 +17,6 @@ def create_app() -> Flask:
     db.init_app(app)
 
     # Creates tables in the database based on the models if they don't exist
-    # If you don't see the tables you should fill them with data
     with app.app_context():
         db.create_all()
 

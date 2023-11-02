@@ -19,5 +19,5 @@ class Users(db.Model):
     subscription_model_id: Mapped[str] = mapped_column(ForeignKey("subscription_models.subscription_model_id"))
 
     # Creates a bidirectional relationship between tables
-    subscription_model: Mapped["SubscriptionModels"] = relationship(back_populates="users", cascade="all")
-    organization_users: Mapped["OrganizationsUsers"] = relationship(back_populates="users", cascade="all")
+    subscription_models: Mapped["SubscriptionModels"] = relationship(back_populates="users", cascade="all")
+    organizations_users: Mapped["OrganizationsUsers"] = relationship(back_populates="users", cascade="all")
