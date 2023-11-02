@@ -22,3 +22,4 @@ class Sets(db.Model):
     comments: Mapped["Comments"] = relationship(back_populates="sets", cascade="all")
     folders_sets: Mapped["FoldersSets"] = relationship(back_populates="sets", cascade="all")
     flashcards: Mapped["Flashcards"] = relationship(back_populates="sets", cascade="all")
+    liked_sets: Mapped["LikedSets"] = relationship(back_populates="sets", cascade="all")
