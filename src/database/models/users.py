@@ -12,7 +12,7 @@ class Users(db.Model):
     username: Mapped[str] = mapped_column(String(40), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     age: Mapped[int] = mapped_column(nullable=True)
-    creation_date: Mapped[str] = mapped_column(String(40), nullable=False)
+    user_creation_date: Mapped[str] = mapped_column(String(40), nullable=False)
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     subscription_date: Mapped[str] = mapped_column(String(40), nullable=False)
