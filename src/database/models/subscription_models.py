@@ -1,0 +1,16 @@
+from dataclasses import dataclass
+
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.database.models.base import db
+
+from src.database.models import Users, Organizations
+
+
+@dataclass
+class SubscriptionModels(db.Model):
+    subscription_model_id: Mapped[str] = mapped_column(String(26), primary_key=True)
+    subscription_model: Mapped[str] = mapped_column(String(25), nullable=False, unique=True)
+    users: Mapped["Users"] = relationship(back_populates="subscription_models")
+    organizations: Mapped["Organizations"] = relationship(back_populates="subscription_models")

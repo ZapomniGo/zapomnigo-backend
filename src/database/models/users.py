@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import String, Boolean, ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
+
+from src.database.models import SubscriptionModels
 
 
 @dataclass
@@ -16,3 +18,5 @@ class Users(db.Model):
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     subscription_date: Mapped[str] = mapped_column(String(40), nullable=False)
+    subscription_model_id: Mapped[str] = mapped_column(ForeignKey("subscription_models.subscription_model_id"))
+    subscription_model: Mapped["SubscriptionModels"] = relationship(back_populates="users")
