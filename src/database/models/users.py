@@ -17,4 +17,5 @@ class Users(db.Model):
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     subscription_date: Mapped[str] = mapped_column(String(40), nullable=False)
     subscription_model_id: Mapped[str] = mapped_column(ForeignKey("subscription_models.subscription_model_id"))
-    subscription_model: Mapped["SubscriptionModels"] = relationship(back_populates="users")
+    subscription_model: Mapped["SubscriptionModels"] = relationship(back_populates="users", cascade="all")
+    organization_users: Mapped["OrganizationsUsers"] = relationship(back_populates="users", cascade="all")
