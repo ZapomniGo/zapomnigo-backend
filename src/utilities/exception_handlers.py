@@ -1,4 +1,4 @@
-from flask import Request, request
+from flask import Request, request, Flask
 
 from src.config import IS_OFFLINE
 from traceback import format_exc
@@ -6,8 +6,8 @@ from traceback import format_exc
 
 # The request Content-Type should be 'application/json'
 class ExceptionHandlers:
-    @staticmethod
-    def handle_uncaught_exception(exc: Exception):
+    @classmethod
+    def handle_uncaught_exception(cls, exc: Exception):
         content = {"message": "Something went wrong, please contact ZapomniGo!"}
 
         if IS_OFFLINE:
@@ -18,3 +18,7 @@ class ExceptionHandlers:
                        "stacktrace": format_exc()}
 
         return content, 500
+
+    @classmethod
+    def register_error_handlers(cls, app: Flask):
+        app.register_error_handler(Exception, cls.handle_uncaught_exception)

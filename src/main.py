@@ -18,7 +18,8 @@ def create_app() -> Flask:
         app.config.from_object(ProdConfig)
 
     Routes.register_blueprints(app)
-    app.register_error_handler(Exception,ExceptionHandlers.handle_uncaught_exception)
+    ExceptionHandlers.register_error_handlers(app)
+
     db.init_app(app)
     migrate.init_app(app, db)
     # Creates tables in the database based on the models if they don't exist
