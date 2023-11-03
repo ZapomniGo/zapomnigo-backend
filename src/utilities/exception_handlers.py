@@ -1,10 +1,10 @@
-from flask import Request, request, Flask
-
-from src.config import IS_OFFLINE
 from traceback import format_exc
 
+from flask import request, Flask
 
-# The request Content-Type should be 'application/json'
+from src.config import IS_OFFLINE
+
+
 class ExceptionHandlers:
     @classmethod
     def handle_uncaught_exception(cls, exc: Exception):
