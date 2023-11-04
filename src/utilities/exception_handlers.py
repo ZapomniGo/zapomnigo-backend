@@ -3,8 +3,6 @@ from traceback import format_exc
 from flask import request, Flask
 from werkzeug.exceptions import HTTPException
 
-from src.config import IS_OFFLINE
-
 
 class ExceptionHandlers:
     @classmethod
