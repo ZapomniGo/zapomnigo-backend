@@ -17,4 +17,4 @@ class DevConfig:
 
 class ProdConfig:
     SECRET_KEY = getenv("PROD_SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
