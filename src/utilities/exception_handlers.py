@@ -22,4 +22,5 @@ class ExceptionHandlers:
 
     @classmethod
     def register_error_handlers(cls, app: Flask):
-        app.register_error_handler(Exception, cls.handle_uncaught_exception)
+        pass
+        # app.register_error_handler(Exception, cls.handle_uncaught_exception)
