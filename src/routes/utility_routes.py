@@ -8,7 +8,6 @@ utility_bp = Blueprint("utility", __name__)
 
 @utility_bp.get("/health")
 def health() -> Tuple[Dict[str, str], int]:
-    raise Exception("Test brat")
     return c.get_health()
 @utility_bp.get("/")
 def health_main() -> Tuple[Dict[str, str], int]:
