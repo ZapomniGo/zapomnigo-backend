@@ -31,7 +31,6 @@ class Users(db.Model):
     comments: Mapped["Comments"] = relationship(back_populates="users", cascade="all")
     folders: Mapped["Folders"] = relationship(back_populates="users", cascade="all")
     preferences: Mapped["Preferences"] = relationship(back_populates="users", cascade="all")
-    flashcards: Mapped["Flashcards"] = relationship(back_populates="users", cascade="all")
     liked_sets: Mapped["LikedSets"] = relationship(back_populates="users", cascade="all")
     reviews_sets: Mapped["ReviewsSets"] = relationship(back_populates="users", cascade="all")
     liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="users", cascade="all")
