@@ -1,21 +1,22 @@
 import datetime
+from typing import Tuple, Dict
 
 from flask import request
 from flask_bcrypt import generate_password_hash
-from jsonschema.validators import Draft7Validator
 from ulid import ULID
 
 from src.database.models import Users
-from src.utilities.json_schemas import register_schema
+from src.pydantic_models.registration_model import RegistrationModel
+from src.utilities.parsers import validate_json_body
 
 
 class UsersControllers:
 
     @staticmethod
-    def create_user(json_data):
+    def create_user(json_data) -> Users:
         hashed_password = generate_password_hash(json_data["password"]).decode("utf-8")
 
-        return Users(user_id=str(ULID), username=json_data["username"],  # type: ignore
+        return Users(user_id=str(ULID()), username=json_data["username"],  # type: ignore
                      name=json_data["name"], email=json_data["email"],
                      password=hashed_password, age=json_data.get("age", None),
                      gender=json_data.get("gender", None),
@@ -25,16 +26,9 @@ class UsersControllers:
                      marketing_consent=json_data["marketing_consent"])
 
     @classmethod
-    def register_user(cls):
+    def register_user(cls) -> Tuple[Dict[str, str], int]:
         json_data = request.get_json()
-        user = cls.create_user(json_data)
-        errors = cls.format_validation_errors(json_data)
-        return {"validation errors": errors}, 400
-
-    @classmethod
-    def format_validation_errors(cls, data):
-        validator = Draft7Validator(register_schema)
-        errors = []
-        for error in validator.iter_errors(data):
-            errors.append(error.message.replace("'", "").replace("is a", "").replace("is", "").replace("  ", " "))
-        return errors
+        errors = validate_json_body(json_data, RegistrationModel)  # type: ignore
+        if errors:
+            return {"validation errors": errors}, 422
+        return {"users": cls.create_user(json_data)}, 200
