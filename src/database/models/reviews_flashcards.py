@@ -15,6 +15,6 @@ class ReviewsFlashcards(db.Model):
     confidence: Mapped[int] = mapped_column(Integer, nullable=True)
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="sets", cascade="all")
-    sets: Mapped["Sets"] = relationship(back_populates="sets", cascade="all")
-    flashcards: Mapped["Flashcards"] = relationship(back_populates="sets", cascade="all")
+    users: Mapped["Users"] = relationship(back_populates="reviews_flashcards", cascade="all")
+    sets: Mapped["Sets"] = relationship(back_populates="reviews_flashcards", cascade="all")
+    flashcards: Mapped["Flashcards"] = relationship(back_populates="reviews_flashcards", cascade="all")
