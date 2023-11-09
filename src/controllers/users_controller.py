@@ -1,8 +1,5 @@
-import json
-
-from flask import request, jsonify
-from jsonschema.exceptions import ValidationError
-from jsonschema.validators import validate
+from flask import request
+from jsonschema.validators import Draft7Validator
 
 from src.utilities.json_schemas import register_schema
 
@@ -17,8 +14,13 @@ class UsersControllers:
     def register_user(cls):
         data = request.get_json()
 
-        try:
-            validate(data, register_schema)
-        except ValidationError as e:
-            error_message = "Input data does not conform to the schema: " + str(e)
-            return {"error": error_message}, 400
+        errors = cls.format_validation_errors(data)
+        return {"validation errors": errors}, 400
+
+    @classmethod
+    def format_validation_errors(cls, data):
+        validator = Draft7Validator(register_schema)
+        errors = []
+        for error in validator.iter_errors(data):
+            errors.append(error.message.replace("'", "").replace("is a", "").replace("is", "").replace("  ", " "))
+        return errors
