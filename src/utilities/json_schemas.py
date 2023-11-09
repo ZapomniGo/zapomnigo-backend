@@ -14,6 +14,7 @@ register_schema = {
         'terms_and_conditions': {'type': 'string'},
         'marketing_consent': {'type': 'string'}
     },
-    'required': ['name', "age"],
+    'required': ['username', 'name', 'email', 'password', 'privacy_policy', 'terms_and_conditions',
+                 'marketing_consent'],
     'additionalProperties': False
 }
