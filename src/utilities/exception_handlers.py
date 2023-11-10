@@ -1,6 +1,7 @@
 from traceback import format_exc
 
 from flask import request, Flask
+from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import HTTPException
 
 from src.config import IS_OFFLINE
@@ -23,6 +24,15 @@ class ExceptionHandlers:
         return content, 500
 
     @classmethod
+    def handle_unique_constraint_violation(cls, exc: IntegrityError):
+        error = str(exc)
+        start_index = error.find("DETAIL:") + len("DETAIL:")
+        end_index = error.find("[")
+        error_message = error[start_index:end_index].strip()
+        return {"error": error_message}, 409
+
+    @classmethod
     def register_error_handlers(cls, app: Flask):
         if IS_OFFLINE:
             app.register_error_handler(Exception, cls.handle_uncaught_exception)
+        app.register_error_handler(IntegrityError, cls.handle_unique_constraint_violation)
