@@ -11,6 +11,7 @@ class RegistrationModel(BaseModel):
     password: Annotated[str, Field(min_length=8, max_length=80)]
     age: int = Field(..., gt=5, le=99)
     gender: Literal["M", "F", "O"]
+    subscription_model: Literal["6 months", "1 month", "1 year"]
     privacy_policy: bool
     terms_and_conditions: bool
     marketing_consent: bool
