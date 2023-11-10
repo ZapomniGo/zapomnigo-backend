@@ -11,7 +11,6 @@ class Sets(db.Model):
     set_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     set_name: Mapped[str] = mapped_column(String(40), nullable=False)
     set_description: Mapped[str] = mapped_column(String(255), nullable=True)
-    set_creation_date: Mapped[str] = mapped_column(String(40), nullable=False)
     set_modification_date: Mapped[str] = mapped_column(String(40), nullable=False)
     set_category: Mapped[str] = mapped_column(ForeignKey("categories.category_id"))
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"))

@@ -14,7 +14,6 @@ class Users(db.Model):
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
-    user_creation_date: Mapped[str] = mapped_column(String(40), nullable=False)
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     subscription_date: Mapped[str] = mapped_column(String(40), nullable=False)
