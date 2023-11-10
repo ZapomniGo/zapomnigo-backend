@@ -5,7 +5,7 @@ from flask import request
 from flask_bcrypt import generate_password_hash
 from ulid import ULID
 
-from src.database.models import Users, SubscriptionModels
+from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
 from src.pydantic_models.registration_model import RegistrationModel
