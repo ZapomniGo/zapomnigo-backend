@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from pydantic import ValidationError, BaseModel
 
@@ -14,7 +14,7 @@ def eval_bool(bl: str | bool) -> bool:
             return False
 
 
-def validate_json_body(json_data: Dict[str, Any], pydantic_model: BaseModel):
+def validate_json_body(json_data: Dict[str, Any], pydantic_model: BaseModel) -> List[Dict[str, Any]] | None:
     try:
         pydantic_model.model_validate(json_data, strict=True)
         return None
