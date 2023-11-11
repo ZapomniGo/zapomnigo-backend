@@ -10,12 +10,17 @@ from src.database.models.base import db
 class Users(db.Model):
     user_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     username: Mapped[str] = mapped_column(String(40), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(40), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
-    user_creation_date: Mapped[str] = mapped_column(String(40), nullable=False)
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     subscription_date: Mapped[str] = mapped_column(String(40), nullable=False)
+    privacy_policy: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    terms_and_conditions: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    marketing_consent: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
     subscription_model_id: Mapped[str] = mapped_column(ForeignKey("subscription_models.subscription_model_id"))
 
     # Creates a bidirectional relationship between tables
@@ -25,7 +30,6 @@ class Users(db.Model):
     comments: Mapped["Comments"] = relationship(back_populates="users", cascade="all")
     folders: Mapped["Folders"] = relationship(back_populates="users", cascade="all")
     preferences: Mapped["Preferences"] = relationship(back_populates="users", cascade="all")
-    flashcards: Mapped["Flashcards"] = relationship(back_populates="users", cascade="all")
     liked_sets: Mapped["LikedSets"] = relationship(back_populates="users", cascade="all")
     reviews_sets: Mapped["ReviewsSets"] = relationship(back_populates="users", cascade="all")
     liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="users", cascade="all")

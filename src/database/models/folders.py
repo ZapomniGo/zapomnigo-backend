@@ -9,7 +9,6 @@ from src.database.models.base import db
 @dataclass
 class Folders(db.Model):
     folder_id: Mapped[str] = mapped_column(String(26), primary_key=True)
-    folder_creation_date: Mapped[str] = mapped_column(String(40), nullable=False)
     folder_modification_date: Mapped[str] = mapped_column(String(40), nullable=False)
     folder_title: Mapped[str] = mapped_column(String(40), nullable=False)
     folder_description: Mapped[str] = mapped_column(String(255))

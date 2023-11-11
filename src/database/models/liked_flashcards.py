@@ -14,6 +14,6 @@ class LikedFlashcards(db.Model):
     flashcard_id: Mapped[str] = mapped_column(ForeignKey("flashcards.flashcard_id"))
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="sets", cascade="all")
-    sets: Mapped["Sets"] = relationship(back_populates="sets", cascade="all")
-    flashcards: Mapped["Flashcards"] = relationship(back_populates="sets", cascade="all")
+    users: Mapped["Users"] = relationship(back_populates="liked_flashcards", cascade="all")
+    sets: Mapped["Sets"] = relationship(back_populates="liked_flashcards", cascade="all")
+    flashcards: Mapped["Flashcards"] = relationship(back_populates="liked_flashcards", cascade="all")
