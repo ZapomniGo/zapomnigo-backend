@@ -16,7 +16,7 @@ class UsersController:
 
     @staticmethod
     def create_user(json_data) -> Users:
-        hashed_password = generate_password_hash(json_data["password"]).decode("utf-8")
+        hashed_password = generate_password_hash(json_data["password"], rounds=15).decode("utf-8")
         subscription_model_id = SubscriptionModelsRepository.get_subscription_model_id(json_data["subscription_model"])
 
         return Users(user_id=str(ULID()), username=json_data["username"],  # type: ignore
