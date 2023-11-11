@@ -12,7 +12,7 @@ from src.pydantic_models.registration_model import RegistrationModel
 from src.utilities.parsers import validate_json_body
 
 
-class UsersControllers:
+class UsersController:
 
     @staticmethod
     def create_user(json_data) -> Users:
