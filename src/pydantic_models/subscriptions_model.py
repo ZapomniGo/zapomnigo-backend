@@ -4,4 +4,4 @@ from pydantic import BaseModel
 
 
 class SubscriptionModel(BaseModel):
-    subscription_models: Literal["6 months", "1 month", "1 year"]
+    subscription_model: Literal["6 months", "1 month", "1 year"]
