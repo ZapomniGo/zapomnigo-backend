@@ -24,7 +24,7 @@ class ExceptionHandlers:
         return content, 500
 
     @classmethod
-    def handle_unique_constraint_violation(cls, exc: IntegrityError):
+    def handle_sqlalchemy_integrity_error(cls, exc: IntegrityError):
         error = str(exc)
         start_index = error.find("DETAIL:") + len("DETAIL:")
         end_index = error.find("[")
@@ -35,4 +35,5 @@ class ExceptionHandlers:
     def register_error_handlers(cls, app: Flask):
         if IS_OFFLINE:
             app.register_error_handler(Exception, cls.handle_uncaught_exception)
-        app.register_error_handler(IntegrityError, cls.handle_unique_constraint_violation)
+
+        app.register_error_handler(IntegrityError, cls.handle_sqlalchemy_integrity_error)
