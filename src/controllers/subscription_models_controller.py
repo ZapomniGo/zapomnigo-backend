@@ -1,4 +1,4 @@
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Any
 
 from flask import request
 from ulid import ULID
@@ -17,7 +17,7 @@ class SubscriptionModelsController:
                                   subscription_model=json_data["subscription_model"])
 
     @classmethod
-    def add_subscription_model(cls) -> Tuple[Dict[str, str], int]:
+    def add_subscription_model(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
         validation_errors = validate_json_body(json_data, SubscriptionModel)  # type: ignore
         if validation_errors:
