@@ -8,6 +8,7 @@ from ulid import ULID
 from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
+from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
@@ -43,7 +44,23 @@ class UsersController:
     @classmethod
     def login_user(cls):
         json_data = request.get_json()
-
         validation_errors = validate_json_body(json_data, LoginModel)  # type: ignore
         if validation_errors:
             return {"validation errors": validation_errors}, 422
+
+        if not cls.check_if_user_exists(json_data):
+            return {"message": "user doesn't exist"}, 404
+
+        return {"message": "user logged in"}, 200
+
+    @classmethod
+    def check_if_user_exists(cls,json_data):
+        email_or_username = json_data["email_or_username"]
+
+        if UsersRepository.get_user_by_username(email_or_username):
+            return True
+
+        elif UsersRepository.get_user_by_email(email_or_username):
+            return True
+
+        return False
