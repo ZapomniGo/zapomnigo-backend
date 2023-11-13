@@ -33,6 +33,7 @@ class UsersController:
     @classmethod
     def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
+
         validation_errors = validate_json_body(json_data, RegistrationModel)  # type: ignore
         if validation_errors:
             return {"validation errors": validation_errors}, 422
@@ -44,6 +45,7 @@ class UsersController:
     @classmethod
     def login_user(cls):
         json_data = request.get_json()
+
         validation_errors = validate_json_body(json_data, LoginModel)  # type: ignore
         if validation_errors:
             return {"validation errors": validation_errors}, 422
