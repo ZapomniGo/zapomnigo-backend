@@ -1,5 +1,5 @@
 import datetime
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Any
 
 from flask import request
 from flask_bcrypt import generate_password_hash
@@ -8,7 +8,7 @@ from ulid import ULID
 from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
-from src.pydantic_models.registration_model import RegistrationModel
+from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -30,7 +30,7 @@ class UsersController:
                      marketing_consent=json_data["marketing_consent"])
 
     @classmethod
-    def register_user(cls) -> Tuple[Dict[str, str], int]:
+    def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
         validation_errors = validate_json_body(json_data, RegistrationModel)  # type: ignore
         if validation_errors:
@@ -39,3 +39,11 @@ class UsersController:
         CommonRepository.add_object_to_db(cls.create_user(json_data))
 
         return {"message": "user added to db"}, 200
+
+    @classmethod
+    def login_user(cls):
+        json_data = request.get_json()
+
+        validation_errors = validate_json_body(json_data, LoginModel)  # type: ignore
+        if validation_errors:
+            return {"validation errors": validation_errors}, 422

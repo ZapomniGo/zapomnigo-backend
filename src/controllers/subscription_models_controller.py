@@ -5,7 +5,7 @@ from ulid import ULID
 
 from src.database.models import SubscriptionModels
 from src.database.repositories.common_repository import CommonRepository
-from src.pydantic_models.subscriptions_model import SubscriptionModel
+from src.pydantic_models import SubscriptionModel
 from src.utilities.parsers import validate_json_body
 
 
