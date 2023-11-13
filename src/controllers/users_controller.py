@@ -2,7 +2,7 @@ import datetime
 from typing import Tuple, Dict, Any
 
 from flask import request
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 from ulid import ULID
 
 from src.database.models import Users
@@ -48,19 +48,24 @@ class UsersController:
         if validation_errors:
             return {"validation errors": validation_errors}, 422
 
-        if not cls.check_if_user_exists(json_data):
+        user = cls.check_if_user_exists(json_data)
+        if not user:
             return {"message": "user doesn't exist"}, 404
+
+        hashed_user_password = user.password
+        if not check_password_hash(hashed_user_password, json_data["password"]):
+            return {"message": "invalid password"}, 401
 
         return {"message": "user logged in"}, 200
 
     @classmethod
-    def check_if_user_exists(cls,json_data):
+    def check_if_user_exists(cls, json_data) -> Users | None:
         email_or_username = json_data["email_or_username"]
 
-        if UsersRepository.get_user_by_username(email_or_username):
-            return True
+        if user := UsersRepository.get_user_by_username(email_or_username):
+            return user
 
-        elif UsersRepository.get_user_by_email(email_or_username):
-            return True
+        elif user := UsersRepository.get_user_by_email(email_or_username):
+            return user
 
-        return False
+        return None
