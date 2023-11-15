@@ -70,8 +70,8 @@ class UsersController:
     @classmethod
     def logout(cls) -> Response:
         response = make_response({"message": "user logged out"}, 200)
-        response.set_cookie('access_token', '', expires=0, httponly=True, samesite='Strict')
-        response.set_cookie('refresh_token', '', expires=0, httponly=True, samesite='Strict')
+        response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
         return response
 
     @classmethod
