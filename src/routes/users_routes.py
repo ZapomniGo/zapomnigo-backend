@@ -18,5 +18,5 @@ def login() -> Response | Tuple[Dict[str, Any], int]:
 
 
 @users_bp.post("/logout")
-def login() -> Response:
+def logout() -> Response:
     return c.logout()
