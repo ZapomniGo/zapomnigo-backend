@@ -1,34 +1,35 @@
 from datetime import datetime, timedelta
-from os import getenv
 
 import jwt
 
-from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig
+from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig, SECRET_KEY
 from src.database.models import Users
 
 
-def create_access_jwt_token(user: Users, raw_password: str) -> str:
+def create_access_jwt_token(**kwargs) -> str:
+    user: Users = kwargs.get("user")
+    raw_password: str = kwargs.get("password")
+    sub: str = kwargs.get("sub")
+
+    if user:
+        sub = user.user_id
+
     if ADMIN_EMAIL == user.email and ADMIN_PASSWORD == raw_password:
 
-        payload = {"sub": user.user_id,
-                   "name": f"{user.name}", "admin": True,
+        payload = {"sub": sub, "admin": True,
                    "exp": datetime.utcnow() + timedelta(hours=1)}
 
     else:
-        payload = {"sub": user.user_id,
-                   "name": f"{user.name}", "admin": False,
+        payload = {"sub": sub, "admin": False,
                    "exp": datetime.utcnow() + timedelta(hours=1)}
 
-    if IS_OFFLINE:
-        token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
-    else:
-        token = jwt.encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
     return token
 
 
-def create_refresh_jwt_token(user: Users) -> str:
-    payload = {"sub": user.user_id,
+def create_refresh_jwt_token(user_id: str) -> str:
+    payload = {"sub": user_id,
                "exp": datetime.utcnow() + timedelta(days=30)}
 
     if IS_OFFLINE:
