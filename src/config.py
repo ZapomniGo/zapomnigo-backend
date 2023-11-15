@@ -8,6 +8,11 @@ load_dotenv()
 
 IS_OFFLINE = eval_bool(getenv("IS_OFFLINE", False))
 
+# There could be a better way.
+# I decided to do it like this in order not to make requests to the database.
+ADMIN_EMAIL = getenv("ADMIN_EMAIL")
+ADMIN_PASSWORD = getenv("ADMIN_PASSWORD")
+
 
 class DevConfig:
     SECRET_KEY = getenv("DEV_SECRET_KEY")
