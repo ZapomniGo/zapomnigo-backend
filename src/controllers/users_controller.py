@@ -65,6 +65,7 @@ class UsersController:
         response = make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="Strict")
+        return response
 
     @classmethod
     def check_if_user_exists(cls, json_data) -> Users | None:
