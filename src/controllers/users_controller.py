@@ -1,7 +1,7 @@
 import datetime
 from typing import Tuple, Dict, Any
 
-from flask import request, make_response
+from flask import request, make_response, Response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ulid import ULID
 
@@ -44,7 +44,7 @@ class UsersController:
         return {"message": "user added to db"}, 200
 
     @classmethod
-    def login_user(cls):
+    def login_user(cls) -> Response | Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         validation_errors = validate_json_body(json_data, LoginModel)  # type: ignore
@@ -65,6 +65,13 @@ class UsersController:
         response = make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="Strict")
+        return response
+
+    @classmethod
+    def logout(cls) -> Response:
+        response = make_response({"message": "user logged out"}, 200)
+        response.set_cookie('access_token', '', expires=0, httponly=True, samesite='Strict')
+        response.set_cookie('refresh_token', '', expires=0, httponly=True, samesite='Strict')
         return response
 
     @classmethod

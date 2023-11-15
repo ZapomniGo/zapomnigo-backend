@@ -1,6 +1,6 @@
 from typing import Tuple, Dict, Any
 
-from flask import Blueprint
+from flask import Blueprint, Response
 
 from src.controllers import UsersController as c
 
@@ -13,5 +13,10 @@ def register() -> Tuple[Dict[str, Any], int]:
 
 
 @users_bp.post("/login")
-def login() -> Tuple[Dict[str, Any], int]:
+def login() -> Response | Tuple[Dict[str, Any], int]:
     return c.login_user()
+
+
+@users_bp.post("/logout")
+def login() -> Response:
+    return c.logout()
