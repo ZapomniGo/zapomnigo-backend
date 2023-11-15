@@ -6,7 +6,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
 from ulid import ULID
 
-from src.auth.jwt_creation import create_access_jwt_token, create_refresh_jwt_token
+from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
 from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
@@ -61,8 +61,8 @@ class UsersController:
         if not check_password_hash(hashed_user_password, json_data["password"]):
             return {"message": "invalid password"}, 401
 
-        access_token = create_access_jwt_token(user=user, password=json_data["password"])
-        refresh_token = create_refresh_jwt_token(user.user_id)
+        access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
+        refresh_token = JwtCreation.create_refresh_jwt_token(user.user_id)
 
         response = make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
@@ -81,8 +81,10 @@ class UsersController:
         refresh_token = request.cookies.get('refresh_token')
         decoded_token = decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
 
-        new_access_token = create_access_jwt_token(sub=decoded_token.get("sub"))
-        new_refresh_token = create_refresh_jwt_token(decoded_token.get("sub"))
+        # TODO: Implement Refresh Token Reuse Detection with Redis
+
+        new_access_token = JwtCreation.create_access_jwt_token(sub=decoded_token.get("sub"))
+        new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("sub"))
 
         response = make_response({'message': 'Token refreshed'}, 200)
         response.set_cookie('access_token', new_access_token, httponly=True, secure=True, samesite='Strict')
