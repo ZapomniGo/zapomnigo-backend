@@ -1,10 +1,11 @@
 import datetime
 from typing import Tuple, Dict, Any
 
-from flask import request
+from flask import request, make_response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ulid import ULID
 
+from src.auth.jwt_creation import create_access_jwt_token, create_refresh_jwt_token
 from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
@@ -58,7 +59,12 @@ class UsersController:
         if not check_password_hash(hashed_user_password, json_data["password"]):
             return {"message": "invalid password"}, 401
 
-        return {"message": "user logged in"}, 200
+        access_token = create_access_jwt_token(user, json_data["password"])
+        refresh_token = create_refresh_jwt_token(user)
+
+        response = make_response({"message": "user logged in"}, 200)
+        response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="Strict")
 
     @classmethod
     def check_if_user_exists(cls, json_data) -> Users | None:
