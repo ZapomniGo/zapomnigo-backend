@@ -3,9 +3,11 @@ from typing import Tuple, Dict, Any
 
 from flask import request, make_response, Response
 from flask_bcrypt import generate_password_hash, check_password_hash
+from jwt import decode
 from ulid import ULID
 
 from src.auth.jwt_creation import create_access_jwt_token, create_refresh_jwt_token
+from src.config import SECRET_KEY
 from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
@@ -59,8 +61,8 @@ class UsersController:
         if not check_password_hash(hashed_user_password, json_data["password"]):
             return {"message": "invalid password"}, 401
 
-        access_token = create_access_jwt_token(user, json_data["password"])
-        refresh_token = create_refresh_jwt_token(user)
+        access_token = create_access_jwt_token(user=user, password=json_data["password"])
+        refresh_token = create_refresh_jwt_token(user.user_id)
 
         response = make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
@@ -72,6 +74,20 @@ class UsersController:
         response = make_response({"message": "user logged out"}, 200)
         response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
         response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+        return response
+
+    @classmethod
+    def refresh_token(cls) -> Response:
+        refresh_token = request.cookies.get('refresh_token')
+        decoded_token = decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
+
+        new_access_token = create_access_jwt_token(sub=decoded_token.get("sub"))
+        new_refresh_token = create_refresh_jwt_token(decoded_token.get("sub"))
+
+        response = make_response({'message': 'Token refreshed'}, 200)
+        response.set_cookie('access_token', new_access_token, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite='Strict')
+
         return response
 
     @classmethod

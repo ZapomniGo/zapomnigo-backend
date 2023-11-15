@@ -20,3 +20,8 @@ def login() -> Response | Tuple[Dict[str, Any], int]:
 @users_bp.post("/logout")
 def logout() -> Response:
     return c.logout()
+
+
+@users_bp.post("/refresh")
+def refresh():
+    return c.refresh_token()
