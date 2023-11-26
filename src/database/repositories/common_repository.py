@@ -10,3 +10,8 @@ class CommonRepository:
     @classmethod
     def get_all_objects_from_db(cls, obj):
         return db.session.query(obj).all()
+
+    @classmethod
+    def delete_object_from_db(cls, obj):
+        db.session.delete(obj)
+        db.session.commit()

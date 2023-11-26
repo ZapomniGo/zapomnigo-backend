@@ -23,3 +23,8 @@ def get_organization(organization_id: str) -> Tuple[Dict[str, Any], int]:
 @admin_required
 def register_organization() -> Tuple[Dict[str, Any], int]:
     return c.add_organization()
+
+
+@organizations_bp.delete("/organizations/<organization_id>")
+def delete_organization(organization_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.delete_organization(organization_id)

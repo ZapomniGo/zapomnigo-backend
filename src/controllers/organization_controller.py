@@ -43,3 +43,11 @@ class OrganizationsController:
         CommonRepository.add_object_to_db(cls.create_organization(json_data))
 
         return {"message": "organization added to db"}, 200
+
+    @classmethod
+    def delete_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
+        if organization := OrganizationsRepository.get_organization_by_id(organization_id):
+            CommonRepository.delete_object_from_db(organization)
+            return {"message": "organization successfully deleted"}, 200
+
+        return {"message": "organization with such id doesn't exist"}, 404
