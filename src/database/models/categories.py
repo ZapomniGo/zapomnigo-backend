@@ -1,12 +1,9 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models.base import db
 
 
-@dataclass
 class Categories(db.Model):
     category_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     category_name: Mapped[str] = mapped_column(String(40), nullable=False)

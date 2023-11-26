@@ -1,12 +1,9 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
 
 
-@dataclass
 class ReviewsFlashcards(db.Model):
     liked_flashcard_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"))

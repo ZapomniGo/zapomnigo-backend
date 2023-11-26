@@ -1,12 +1,9 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String, Boolean, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
 
 
-@dataclass
 class Users(db.Model):
     user_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     user_photo: Mapped[str] = mapped_column(String, nullable=True)

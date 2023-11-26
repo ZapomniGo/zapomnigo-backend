@@ -1,12 +1,9 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
 
 
-@dataclass
 class FoldersSets(db.Model):
     folder_set_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     folder_id: Mapped[str] = mapped_column(ForeignKey("folders.folder_id"))
