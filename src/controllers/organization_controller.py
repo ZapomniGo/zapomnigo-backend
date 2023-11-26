@@ -4,9 +4,10 @@ from flask import request
 from ulid import ULID
 
 from src.database.models import Organizations
-from src.database.repositories import OrganizationsRepository, SubscriptionModelsRepository
+from src.database.repositories import OrganizationsRepository
 from src.database.repositories.common_repository import CommonRepository
-from src.pydantic_models.organization_model import OrganizationModel
+from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
+from src.pydantic_models.organization_model import OrganizationModel, UpdateOrganizationModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -23,7 +24,7 @@ class OrganizationsController:
         if organization := OrganizationsRepository.get_organization_by_id(organization_id):
             return {"organization": organization.to_json()}, 200
 
-        return {"message": "organization with such id doesn't exist"}, 404
+        return {"message": "Organization with such id doesn't exist"}, 404
 
     @staticmethod
     def create_organization(json_data):
@@ -36,18 +37,31 @@ class OrganizationsController:
     @classmethod
     def add_organization(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
-        validation_errors = validate_json_body(json_data, OrganizationModel)  # type: ignore
-        if validation_errors:
+        if validation_errors := validate_json_body(json_data, OrganizationModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
         CommonRepository.add_object_to_db(cls.create_organization(json_data))
 
-        return {"message": "organization added to db"}, 200
+        return {"message": "Organization added to db"}, 200
 
     @classmethod
     def delete_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
         if organization := OrganizationsRepository.get_organization_by_id(organization_id):
             CommonRepository.delete_object_from_db(organization)
-            return {"message": "organization successfully deleted"}, 200
+            return {"message": "Organization successfully deleted"}, 200
 
-        return {"message": "organization with such id doesn't exist"}, 404
+        return {"message": "Organization with such id doesn't exist"}, 404
+
+    @classmethod
+    def update_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+        organization = OrganizationsRepository.get_organization_by_id(organization_id)
+
+        if not organization:
+            return {"message": "Organization with such id doesn't exist"}, 404
+
+        if validation_errors := validate_json_body(json_data, UpdateOrganizationModel):  # type: ignore
+            return {"validation errors": validation_errors}, 422
+
+        OrganizationsRepository.edit_organization(organization, json_data)
+        return {"message": "Organization successfully updated"}, 200
