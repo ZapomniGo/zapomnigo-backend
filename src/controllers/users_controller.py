@@ -65,7 +65,7 @@ class UsersController:
         refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
 
         response = make_response({"message": "user logged in"}, 200)
-        response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
+        response.set_cookie('access_token', access_token, secure=True, samesite="Strict")
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="Strict")
         return response
 
