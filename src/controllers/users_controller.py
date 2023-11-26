@@ -1,14 +1,18 @@
 import datetime
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Any
 
-from flask import request
-from flask_bcrypt import generate_password_hash
+from flask import request, make_response, Response
+from flask_bcrypt import generate_password_hash, check_password_hash
+from jwt import decode
 from ulid import ULID
 
+from src.auth.jwt_creation import JwtCreation
+from src.config import SECRET_KEY
 from src.database.models import Users
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
-from src.pydantic_models.registration_model import RegistrationModel
+from src.database.repositories.users_repository import UsersRepository
+from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -30,8 +34,9 @@ class UsersController:
                      marketing_consent=json_data["marketing_consent"])
 
     @classmethod
-    def register_user(cls) -> Tuple[Dict[str, str], int]:
+    def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
+
         validation_errors = validate_json_body(json_data, RegistrationModel)  # type: ignore
         if validation_errors:
             return {"validation errors": validation_errors}, 422
@@ -39,3 +44,62 @@ class UsersController:
         CommonRepository.add_object_to_db(cls.create_user(json_data))
 
         return {"message": "user added to db"}, 200
+
+    @classmethod
+    def login_user(cls) -> Response | Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+
+        validation_errors = validate_json_body(json_data, LoginModel)  # type: ignore
+        if validation_errors:
+            return {"validation errors": validation_errors}, 422
+
+        user = cls.check_if_user_exists(json_data)
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        hashed_user_password = user.password
+        if not check_password_hash(hashed_user_password, json_data["password"]):
+            return {"message": "invalid password"}, 401
+
+        access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
+        refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
+
+        response = make_response({"message": "user logged in"}, 200)
+        response.set_cookie('access_token', access_token, secure=True, samesite="Strict")
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="Strict")
+        return response
+
+    @classmethod
+    def logout(cls) -> Response:
+        response = make_response({"message": "user logged out"}, 200)
+        response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+        return response
+
+    @classmethod
+    def refresh_token(cls) -> Response:
+        refresh_token = request.cookies.get('refresh_token')
+        decoded_token = decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
+
+        # TODO: Implement Refresh Token Reuse Detection with Redis
+
+        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"))
+        new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
+
+        response = make_response({'message': 'Token refreshed'}, 200)
+        response.set_cookie('access_token', new_access_token, secure=True, samesite='Strict')
+        response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite='Strict')
+
+        return response
+
+    @classmethod
+    def check_if_user_exists(cls, json_data) -> Users | None:
+        email_or_username = json_data["email_or_username"]
+
+        if user := UsersRepository.get_user_by_username(email_or_username):
+            return user
+
+        elif user := UsersRepository.get_user_by_email(email_or_username):
+            return user
+
+        return None
