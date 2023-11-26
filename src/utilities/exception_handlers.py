@@ -42,7 +42,7 @@ class ExceptionHandlers:
 
     @classmethod
     def handle_decode_error(cls, exc: DecodeError):
-        return {"Message": "Invalid or missing auth token."}, 401
+        return {"Message": "Invalid or missing auth token."}, 499
 
     @classmethod
     def register_error_handlers(cls, app: Flask):
