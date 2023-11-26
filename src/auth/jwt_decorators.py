@@ -1,3 +1,5 @@
+from functools import wraps
+
 import jwt
 from flask import request
 
@@ -5,7 +7,8 @@ from src.config import SECRET_KEY
 
 
 def admin_required(f):
-    def wrapper(*args, **kwargs):
+    @wraps(f)
+    def admin_token_check(*args, **kwargs):
         access_token = request.cookies.get("access_token")
         if access_token:
 
@@ -18,10 +21,11 @@ def admin_required(f):
         else:
             return {"message": "No auth token provided."}, 499
 
-    return wrapper
+    return admin_token_check
 
 
 def jwt_required(f):
+    @wraps(f)
     def wrapper(*args, **kwargs):
         access_token = request.cookies.get("access_token")
 
