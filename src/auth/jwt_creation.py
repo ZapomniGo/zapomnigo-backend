@@ -18,7 +18,7 @@ class JwtCreation:
 
         if username:
             user = UsersRepository.get_user_by_username(username)
-            is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, ADMIN_PASSWORD))
+            is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
         else:
             is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
             username = user.username
