@@ -34,15 +34,16 @@ class ExceptionHandlers:
 
     @classmethod
     def handle_token_expired_exception(cls, exc: ExpiredSignatureError):
-        return {"Message": "Auth token expired."}, 498
+        return {"message": "Auth token expired."}, 498
 
     @classmethod
     def handle_invalid_signature(cls, exd: InvalidSignatureError):
-        return {"Message": "Invalid token signature."}, 401
+        return {"message": "Invalid token signature."}, 401
 
     @classmethod
     def handle_decode_error(cls, exc: DecodeError):
-        return {"Message": "Invalid or missing auth token."}, 499
+        return {"message": "Invalid or missing auth token."}, 499
+
 
     @classmethod
     def register_error_handlers(cls, app: Flask):
