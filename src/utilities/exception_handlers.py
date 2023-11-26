@@ -27,6 +27,7 @@ class ExceptionHandlers:
 
     @classmethod
     def handle_sqlalchemy_integrity_error(cls, exc: IntegrityError):
+        db.session.rollback()
         error = str(exc)
         start_index = error.find("DETAIL:") + len("DETAIL:")
         end_index = error.find("[")
