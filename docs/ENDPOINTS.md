@@ -67,6 +67,10 @@ Responses:
 ```
 * `refresh_token`: SameSite="Strict", Secure=True, HttpOnly=True
 
+Example body:
+```json
+{"email_or_username":"test4@test.com","password": "T3stpswd"}
+```
 
 ### `POST /logout` logs out the user
 
