@@ -9,7 +9,8 @@ from ulid import ULID
 from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
 from src.database.models import Users
-from src.database.repositories import CommonRepository, SubscriptionModelsRepository, UsersRepository
+from src.database.repositories import CommonRepository,  UsersRepository
+from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
