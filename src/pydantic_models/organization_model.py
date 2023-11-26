@@ -1,9 +1,20 @@
-from typing import Annotated, Literal
+from typing import Optional
 
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, ConfigDict
+
+from src.pydantic_models.common import NAME
+from src.pydantic_models.subscription_model import SUBSCRIPTION_MODELS
 
 
 class OrganizationModel(BaseModel):
-    organization_name: Annotated[str, StringConstraints(min_length=2, max_length=40)]  # type: ignore
+    organization_name: NAME
     organization_domain: str
-    subscription_model: Literal["6 months", "1 month", "1 year", "Free trial"]
+    subscription_model: SUBSCRIPTION_MODELS
+
+
+class UpdateOrganizationModel(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+
+    organization_name: Optional[NAME] = None
+    organization_domain: Optional[str] = None
+    subscription_model: Optional[SUBSCRIPTION_MODELS] = None
