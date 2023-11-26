@@ -14,3 +14,9 @@ class Organizations(db.Model):
     subscription_models: Mapped["SubscriptionModels"] = relationship(back_populates="organizations", cascade="all")
     organizations_users: Mapped["OrganizationsUsers"] = relationship(back_populates="organizations",
                                                                      cascade="all")
+
+    def to_json(self):
+        return {"organization_id": "organization_id",
+                "organization_name": self.organization_name,
+                "organization_domain": self.organization_domain,
+                "subscription_model_id": self.subscription_model_id}
