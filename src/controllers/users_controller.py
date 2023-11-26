@@ -62,7 +62,7 @@ class UsersController:
             return {"message": "invalid password"}, 401
 
         access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
-        refresh_token = JwtCreation.create_refresh_jwt_token(user.user_id)
+        refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
 
         response = make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite="Strict")
@@ -83,11 +83,11 @@ class UsersController:
 
         # TODO: Implement Refresh Token Reuse Detection with Redis
 
-        new_access_token = JwtCreation.create_access_jwt_token(sub=decoded_token.get("sub"))
-        new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("sub"))
+        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"))
+        new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
 
         response = make_response({'message': 'Token refreshed'}, 200)
-        response.set_cookie('access_token', new_access_token, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie('access_token', new_access_token, secure=True, samesite='Strict')
         response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite='Strict')
 
         return response
