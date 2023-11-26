@@ -9,6 +9,7 @@ from src.database.models.base import db
 @dataclass
 class Users(db.Model):
     user_id: Mapped[str] = mapped_column(String(26), primary_key=True)
+    user_photo: Mapped[str] = mapped_column(String, nullable=True)
     username: Mapped[str] = mapped_column(String(40), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(40), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
@@ -16,7 +17,7 @@ class Users(db.Model):
     age: Mapped[int] = mapped_column(Integer, nullable=True)
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
-    subscription_date: Mapped[str] = mapped_column(String(40), nullable=False)
+    subscription_date: Mapped[str] = mapped_column(String(40), nullable=True)
     privacy_policy: Mapped[bool] = mapped_column(Boolean, nullable=False)
     terms_and_conditions: Mapped[bool] = mapped_column(Boolean, nullable=False)
     marketing_consent: Mapped[bool] = mapped_column(Boolean, nullable=False)

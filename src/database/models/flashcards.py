@@ -11,6 +11,7 @@ class Flashcards(db.Model):
     flashcard_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     term: Mapped[str] = mapped_column(String(40), nullable=True)
     definition: Mapped[str] = mapped_column(String(255), nullable=True)
+    notes: Mapped[str] = mapped_column(String(255), nullable=True)
     set_id: Mapped[str] = mapped_column(ForeignKey("sets.set_id"))
 
     # Creates a bidirectional relationship between tables
