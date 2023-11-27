@@ -1,12 +1,9 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
 
 
-@dataclass
 class Folders(db.Model):
     folder_id: Mapped[str] = mapped_column(String(26), primary_key=True)
     folder_modification_date: Mapped[str] = mapped_column(String(40), nullable=False)

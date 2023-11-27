@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import HTTPException
 
 from src.config import IS_OFFLINE
+from src.database.models.base import db
 
 
 class ExceptionHandlers:
@@ -21,11 +22,12 @@ class ExceptionHandlers:
                    "url": str(request.url),
                    "body": None if request.data == b'' else str(request.get_json()),
                    "stacktrace": format_exc()}
-
+        db.session.rollback()
         return content, 500
 
     @classmethod
     def handle_sqlalchemy_integrity_error(cls, exc: IntegrityError):
+        db.session.rollback()
         error = str(exc)
         start_index = error.find("DETAIL:") + len("DETAIL:")
         end_index = error.find("[")
@@ -43,7 +45,6 @@ class ExceptionHandlers:
     @classmethod
     def handle_decode_error(cls, exc: DecodeError):
         return {"message": "Invalid or missing auth token."}, 499
-
 
     @classmethod
     def register_error_handlers(cls, app: Flask):

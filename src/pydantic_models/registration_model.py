@@ -1,12 +1,13 @@
 import string
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, StringConstraints, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from src.pydantic_models.common import NAME
 
 
 class RegistrationModel(BaseModel):
-    name: Annotated[str, StringConstraints(min_length=2, max_length=40)]  # type: ignore
-    username: Annotated[str, StringConstraints(min_length=2, max_length=40)]  # type: ignore
+    name: NAME  # type: ignore
+    username: NAME  # type: ignore
     email: EmailStr
     password: Annotated[str, Field(min_length=8, max_length=80)]
     age: int = Field(..., gt=5, le=99)
