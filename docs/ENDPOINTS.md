@@ -84,3 +84,69 @@ Responses:
 * `{"message": "Auth token expired."}, 498`
 * `{"message": "Invalid or missing auth token."}, 499`
 * `{"message": "Invalid token signature."}, 401`
+
+### `GET /organizations` get a list of all organizations
+
+Responses:
+* 200 Status code
+```json
+    "organizations": [
+        {
+            "organization_domain": "aubg.edu",
+            "organization_id": "01HG6QGNWTZK2N0TBQCHDEWAJQ",
+            "organization_name": "AUBG",
+            "subscription_model_id": "01HG6QGEK1GEYDSQ34HKS637AR"
+        }
+    ]
+```
+* `{"message": "No organizations were found"}, 404`
+
+### `GET /organization/id` get info for a specific organization
+
+Responses 
+* 200
+```json
+    "organization": {
+        "organization_domain": "aubg.edu",
+        "organization_id": "01HG6QGNWTZK2N0TBQCHDEWAJQ",
+        "organization_name": "AUBG",
+        "subscription_model_id": "01HG6QGEK1GEYDSQ34HKS637AR"
+    }
+```
+* `{"message": "Organization with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+
+### `DELETE /organization/id` - deletes an organization by id
+
+Responses:
+* `{"message": "Organization successfully deleted"}, 200`
+* `{"message": "Organization with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+
+### `POST /organizations` - create an organization
+
+Responses:
+* `{"message": "Organization added to db"}, 200`
+* 422, 409
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body:
+
+```json
+{"organization_name": "AUBG",
+"organization_domain": "aubg.edu",
+"subscription_model": "Free trial"}
+```
+
+### `PUT /organization/id` - edit organization info
+
+Responses:
+* `{"message": "Organization successfully updated"}, 200`
+* `{"message": "Organization with such id doesn't exist"}, 404`
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body: (You pass only the fields you wand to change)
+```json
+{"organization_name": "Nasko"}
+```
