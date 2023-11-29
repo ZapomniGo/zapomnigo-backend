@@ -1,15 +1,13 @@
 # Endpoints:
 ### Base url `localhost:5000/v1`
+### Common Responses:
+* 498 Status code`{"message": "Auth token expired."}`
+* 499 Status code `{"message": "Invalid or missing auth token."}`
+* 401 Status code not on `/login` -> `{"message": "Invalid token signature."}`
+* 403 Status code `{"message": "Admin privileges required."}`
+* 422 Status code: Validation errors when parsing the json body. The keys are the fields passed in the json body.
 
-### `GET /health` - could be used for e heartbeat service
-Responses: `{"status": healthy}, 200`
-
-### `POST /register` - Used to register a new user
-
-Responses:
-* `{"message": "user added to db"}, 200`
-* `{"error": "Key (username)=(test_username) already exists."}, 409` - this is valid for email as well
-* `{"validation errors": list of dictionaries}, 422`
+`{"validation errors": list of dictionaries}`
 ```json
 {
     "validation errors": [
@@ -18,10 +16,25 @@ Responses:
         },
         {
             "gender": "Input should be 'M', 'F' or 'O'"
+        },
+        {
+            "organization_name": "String should have at least 2 characters"
+        },
+        {
+            "test_field": "Extra inputs are not permitted"
         }
     ]
 }
 ```
+### `GET /health` - could be used for e heartbeat service
+Responses: `{"status": healthy}, 200`
+
+### `POST /register` - Used to register a new user
+
+Responses:
+* `{"message": "user added to db"}, 200`
+* `{"error": "Key (username)=(test_username) already exists."}, 409` - this is valid for `email` as well
+* 422
 
 Example body:
 ```json
@@ -40,8 +53,7 @@ Example body:
 ```
 ### `POST /subscription-models` - used to add a new subscription model to the DB
 
-Responses: `200`, `422`, `409`. The same as the previous endpoint.
-Also we have `{"message": "Admin privileges required."}, 403` 
+Responses: `200`, `422`, `409`, `403`. The same as the previous endpoint.
 
 Example body: 
 ```json
@@ -78,9 +90,9 @@ Responses:
 
 Responses:
 * `{"message": "Token refreshed"}, 200` and the two new JWT tokens as cookies
-* `{"message": "Auth token expired."}, 498`
-* `{"message": "Invalid or missing auth token."}, 499`
-* `{"message": "Invalid token signature."}, 401`
+* 498
+* 499
+* 401
 
 ### `GET /organizations` get a list of all organizations
 
@@ -124,7 +136,9 @@ Responses:
 
 Responses:
 * `{"message": "Organization added to db"}, 200`
-* 422, 409
+* 409 - `{"error": "Key (organization_domain)=(aubg.edu) already exists."}` or\
+`{"error": "Key (organization_name)=(AUBGbrad) already exists."}`
+* 422
 * 401, 403, 498, 499 As it is a protected endpoint
 
 Example body:
