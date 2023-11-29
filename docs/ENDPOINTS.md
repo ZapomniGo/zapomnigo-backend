@@ -18,9 +18,6 @@ Responses:
         },
         {
             "gender": "Input should be 'M', 'F' or 'O'"
-        },
-        {
-            "subscription_model": "Input should be '6 months', '1 month' or '1 year'"
         }
     ]
 }
@@ -33,7 +30,7 @@ Example body:
 "email": "test@test.com",
 "username": "testusername",
 "password": "T3stpswd*",
-"subscription_model":"6 months",
+"organization": "01HG6QGNWTZK2N0TBQCHDEWAJQ",
 "gender": "M",
 "age": 18,
 "privacy_policy": true,
