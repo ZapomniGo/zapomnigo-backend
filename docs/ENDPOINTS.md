@@ -35,6 +35,7 @@ Responses:
 * `{"message": "user added to db"}, 200`
 * `{"error": "Key (username)=(test_username) already exists."}, 409` - this is valid for `email` as well
 * 422
+* `{"message": "Organization with such id doesn't exist"}, 404`
 
 Example body:
 ```json
