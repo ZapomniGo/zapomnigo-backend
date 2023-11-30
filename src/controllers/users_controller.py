@@ -1,4 +1,3 @@
-import datetime
 from typing import Tuple, Dict, Any
 
 from flask import request, make_response, Response
@@ -8,9 +7,8 @@ from ulid import ULID
 
 from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
-from src.database.models import Users
-from src.database.repositories import CommonRepository,  UsersRepository
-from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
+from src.database.models import Users, OrganizationsUsers
+from src.database.repositories import CommonRepository, UsersRepository, OrganizationsRepository
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
@@ -20,14 +18,11 @@ class UsersController:
     @staticmethod
     def create_user(json_data) -> Users:
         hashed_password = generate_password_hash(json_data["password"]).decode("utf-8")
-        subscription_model_id = SubscriptionModelsRepository.get_subscription_model_id(json_data["subscription_model"])
 
         return Users(user_id=str(ULID()), username=json_data["username"],  # type: ignore
                      name=json_data["name"], email=json_data["email"],
                      password=hashed_password, age=json_data.get("age", None),
-                     gender=json_data.get("gender", None),
-                     subscription_date=str(datetime.datetime.now()),  # type: ignore
-                     subscription_model_id=subscription_model_id,  # type: ignore
+                     gender=json_data.get("gender", None),  # type: ignore
                      privacy_policy=json_data["privacy_policy"],
                      terms_and_conditions=json_data["terms_and_conditions"],
                      marketing_consent=json_data["marketing_consent"])
@@ -40,7 +35,16 @@ class UsersController:
         if validation_errors:
             return {"validation errors": validation_errors}, 422
 
-        CommonRepository.add_object_to_db(cls.create_user(json_data))
+        user = cls.create_user(json_data)
+        CommonRepository.add_object_to_db(user)
+
+        if organization_id := json_data["organization"]:
+            if OrganizationsRepository.get_organization_by_id(organization_id):
+                obj = OrganizationsUsers(organization_user_id=str(ULID()),
+                                         user_id=user.user_id, organization_id=str(organization_id))
+                CommonRepository.add_object_to_db(obj)
+            else:
+                return {"message": "Organization with such id doesn't exist"}, 404
 
         return {"message": "user added to db"}, 200
 

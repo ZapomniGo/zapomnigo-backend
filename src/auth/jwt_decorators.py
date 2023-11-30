@@ -19,7 +19,7 @@ def admin_required(f):
             else:
                 return {"message": "Admin privileges required."}, 403
         else:
-            return {"message": "No auth token provided."}, 499
+            return {"message": "Invalid or missing auth token."}, 499
 
     return admin_token_check
 
@@ -34,6 +34,6 @@ def jwt_required(f):
             return f(*args, **kwargs)
 
         else:
-            return {"message": "No auth token provided."}, 499
+            return {"message": "Invalid or missing auth token."}, 499
 
     return wrapper

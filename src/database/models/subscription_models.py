@@ -9,5 +9,5 @@ class SubscriptionModels(db.Model):
     subscription_model: Mapped[str] = mapped_column(String(25), nullable=False, unique=True)
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="subscription_models", cascade="all")
+    # users: Mapped["Users"] = relationship(back_populates="subscription_models", cascade="all")
     organizations: Mapped["Organizations"] = relationship(back_populates="subscription_models", cascade="all")

@@ -1,5 +1,5 @@
 import string
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from src.pydantic_models.common import NAME
@@ -12,7 +12,7 @@ class RegistrationModel(BaseModel):
     password: Annotated[str, Field(min_length=8, max_length=80)]
     age: int = Field(..., gt=5, le=99)
     gender: Literal["M", "F", "O"]
-    subscription_model: Literal["6 months", "1 month", "1 year"]
+    organization: Optional[str] = None
     privacy_policy: bool
     terms_and_conditions: bool
     marketing_consent: bool
