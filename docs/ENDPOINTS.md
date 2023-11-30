@@ -162,3 +162,16 @@ Example body: (You pass only the fields you wand to change)
 ```json
 {"organization_name": "Nasko"}
 ```
+
+### `POST /categories` - create a category
+
+Responses:
+*`{"message": "Category added to db"}, 200`
+*`{"error": "Key (category_name)=(english) already exists."}`
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body: The value is saved as lower case in the db
+```json
+{"category_name":"English"}
+```
