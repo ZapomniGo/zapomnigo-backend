@@ -175,3 +175,21 @@ Example body: The value is saved as lower case in the db
 ```json
 {"category_name":"English"}
 ```
+
+### `GET /categories` - get all categories from the db
+
+Responses:
+* 200
+```json
+    "categories": [
+        {
+            "category_id": "01HGGQ54X84PP3S0CZWB2HED9T",
+            "category_name": "english"
+        }
+    ]
+```
+* 404
+```json
+{"message": "No categories were found"}
+```
+

@@ -1,4 +1,6 @@
 from flask import Blueprint
+
+from src.auth.jwt_decorators import admin_required
 from src.controllers.categories_controller import CategoriesController as c
 
 categories_bp = Blueprint("categories", __name__)
@@ -6,7 +8,7 @@ categories_bp = Blueprint("categories", __name__)
 
 @categories_bp.get("/categories")
 def get_categories():
-    pass
+    return c.get_all_categories()
 
 
 @categories_bp.get("/categories/<category_id>")
@@ -15,6 +17,7 @@ def get_category():
 
 
 @categories_bp.post("/categories")
+@admin_required
 def create_category():
     return c.add_category()
 
