@@ -172,6 +172,20 @@ bcrypt = ">=3.1.1"
 Flask = "*"
 
 [[package]]
+name = "flask-cors"
+version = "4.0.0"
+description = "A Flask extension adding a decorator for CORS support"
+optional = false
+python-versions = "*"
+files = [
+    {file = "Flask-Cors-4.0.0.tar.gz", hash = "sha256:f268522fcb2f73e2ecdde1ef45e2fd5c71cc48fe03cffb4b441c6d1b40684eb0"},
+    {file = "Flask_Cors-4.0.0-py2.py3-none-any.whl", hash = "sha256:bc3492bfd6368d27cfe79c7821df5a8a319e1a6d5eab277a3794be19bdc51783"},
+]
+
+[package.dependencies]
+Flask = ">=0.9"
+
+[[package]]
 name = "flask-migrate"
 version = "4.0.5"
 description = "SQLAlchemy database migrations for Flask applications using Alembic."
@@ -808,4 +822,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "3a830a15ea54635099da49854ab13203ec77aaf2c8e2b42701ece1377b67c775"
+content-hash = "b2ded186a9a4b34e119aad0d70426f9ec30cd407d56397a5a1daa4641701246d"
