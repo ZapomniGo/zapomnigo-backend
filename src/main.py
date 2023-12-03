@@ -30,7 +30,7 @@ def create_app() -> Flask:
 
 
 def start() -> None:
-    create_app().run(host="0.0.0.0")
+    create_app().run(host="0.0.0.0", port=3884)
 
 
 if __name__ == '__main__':
