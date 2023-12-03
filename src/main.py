@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
 
 from src.config import DevConfig, ProdConfig, IS_OFFLINE
@@ -11,6 +12,7 @@ migrate = Migrate(directory="database/migrations")
 
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
+    CORS(app, resources={r"/v1/*": {"origins": "*"}})
 
     if IS_OFFLINE:
         app.config.from_object(DevConfig)
