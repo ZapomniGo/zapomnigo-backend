@@ -31,8 +31,11 @@ poetry run start
 
 # Working with migrations
 ### If you have never created migrations and you don't have the migrations folder:
-1. Run `export FLASK_APP=main:create_app`
+1. Run `export FLASK_APP=main:create_app` or add it to your .bashrc/.zshrc file
 2. Run `flask db init` in the `/src` folder
+
+### If you are working with an exsisting state of the database or existing migrations
+1. Run `flask db stamp head` this indicates that the current state of the database represents the application of all migrations.
 
 ### Making changes to the tables
 * Make changes to the classes located in the `/database/models` folder
