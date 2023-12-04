@@ -38,7 +38,7 @@ class UsersController:
         user = cls.create_user(json_data)
         CommonRepository.add_object_to_db(user)
 
-        if organization_id := json_data["organization"]:
+        if organization_id := json_data.get("organization", None):
             if OrganizationsRepository.get_organization_by_id(organization_id):
                 obj = OrganizationsUsers(organization_user_id=str(ULID()),
                                          user_id=user.user_id, organization_id=str(organization_id))
