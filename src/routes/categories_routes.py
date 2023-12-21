@@ -23,8 +23,8 @@ def create_category():
 
 
 @categories_bp.put("/categories/<category_id>")
-def edit_category():
-    pass
+def edit_category(category_id: str):
+    return c.update_category(category_id)
 
 
 @categories_bp.delete("/categories/<category_id>")
