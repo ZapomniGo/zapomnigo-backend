@@ -12,12 +12,12 @@ def get_categories():
 
 
 @categories_bp.get("/categories/<category_id>")
-def get_category():
-    pass
+def get_category(category_id: str):
+    return c.get_category(category_id)
 
 
 @categories_bp.post("/categories")
-@admin_required
+# @admin_required
 def create_category():
     return c.add_category()
 
@@ -28,5 +28,5 @@ def edit_category():
 
 
 @categories_bp.delete("/categories/<category_id>")
-def delete_category():
-    pass
+def delete_category(category_id: str):
+    return c.delete_category(category_id)

@@ -5,6 +5,7 @@ from ulid import ULID
 
 from src.database.models import Categories
 from src.database.repositories import CommonRepository
+from src.database.repositories.categories_repository import CategoriesRepository
 from src.pydantic_models.categories_model import CategoriesModel
 from src.utilities.parsers import validate_json_body
 
@@ -33,9 +34,17 @@ class CategoriesController:
 
         return {"message": "No categories were found"}, 404
 
-    # @classmethod
-    # def get_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
-    #     if organization := OrganizationsRepository.get_organization_by_id(organization_id):
-    #         return {"organization": organization.to_json()}, 200
-    #
-    #     return {"message": "Organization with such id doesn't exist"}, 404
+    @classmethod
+    def get_category(cls, category_id: str) -> Tuple[Dict[str, Any], int]:
+        if category := CategoriesRepository.get_category_by_id(category_id):
+            return {"category": category.to_json()}, 200
+
+        return {"message": "Category with such id doesn't exist"}, 404
+
+    @classmethod
+    def delete_category(cls, category_id: str):
+        if category := CategoriesRepository.get_category_by_id(category_id):
+            CommonRepository.delete_object_from_db(category)
+            return {"message": "Category successfully deleted"}, 200
+
+        return {"message": "Category with such id doesn't exist"}, 404
