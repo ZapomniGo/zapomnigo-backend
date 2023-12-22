@@ -1,7 +1,7 @@
 from flask import Blueprint
 
 from src.auth.jwt_decorators import admin_required, jwt_required
-from src.controllers.categories_controller import CategoriesController as c
+from src.controllers import CategoriesController as c
 
 categories_bp = Blueprint("categories", __name__)
 
