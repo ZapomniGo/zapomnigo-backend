@@ -193,3 +193,37 @@ Responses:
 {"message": "No categories were found"}
 ```
 
+### `GET /category/id` - get info for specific category
+
+Responses:
+* 200
+```json
+"category": { "category_id": "01HGTTQTZPCVVC3XFGZH9VMMTB", 
+            "category_name": "english" }
+```
+
+* 404
+```json
+{
+    "message": "Category with such id doesn't exist"
+}
+```
+
+### `PUT /categories/category_id` - edit a category
+
+Responses:
+*`{"message": "Category successfully updated"}, 200`
+*`{"error": "Key (category_name)=(biologybratle) already exists."}`
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body: The value is saved as lower case in the db
+```json
+{"category_name":"English"}
+```
+
+### `DELETE /categories/category_id` - delete a category
+Responses:
+*`{"message": "Category successfully deleted"}, 200`
+*`{"message": "Category with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
