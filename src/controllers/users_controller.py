@@ -10,6 +10,7 @@ from src.config import SECRET_KEY
 from src.database.models import Users, OrganizationsUsers
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.organizations_repository import OrganizationsRepository
+from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
