@@ -2,16 +2,14 @@ from datetime import datetime
 from typing import Tuple, Dict, Any
 
 from flask import request
-from jwt import decode
 from ulid import ULID
 
-from src.config import SECRET_KEY
+from src.controllers.utility_controller import UtilityController
 from src.database.models.sets import Sets
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
-
-from src.pydantic_models.sets_model import SetsModel
+from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -21,15 +19,13 @@ class SetsController:
         return Sets(set_id=str(ULID()), set_name=json_data["set_name"],
                     set_description=json_data.get("set_description", None),
                     set_modification_date=str(datetime.now()),
-                    set_set=json_data.get("set_set", None),
+                    set_category=json_data.get("set_category", None),
                     user_id=user_id)
 
     @classmethod
     def add_set(cls):
         json_data = request.json
-        decoded_token = decode(request.cookies.get('refresh_token'), SECRET_KEY, algorithms=["HS256"])
-        user_id = UsersRepository.get_user_by_username(decoded_token.get("username")).user_id
-
+        user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username()).user_id
         if validation_errors := validate_json_body(json_data, SetsModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
@@ -44,7 +40,7 @@ class SetsController:
                              for sets in result]}, 200
 
         return {"message": "No sets were found"}, 404
-    
+
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         if set_obj := SetsRepository.get_set_by_id(set_id):
@@ -52,3 +48,21 @@ class SetsController:
             return {"set": set_obj.to_json(username)}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
+
+    @classmethod
+    def update_set(cls, set_id: str):
+
+        if result := UtilityController.check_user_access(UtilityController.get_session_username()):
+            return result
+
+        json_data = request.get_json()
+        set_obj = SetsRepository.get_set_by_id(set_id)
+
+        if not set_obj:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        if validation_errors := validate_json_body(json_data, UpdateSetsModel):  # type: ignore
+            return {"validation errors": validation_errors}, 422
+
+        SetsRepository.edit_set(set_obj, json_data)
+        return {"message": "set successfully updated"}, 200
