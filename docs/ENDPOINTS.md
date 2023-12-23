@@ -26,6 +26,7 @@
     ]
 }
 ```
+---
 ### `GET /health` - could be used for e heartbeat service
 Responses: `{"status": healthy}, 200`
 
@@ -95,6 +96,7 @@ Responses:
 * 499
 * 401
 
+---
 ### `GET /organizations` get a list of all organizations
 
 Responses:
@@ -162,12 +164,12 @@ Example body: (You pass only the fields you wand to change)
 ```json
 {"organization_name": "Nasko"}
 ```
-
+---
 ### `POST /categories` - create a category
 
 Responses:
 *`{"message": "Category added to db"}, 200`
-*`{"error": "Key (category_name)=(english) already exists."}`
+* 409 - `{"error": "Key (category_name)=(english) already exists."}`
 * 422
 * 401, 403, 498, 499 As it is a protected endpoint
 
@@ -213,7 +215,7 @@ Responses:
 
 Responses:
 *`{"message": "Category successfully updated"}, 200`
-*`{"error": "Key (category_name)=(biologybratle) already exists."}`
+* 409 - `{"error": "Key (category_name)=(biologybratle) already exists."}`
 * 422
 * 401, 403, 498, 499 As it is a protected endpoint
 
@@ -227,3 +229,93 @@ Responses:
 *`{"message": "Category successfully deleted"}, 200`
 *`{"message": "Category with such id doesn't exist"}, 404`
 * 401, 403, 498, 499 As it is a protected endpoint
+
+---
+### `POST /sets` - create a set
+
+Responses:
+*`{"message": "Set added to db"}, 200`
+* 409 - `"error": "Key (set_category)=(English) is not present in table \"categories\"."`
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body: The value is saved as lower case in the db
+```json
+{"set_name": "TestBratme",
+"set_description": "naskoebobur",
+"set_category": "01HJ6DSCG5YG6YQMGFT9PVZJQA" 
+}
+```
+
+### `GET /sets` - get all sets from the db
+
+Responses:
+* 200
+```json
+{
+  "sets": [
+    {
+      "set_category": "01HJ6DSCG5YG6YQMGFT9PVZJQA",
+      "set_description": "naskoebobur",
+      "set_id": "01HJBKF94QV95TW35F5S7DZQAP",
+      "set_modification_date": "2023-12-23 17:07:35.447655",
+      "set_name": "TEst",
+      "username": "nasko"
+    },
+    {
+      "set_category": null,
+      "set_description": "forza4",
+      "set_id": "01HJBKF9WTWRYZY2GAMACTC7AN",
+      "set_modification_date": "2023-12-23 17:07:36.218534",
+      "set_name": "TEst",
+      "username": "aleks"
+    }
+  ]
+}
+```
+* 404
+```json
+{"message": "No sets were found"}
+```
+
+### `GET /set/id` - get info for specific set
+
+Responses:
+* 200
+```json
+{
+   "set": {
+      "set_category": null,
+      "set_description": "forza4",
+      "set_id": "01HJBKF9WTWRYZY2GAMACTC7AN",
+      "set_modification_date": "2023-12-23 17:07:36.218534",
+      "set_name": "TEst",
+      "username": "aleks"
+    }
+}
+```
+
+* 404
+```json
+{
+    "message": "Set with such id doesn't exist"
+}
+```
+
+### `PUT /sets/set_id` - edit a set
+
+Responses:
+*`{"message": "Set successfully updated"}, 200`
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+```json
+{"set_name":"ZabraviGo"}
+```
+
+### `DELETE /set/set_id` - delete a category
+Responses:
+*`{"message": "Set successfully deleted"}, 200`
+*`{"message": "Set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+---
