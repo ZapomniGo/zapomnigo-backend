@@ -8,6 +8,7 @@ from ulid import ULID
 from src.config import SECRET_KEY
 from src.database.models.sets import Sets
 from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 
 from src.pydantic_models.sets_model import SetsModel
@@ -20,7 +21,7 @@ class SetsController:
         return Sets(set_id=str(ULID()), set_name=json_data["set_name"],
                     set_description=json_data.get("set_description", None),
                     set_modification_date=str(datetime.now()),
-                    set_category=json_data.get("set_category", None),
+                    set_set=json_data.get("set_set", None),
                     user_id=user_id)
 
     @classmethod
@@ -39,6 +40,15 @@ class SetsController:
     @classmethod
     def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
         if result := CommonRepository.get_all_objects_from_db(Sets):
-            return {"sets": [sets.to_json() for sets in result]}, 200
+            return {"sets": [sets.to_json(SetsRepository.get_creator_username(sets.get_user_id()))
+                             for sets in result]}, 200
 
         return {"message": "No sets were found"}, 404
+    
+    @classmethod
+    def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        if set_obj := SetsRepository.get_set_by_id(set_id):
+            username = SetsRepository.get_creator_username(set_obj.get_user_id())
+            return {"set": set_obj.to_json(username)}, 200
+
+        return {"message": "set with such id doesn't exist"}, 404

@@ -13,10 +13,9 @@ def get_sets() -> Tuple[Dict[str, Any], int]:
     return c.get_all_sets()
 
 
-# @sets_bp.get("/sets/<set_id>")
-# @admin_required
-# def get_set(set_id: str) -> Tuple[Dict[str, Any], int]:
-#     return c.get_set(set_id)
+@sets_bp.get("/sets/<set_id>")
+def get_set(set_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.get_set(set_id)
 
 
 @sets_bp.post("/sets")
