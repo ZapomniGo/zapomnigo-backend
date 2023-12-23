@@ -1,7 +1,7 @@
 from typing import Tuple, Dict
 
 from flask import Blueprint
-from src.controllers import UtilityController as c
+from src.controllers.utility_controller import UtilityController as c
 
 utility_bp = Blueprint("utility", __name__)
 

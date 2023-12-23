@@ -4,8 +4,8 @@ from flask import request
 from ulid import ULID
 
 from src.database.models import Organizations
-from src.database.repositories import OrganizationsRepository
 from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
 from src.pydantic_models.organization_model import OrganizationModel, UpdateOrganizationModel
 from src.utilities.parsers import validate_json_body

@@ -9,6 +9,7 @@ load_dotenv()
 IS_OFFLINE = eval_bool(getenv("IS_OFFLINE", False))
 
 ADMIN_EMAIL = getenv("ADMIN_EMAIL")
+ADMIN_USERNAME = getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = getenv("ADMIN_PASSWORD")
 
 if IS_OFFLINE:

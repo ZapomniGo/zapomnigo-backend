@@ -8,7 +8,7 @@ class CommonRepository:
         db.session.commit()
 
     @classmethod
-    def get_all_objects_from_db(cls, obj) -> None:
+    def get_all_objects_from_db(cls, obj):
         return db.session.query(obj).all()
 
     @classmethod

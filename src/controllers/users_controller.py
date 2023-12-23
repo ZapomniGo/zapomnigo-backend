@@ -8,7 +8,9 @@ from ulid import ULID
 from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
 from src.database.models import Users, OrganizationsUsers
-from src.database.repositories import CommonRepository, UsersRepository, OrganizationsRepository
+from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.organizations_repository import OrganizationsRepository
+from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
@@ -75,7 +77,7 @@ class UsersController:
     @classmethod
     def logout(cls) -> Response:
         response = make_response({"message": "user logged out"}, 200)
-        response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie('access_token', '', expires=0, secure=True, samesite='Strict')
         response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
         return response
 

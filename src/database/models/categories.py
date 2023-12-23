@@ -6,8 +6,12 @@ from src.database.models.base import db
 
 class Categories(db.Model):
     category_id: Mapped[str] = mapped_column(String(26), primary_key=True)
-    category_name: Mapped[str] = mapped_column(String(40), nullable=False)
+    category_name: Mapped[str] = mapped_column(String(40), unique=True, nullable=False)
 
     # Creates a bidirectional relationship between tables
     sets: Mapped["Sets"] = relationship(back_populates="categories", cascade="all")
     folders: Mapped["Folders"] = relationship(back_populates="categories", cascade="all")
+
+    def to_json(self):
+        return {"category_id": self.category_id,
+                "category_name": self.category_name}
