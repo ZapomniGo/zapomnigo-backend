@@ -8,7 +8,8 @@ from ulid import ULID
 from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
 from src.database.models import Users, OrganizationsUsers
-from src.database.repositories import CommonRepository, UsersRepository, OrganizationsRepository
+from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 

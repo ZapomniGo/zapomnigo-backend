@@ -22,3 +22,11 @@ class Sets(db.Model):
     reviews_sets: Mapped["ReviewsSets"] = relationship(back_populates="sets", cascade="all")
     liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="sets", cascade="all")
     reviews_flashcards: Mapped["ReviewsFlashcards"] = relationship(back_populates="sets", cascade="all")
+    def to_json(self):
+        return {"set_id": self.set_id,
+                "set_name": self.set_name,
+                "set_description": self.set_description,
+                "set_modification_date": self.set_modification_date,
+                "set_category": self.set_category,
+                "username": self.user_id
+                }

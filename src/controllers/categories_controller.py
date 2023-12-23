@@ -4,8 +4,8 @@ from flask import request
 from ulid import ULID
 
 from src.database.models import Categories
-from src.database.repositories import CommonRepository
 from src.database.repositories.categories_repository import CategoriesRepository
+from src.database.repositories.common_repository import CommonRepository
 from src.pydantic_models.categories_model import CategoriesModel
 from src.utilities.parsers import validate_json_body
 from src.pydantic_models.categories_model import UpdateCategoriesModel
