@@ -51,7 +51,6 @@ class SetsController:
 
     @classmethod
     def update_set(cls, set_id: str):
-
         if result := UtilityController.check_user_access(UtilityController.get_session_username()):
             return result
 
@@ -66,3 +65,14 @@ class SetsController:
 
         SetsRepository.edit_set(set_obj, json_data)
         return {"message": "set successfully updated"}, 200
+
+    @classmethod
+    def delete_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        if result := UtilityController.check_user_access(UtilityController.get_session_username()):
+            return result
+
+        if set_obj := SetsRepository.get_set_by_id(set_id):
+            CommonRepository.delete_object_from_db(set_obj)
+            return {"message": "Set successfully deleted"}, 200
+
+        return {"message": "Set with such id doesn't exist"}, 404

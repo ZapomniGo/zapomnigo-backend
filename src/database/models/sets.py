@@ -13,8 +13,8 @@ class Sets(db.Model):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False)
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="sets", cascade="all")
-    categories: Mapped["Categories"] = relationship(back_populates="sets", cascade="all")
+    users: Mapped["Users"] = relationship(back_populates="sets")
+    categories: Mapped["Categories"] = relationship(back_populates="sets")
     comments: Mapped["Comments"] = relationship(back_populates="sets", cascade="all")
     folders_sets: Mapped["FoldersSets"] = relationship(back_populates="sets", cascade="all")
     flashcards: Mapped["Flashcards"] = relationship(back_populates="sets", cascade="all")

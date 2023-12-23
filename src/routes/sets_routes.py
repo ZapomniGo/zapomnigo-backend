@@ -23,10 +23,10 @@ def get_set(set_id: str) -> Tuple[Dict[str, Any], int]:
 def create_set() -> Tuple[Dict[str, Any], int]:
     return c.add_set()
 
-# @sets_bp.delete("/sets/<set_id>")
-# @admin_required
-# def delete_set(set_id: str) -> Tuple[Dict[str, Any], int]:
-#     return c.delete_set(set_id)
+@sets_bp.delete("/sets/<set_id>")
+@jwt_required
+def delete_set(set_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.delete_set(set_id)
 
 
 @sets_bp.put("/sets/<set_id>")
