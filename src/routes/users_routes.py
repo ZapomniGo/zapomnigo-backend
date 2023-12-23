@@ -2,7 +2,7 @@ from typing import Tuple, Dict, Any
 
 from flask import Blueprint, Response
 
-from src.controllers import UsersController as c
+from src.controllers.users_controller import UsersController as c
 
 users_bp = Blueprint("users", __name__)
 

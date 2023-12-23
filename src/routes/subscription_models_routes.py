@@ -3,7 +3,7 @@ from typing import Tuple, Dict, Any
 from flask import Blueprint
 
 from src.auth.jwt_decorators import admin_required
-from src.controllers import SubscriptionModelsController as c
+from src.controllers.subscription_models_controller import SubscriptionModelsController as c
 
 subscription_models_bp = Blueprint("subscription_models", __name__)
 
