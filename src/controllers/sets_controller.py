@@ -51,14 +51,15 @@ class SetsController:
 
     @classmethod
     def update_set(cls, set_id: str):
-        if result := UtilityController.check_user_access(UtilityController.get_session_username()):
-            return result
-
         json_data = request.get_json()
         set_obj = SetsRepository.get_set_by_id(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
+
+        username = SetsRepository.get_creator_username(set_obj.get_user_id())
+        if result := UtilityController.check_user_access(username):
+            return result
 
         if validation_errors := validate_json_body(json_data, UpdateSetsModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
@@ -68,11 +69,14 @@ class SetsController:
 
     @classmethod
     def delete_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        if result := UtilityController.check_user_access(UtilityController.get_session_username()):
+        set_obj = SetsRepository.get_set_by_id(set_id)
+
+        if not set_obj:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        username = SetsRepository.get_creator_username(set_obj.get_user_id())
+        if result := UtilityController.check_user_access(username):
             return result
 
-        if set_obj := SetsRepository.get_set_by_id(set_id):
-            CommonRepository.delete_object_from_db(set_obj)
-            return {"message": "Set successfully deleted"}, 200
-
-        return {"message": "Set with such id doesn't exist"}, 404
+        CommonRepository.delete_object_from_db(set_obj)
+        return {"message": "Set successfully deleted"}, 200
