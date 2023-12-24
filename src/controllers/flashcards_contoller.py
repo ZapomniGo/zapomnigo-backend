@@ -1,8 +1,12 @@
+from typing import Tuple, Dict, Any
+
 from flask import request
 from ulid import ULID
 
 from src.database.models import Flashcards
 from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.flashcards_repository import FlashcardsRepository
+from src.database.repositories.sets_repository import SetsRepository
 from src.pydantic_models.flashcards_model import FlashcardsModel
 from src.utilities.parsers import validate_json_body
 
@@ -25,21 +29,22 @@ class FlashcardsController:
 
         return {"message": "Flashcard added to db"}, 200
 
-    # @classmethod
-    # def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
-    #     if result := CommonRepository.get_all_objects_from_db(Sets):
-    #         return {"sets": [sets.to_json(SetsRepository.get_creator_username(sets.get_user_id()))
-    #                          for sets in result]}, 200
-    #
-    #     return {"message": "No sets were found"}, 404
-    #
-    # @classmethod
-    # def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-    #     if set_obj := SetsRepository.get_set_by_id(set_id):
-    #         username = SetsRepository.get_creator_username(set_obj.get_user_id())
-    #         return {"set": set_obj.to_json(username)}, 200
-    #
-    #     return {"message": "set with such id doesn't exist"}, 404
+    @classmethod
+    def get_all_flashcards(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        if not SetsRepository.get_set_by_id(set_id):
+            return {"message": "set with such id doesn't exist"}, 404
+
+        if result := FlashcardsRepository.get_flashcards_by_set_id(set_id):
+            return {"flashcards": [flashcard.to_json() for flashcard in result]}, 200
+
+        return {"message": "No flashcards were found for this set"}, 404
+
+    @classmethod
+    def get_flashcard(cls, flashcard_id: str) -> Tuple[Dict[str, Any], int]:
+        if flashcard := FlashcardsRepository.get_flashcard_by_id(flashcard_id):
+            return {"flashcard": flashcard.to_json()}, 200
+
+        return {"message": "flashcard with such id doesn't exist"}, 404
     #
     # @classmethod
     # def update_set(cls, set_id: str):

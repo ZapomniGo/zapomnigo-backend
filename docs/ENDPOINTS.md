@@ -333,3 +333,51 @@ Example body
 "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
 "notes": "testtesttestsetest"}
 ```
+
+### `GET sets/set_id/flashcards` - get all flashcards for a given set
+Responses:
+* `{"message": "set with such id doesn't exist"}, 404`
+* `{"message": "No flashcards were found for this set"}, 404`
+* 200 -
+```json
+{
+    "flashcards": [
+        {
+            "definition": "capital of bulgaria",
+            "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",
+            "notes": null,
+            "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+            "term": "sofia"
+        },
+        {
+            "definition": "capital of UK",
+            "flashcard_id": "01HJECRT8FTKNMVVBR7DEGKBGG",
+            "notes": "testtesttestsetest",
+            "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+            "term": "london"
+        }
+    ]
+}
+```
+
+### `GET /flashcards/flashcard_id` - get info for a given flashcard
+
+Responses:
+ * 200 - 
+```json
+{
+    "flashcard": {
+        "definition": "capital of bulgaria",
+        "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",
+        "notes": null,
+        "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+        "term": "sofia"
+    }
+}
+```
+* 404 - 
+```json
+{
+    "message": "flashcard with such id doesn't exist"
+}
+```
