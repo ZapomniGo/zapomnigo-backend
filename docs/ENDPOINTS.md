@@ -239,7 +239,7 @@ Responses:
 * 422
 * 401, 403, 498, 499 As it is a protected endpoint
 
-Example body: The value is saved as lower case in the db
+Example body
 ```json
 {"set_name": "TestBratme",
 "set_description": "naskoebobur",
@@ -319,3 +319,17 @@ Responses:
 *`{"message": "Set with such id doesn't exist"}, 404`
 * 401, 403, 498, 499 As it is a protected endpoint
 ---
+
+### `POST /flashcrads` - creates a flashcard assigned to a set
+Responses:
+*`{"message": "Flashcard added to db"}, 200`
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body
+```json
+{"term": "london",
+"definition": "capital of UK",
+"set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+"notes": "testtesttestsetest"}
+```
