@@ -11,7 +11,6 @@ class FlashcardsModel(BaseModel):
     term: TERM_DEFINITION
     definition: TERM_DEFINITION
     notes: Optional[TERM_DEFINITION] = None
-    set_id: str
 
 
 class UpdateFlashcardsModel(BaseModel):
@@ -19,4 +18,3 @@ class UpdateFlashcardsModel(BaseModel):
     term: Optional[NAME] = None
     definition: Optional[TERM_DEFINITION] = None
     notes: Optional[TERM_DEFINITION] = None
-

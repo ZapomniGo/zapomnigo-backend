@@ -1,8 +1,8 @@
-from typing import Optional, Annotated
+from typing import Optional, Annotated, List
 
-from pydantic import BaseModel, StringConstraints, ConfigDict
+from pydantic import BaseModel, StringConstraints, ConfigDict, model_validator
 
-from src.pydantic_models.common import NAME
+from src.pydantic_models.flashcards_model import FlashcardsModel
 
 SET_DESCRIPTION = Annotated[str, StringConstraints(min_length=2, max_length=4096)]
 SET_NAME = Annotated[str, StringConstraints(min_length=1, max_length=255)]
@@ -12,6 +12,14 @@ class SetsModel(BaseModel):
     set_name: SET_NAME
     set_description: Optional[SET_DESCRIPTION] = None
     set_category: str
+    flashcards: List[FlashcardsModel]
+
+    @model_validator(mode='before')
+    def check_empty_flashcards(cls, values):
+        flashcards = values.get('flashcards')
+        if not flashcards:
+            raise ValueError("Flashcards list cannot be empty")
+        return values
 
 
 class UpdateSetsModel(BaseModel):

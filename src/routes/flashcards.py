@@ -18,12 +18,6 @@ def get_flashcard(flashcard_id: str) -> Tuple[Dict[str, Any], int]:
     return c.get_flashcard(flashcard_id)
 
 
-@flashcards_bp.post("/flashcards")
-@jwt_required
-def create_flashcard() -> Tuple[Dict[str, Any], int]:
-    return c.add_flashcard()
-
-
 @flashcards_bp.delete("/flashcards/<flashcard_id>")
 @jwt_required
 def delete_flashcard(flashcard_id: str) -> Tuple[Dict[str, Any], int]:
