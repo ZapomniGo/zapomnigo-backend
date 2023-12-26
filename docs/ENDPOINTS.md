@@ -239,7 +239,7 @@ Responses:
 * 422
 * 401, 403, 498, 499 As it is a protected endpoint
 
-Example body: The value is saved as lower case in the db
+Example body
 ```json
 {"set_name": "TestBratme",
 "set_description": "naskoebobur",
@@ -313,9 +313,93 @@ Responses:
 {"set_name":"ZabraviGo"}
 ```
 
-### `DELETE /set/set_id` - delete a category
+### `DELETE /set/set_id` - delete a set and all flashcards related to it
 Responses:
 *`{"message": "Set successfully deleted"}, 200`
 *`{"message": "Set with such id doesn't exist"}, 404`
 * 401, 403, 498, 499 As it is a protected endpoint
 ---
+
+### `POST /flashcrads` - creates a flashcard assigned to a set
+Responses:
+*`{"message": "Flashcard added to db"}, 200`
+* 422
+* 409 - `{"error": "Key (set_id)=(01HJBKFAJQMMAS0ZKWC83VV1AY) is not present in table \"sets\"."}`
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body
+```json
+{"term": "london",
+"definition": "capital of UK",
+"set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+"notes": "testtesttestsetest"}
+```
+
+### `GET sets/set_id/flashcards` - get all flashcards for a given set
+Responses:
+* `{"message": "set with such id doesn't exist"}, 404`
+* `{"message": "No flashcards were found for this set"}, 404`
+* 200 -
+```json
+{
+    "flashcards": [
+        {
+            "definition": "capital of bulgaria",
+            "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",
+            "notes": null,
+            "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+            "term": "sofia"
+        },
+        {
+            "definition": "capital of UK",
+            "flashcard_id": "01HJECRT8FTKNMVVBR7DEGKBGG",
+            "notes": "testtesttestsetest",
+            "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+            "term": "london"
+        }
+    ]
+}
+```
+
+### `GET /flashcards/flashcard_id` - get info for a given flashcard
+
+Responses:
+ * 200 - 
+```json
+{
+    "flashcard": {
+        "definition": "capital of bulgaria",
+        "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",
+        "notes": null,
+        "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",
+        "term": "sofia"
+    }
+}
+```
+* 404 - 
+```json
+{
+    "message": "flashcard with such id doesn't exist"
+}
+```
+
+### `DELETE /flashcard/flashcard_id` - deletes a flashcard
+Responses:
+* `{"message": "Flashcard successfully deleted"}, 200`
+* `{"message": "Flashcard with such id doesn't exist"}, 404`
+* `{"message": "Set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+
+### `PUT /flashcard/flashcard_id` - updates a flashcard
+Responses:
+* `{"message": "Flashcard successfully updated"}, 200`
+* `{"message": "Flashcard with such id doesn't exist"}, 404`
+* `{"message": "Set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+Example body
+```json
+{
+    "term": "london",
+    "definition": "capital of UK"
+}
+```
