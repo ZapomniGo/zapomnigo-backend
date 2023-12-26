@@ -326,7 +326,22 @@ Responses:
 ```json
 {"set_name":"ZabraviGo"}
 ```
-
+This is how to add new flashcards to a current set
+```json
+{"flashcards": [
+        {
+            "definition": "capital of Bulgaria",
+            "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",
+            "term": "sofia"
+        },
+        {
+            "definition": "capital of UK",
+            "flashcard_id": "01HJECRT8FTKNMVVBR7DEGKBGG",
+            "notes": "testtesttestsetest",
+            "term": "london"
+        }
+    ]}
+```
 ### `DELETE /set/set_id` - delete a set and all flashcards related to it
 Responses:
 *`{"message": "Set successfully deleted"}, 200`

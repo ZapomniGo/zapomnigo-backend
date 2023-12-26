@@ -27,3 +27,4 @@ class UpdateSetsModel(BaseModel):
     set_name: Optional[SET_NAME] = None
     set_description: Optional[SET_DESCRIPTION] = None
     set_category: Optional[str] = None
+    flashcards: List[FlashcardsModel] = None
