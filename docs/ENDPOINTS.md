@@ -313,7 +313,7 @@ Responses:
 {"set_name":"ZabraviGo"}
 ```
 
-### `DELETE /set/set_id` - delete a category
+### `DELETE /set/set_id` - delete a set and all flashcards related to it
 Responses:
 *`{"message": "Set successfully deleted"}, 200`
 *`{"message": "Set with such id doesn't exist"}, 404`
@@ -324,6 +324,7 @@ Responses:
 Responses:
 *`{"message": "Flashcard added to db"}, 200`
 * 422
+* 409 - `{"error": "Key (set_id)=(01HJBKFAJQMMAS0ZKWC83VV1AY) is not present in table \"sets\"."}`
 * 401, 403, 498, 499 As it is a protected endpoint
 
 Example body
@@ -381,3 +382,10 @@ Responses:
     "message": "flashcard with such id doesn't exist"
 }
 ```
+
+### `DELETE /flashcard/flashcard_id` - deletes a flashcard
+Responses:
+* `{"message": "Flashcard successfully deleted"}, 200`
+* `{"message": "Flashcard with such id doesn't exist"}, 404`
+* `{"message": "Set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint

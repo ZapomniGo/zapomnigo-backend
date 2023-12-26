@@ -12,7 +12,7 @@ class Flashcards(db.Model):
     set_id: Mapped[str] = mapped_column(ForeignKey("sets.set_id"), nullable=False)
 
     # Creates a bidirectional relationship between tables
-    sets: Mapped["Sets"] = relationship(back_populates="flashcards", cascade="all")
+    sets: Mapped["Sets"] = relationship(back_populates="flashcards")
     liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="flashcards", cascade="all")
     reviews_flashcards: Mapped["ReviewsFlashcards"] = relationship(back_populates="flashcards", cascade="all")
 
