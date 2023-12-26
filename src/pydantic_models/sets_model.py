@@ -27,3 +27,11 @@ class UpdateSetsModel(BaseModel):
     set_name: Optional[SET_NAME] = None
     set_description: Optional[SET_DESCRIPTION] = None
     set_category: Optional[str] = None
+    flashcards: List[FlashcardsModel] = None
+
+    @model_validator(mode='before')
+    def check_empty_flashcards(cls, values):
+        flashcards = values.get('flashcards')
+        if flashcards and len(flashcards) == 0:
+            raise ValueError("Flashcards list cannot be empty")
+        return values

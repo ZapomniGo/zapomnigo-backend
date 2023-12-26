@@ -8,6 +8,7 @@ from src.controllers.utility_controller import UtilityController
 from src.database.models import Flashcards
 from src.database.models.sets import Sets
 from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
@@ -26,7 +27,7 @@ class SetsController:
     @classmethod
     def create_flashcards(cls, json_data, set_id: str):
         flashcards_objects = []
-        for flashcard in json_data["flashcards"]:
+        for flashcard in json_data.get("flashcards", []):
             flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard["term"],
                                                  definition=flashcard["definition"],
                                                  notes=flashcard.get("notes", None),
@@ -44,6 +45,9 @@ class SetsController:
         CommonRepository.add_object_to_db(set_obj)
 
         flashcards = cls.create_flashcards(json_data, set_obj.set_id)
+        if len(flashcards) > 2000:
+            return {"message": "Cannot create more than 2000 flashcards per set"}, 400
+
         CommonRepository.add_many_objects_to_db(flashcards)
 
         return {"message": "Set added to db"}, 200
@@ -80,6 +84,13 @@ class SetsController:
             return {"validation errors": validation_errors}, 422
 
         SetsRepository.edit_set(set_obj, json_data)
+
+        if flashcards := cls.create_flashcards(json_data, set_obj.set_id):
+            if len(FlashcardsRepository.get_flashcards_by_set_id(set_obj.set_id)) + len(flashcards) > 2000:
+                return {"message": "Cannot create more than 2000 flashcards per set"}, 400
+            else:
+                CommonRepository.add_many_objects_to_db(flashcards)
+
         return {"message": "set successfully updated"}, 200
 
     @classmethod
