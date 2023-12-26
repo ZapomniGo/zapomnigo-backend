@@ -5,6 +5,7 @@ from flask import request
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
+from src.database.models import Flashcards
 from src.database.models.sets import Sets
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.sets_repository import SetsRepository
@@ -23,13 +24,27 @@ class SetsController:
                     user_id=user_id)
 
     @classmethod
+    def create_flashcards(cls, json_data, set_id: str):
+        flashcards_objects = []
+        for flashcard in json_data["flashcards"]:
+            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard["term"],
+                                                 definition=flashcard["definition"],
+                                                 notes=flashcard.get("notes", None),
+                                                 set_id=set_id))
+        return flashcards_objects
+
+    @classmethod
     def add_set(cls):
         json_data = request.json
         user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username()).user_id
         if validation_errors := validate_json_body(json_data, SetsModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
-        CommonRepository.add_object_to_db(cls.create_set(json_data, user_id))
+        set_obj = cls.create_set(json_data, user_id)
+        CommonRepository.add_object_to_db(set_obj)
+
+        flashcards = cls.create_flashcards(json_data, set_obj.set_id)
+        CommonRepository.add_many_objects_to_db(flashcards)
 
         return {"message": "Set added to db"}, 200
 

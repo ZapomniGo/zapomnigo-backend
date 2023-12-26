@@ -1,35 +1,16 @@
 from typing import Tuple, Dict, Any
 
 from flask import request
-from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
-from src.database.models import Flashcards
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
-from src.pydantic_models.flashcards_model import FlashcardsModel, UpdateFlashcardsModel
+from src.pydantic_models.flashcards_model import UpdateFlashcardsModel
 from src.utilities.parsers import validate_json_body
 
 
 class FlashcardsController:
-    @classmethod
-    def create_flashcard(cls, json_data):
-        return Flashcards(flashcard_id=str(ULID()), term=json_data["term"],
-                          definition=json_data["definition"],
-                          notes=json_data.get("notes", None),
-                          set_id=json_data["set_id"])
-
-    @classmethod
-    def add_flashcard(cls):
-        json_data = request.json
-        if validation_errors := validate_json_body(json_data, FlashcardsModel):  # type: ignore
-            return {"validation errors": validation_errors}, 422
-
-        CommonRepository.add_object_to_db(cls.create_flashcard(json_data))
-
-        return {"message": "Flashcard added to db"}, 200
-
     @classmethod
     def get_all_flashcards(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         if not SetsRepository.get_set_by_id(set_id):
