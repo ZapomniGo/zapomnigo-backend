@@ -19,3 +19,4 @@ class UpdateFlashcardsModel(BaseModel):
     term: Optional[NAME] = None
     definition: Optional[TERM_DEFINITION] = None
     notes: Optional[TERM_DEFINITION] = None
+
