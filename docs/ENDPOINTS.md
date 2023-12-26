@@ -245,6 +245,7 @@ Example body
     "set_name": "TestBratme",
     "set_description": "naskoebobur",
     "set_category": "01HJ6DSCG5YG6YQMGFT9PVZJQA",
+    "organization_id": "01HG6QGNWTZK2N0TBQCHDEWAJQ", (Optional)
     "flashcards": [
         {
             "definition": "capital of Бulgaria",
