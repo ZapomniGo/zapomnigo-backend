@@ -11,6 +11,7 @@ class Sets(db.Model):
     set_modification_date: Mapped[str] = mapped_column(String(40), nullable=False)
     set_category: Mapped[str] = mapped_column(ForeignKey("categories.category_id"), nullable=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False)
+    organization_id: Mapped[str] = mapped_column(ForeignKey("organizations.organization_id"), nullable=True)
 
     # Creates a bidirectional relationship between tables
     users: Mapped["Users"] = relationship(back_populates="sets")
@@ -22,6 +23,7 @@ class Sets(db.Model):
     reviews_sets: Mapped["ReviewsSets"] = relationship(back_populates="sets", cascade="all")
     liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="sets", cascade="all")
     reviews_flashcards: Mapped["ReviewsFlashcards"] = relationship(back_populates="sets", cascade="all")
+    organizations: Mapped["Organizations"] = relationship(back_populates="sets")
 
     def get_user_id(self):
         return self.user_id
@@ -32,5 +34,6 @@ class Sets(db.Model):
                 "set_description": self.set_description,
                 "set_modification_date": self.set_modification_date,
                 "set_category": self.set_category,
-                "username": username
+                "username": username,
+                "organization": self.organization_id
                 }
