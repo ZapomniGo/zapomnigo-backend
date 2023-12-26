@@ -20,3 +20,7 @@ class Organizations(db.Model):
                 "organization_name": self.organization_name,
                 "organization_domain": self.organization_domain,
                 "subscription_model_id": self.subscription_model_id}
+
+    def public_to_json(self):
+        return {"organization_id": self.organization_id,
+                "organization_name": self.organization_name}
