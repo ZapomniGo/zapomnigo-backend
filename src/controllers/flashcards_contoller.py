@@ -8,7 +8,7 @@ from src.database.models import Flashcards
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
-from src.pydantic_models.flashcards_model import FlashcardsModel
+from src.pydantic_models.flashcards_model import FlashcardsModel, UpdateFlashcardsModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -47,25 +47,32 @@ class FlashcardsController:
 
         return {"message": "Flashcard with such id doesn't exist"}, 404
 
-    #
-    # @classmethod
-    # def update_set(cls, set_id: str):
-    #     json_data = request.get_json()
-    #     set_obj = SetsRepository.get_set_by_id(set_id)
-    #
-    #     if not set_obj:
-    #         return {"message": "set with such id doesn't exist"}, 404
-    #
-    #     username = SetsRepository.get_creator_username(set_obj.get_user_id())
-    #     if result := UtilityController.check_user_access(username):
-    #         return result
-    #
-    #     if validation_errors := validate_json_body(json_data, UpdateSetsModel):  # type: ignore
-    #         return {"validation errors": validation_errors}, 422
-    #
-    #     SetsRepository.edit_set(set_obj, json_data)
-    #     return {"message": "set successfully updated"}, 200
-    #
+    @classmethod
+    def check_if_user_can_delete_flashcard(cls, set_id: str):
+        set_obj = SetsRepository.get_set_by_id(set_id)
+        if not set_obj:
+            return {"message": "Set with such id doesn't exist"}, 404
+
+        username = SetsRepository.get_creator_username(set_obj.get_user_id())
+        if result := UtilityController.check_user_access(username):
+            return result
+
+    @classmethod
+    def update_flashcard(cls, flashcard_id: str):
+        json_data = request.get_json()
+        flashcard = FlashcardsRepository.get_flashcard_by_id(flashcard_id)
+
+        if not flashcard:
+            return {"message": "Flashcard with such id doesn't exist"}, 404
+
+        cls.check_if_user_can_delete_flashcard(flashcard.set_id)
+
+        if validation_errors := validate_json_body(json_data, UpdateFlashcardsModel):  # type: ignore
+            return {"validation errors": validation_errors}, 422
+
+        FlashcardsRepository.edit_flashcard(flashcard, json_data)
+        return {"message": "Flashcard successfully updated"}, 200
+
     @classmethod
     def delete_flashcard(cls, flashcard_id: str) -> Tuple[Dict[str, Any], int]:
         flashcard = FlashcardsRepository.get_flashcard_by_id(flashcard_id)
@@ -73,13 +80,7 @@ class FlashcardsController:
         if not flashcard:
             return {"message": "Flashcard with such id doesn't exist"}, 404
 
-        set_obj = SetsRepository.get_set_by_id(flashcard.set_id)
-        if not set_obj:
-            return {"message": "Set with such id doesn't exist"}, 404
-
-        username = SetsRepository.get_creator_username(set_obj.get_user_id())
-        if result := UtilityController.check_user_access(username):
-            return result
+        cls.check_if_user_can_delete_flashcard(flashcard.set_id)
 
         CommonRepository.delete_object_from_db(flashcard)
         return {"message": "Flashcard successfully deleted"}, 200

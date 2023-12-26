@@ -389,3 +389,17 @@ Responses:
 * `{"message": "Flashcard with such id doesn't exist"}, 404`
 * `{"message": "Set with such id doesn't exist"}, 404`
 * 401, 403, 498, 499 As it is a protected endpoint
+
+### `PUT /flashcard/flashcard_id` - updates a flashcard
+Responses:
+* `{"message": "Flashcard successfully updated"}, 200`
+* `{"message": "Flashcard with such id doesn't exist"}, 404`
+* `{"message": "Set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+Example body
+```json
+{
+    "term": "london",
+    "definition": "capital of UK"
+}
+```
