@@ -19,3 +19,7 @@ async def send_mail_async(receiver: str, subject: str, html: str) -> None:
     async with SMTP(hostname='smtp.gmail.com', port=port, use_tls=True) as server:
         await server.login(email, password)
         await server.sendmail(email, receiver, mime_msg.as_string())
+
+
+# async def send_email_background_task():
+#     await send_mail_async("", "Test", "")
