@@ -25,6 +25,7 @@ quart = "^0.19.4"
 quart-cors = "^0.7.0"
 quart-flask-patch = "^0.3.0"
 aiosmtplib = "^3.0.1"
+hypercorn = "^0.15.0"
 
 [tool.poetry.scripts]
 start = "src.main:start"
