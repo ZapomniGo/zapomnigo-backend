@@ -88,7 +88,7 @@ class UsersController:
 
         # TODO: Implement Refresh Token Reuse Detection with Redis
 
-        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"))
+        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"),refresh=True)
         new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
 
         response = make_response({'message': 'Token refreshed'}, 200)
