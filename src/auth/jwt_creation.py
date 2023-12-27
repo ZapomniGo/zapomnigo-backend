@@ -11,24 +11,11 @@ from src.database.repositories.users_repository import UsersRepository
 class JwtCreation:
 
     @classmethod
-    def create_access_jwt_token(cls, **kwargs) -> str:
-        user: Users = kwargs.get("user")
-        raw_password = kwargs.get("password")
-        username = kwargs.get("username")
-        refresh = kwargs.get("refresh")
-
-        if refresh:
-            if username == ADMIN_USERNAME:
-                is_admin = True
-            else:
-                is_admin = False
+    def create_access_jwt_token(cls, username: str) -> str:
+        if username == ADMIN_USERNAME:
+            is_admin = True
         else:
-            if username:
-                user = UsersRepository.get_user_by_username(username)
-                is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
-            else:
-                is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
-                username = user.username
+            is_admin = False
 
         payload = {
             "username": username,
@@ -44,10 +31,6 @@ class JwtCreation:
     def create_refresh_jwt_token(cls, username: str) -> str:
         payload = {"username": username,
                    "exp": datetime.utcnow() + timedelta(days=30)}
-
-        if IS_OFFLINE:
-            token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
-        else:
-            token = jwt.encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
         return token
