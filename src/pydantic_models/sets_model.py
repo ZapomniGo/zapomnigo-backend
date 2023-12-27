@@ -6,7 +6,7 @@ from src.pydantic_models.flashcards_model import FlashcardsModel
 
 SET_DESCRIPTION = Annotated[str, StringConstraints(min_length=2, max_length=4096)]
 SET_NAME = Annotated[str, StringConstraints(min_length=1, max_length=255)]
-ORGANIZATION_ID = Annotated[str, StringConstraints(min_length=1, max_length=26)]
+ORGANIZATION_ID = Annotated[str, StringConstraints(max_length=26)]
 
 
 class SetsModel(BaseModel):
