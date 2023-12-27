@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, List
 
 from flask import request
 from ulid import ULID
@@ -18,20 +18,35 @@ from src.utilities.parsers import validate_json_body
 class SetsController:
     @classmethod
     def create_set(cls, json_data, user_id: str):
+        set_description = json_data.get("set_description", None)
+        set_category = json_data.get("set_category", None)
+        organization_id = json_data.get("organization_id", None)
+
+        if set_description == "":
+            set_description = None
+        if set_category == "":
+            set_category = None
+        if organization_id == "":
+            organization_id = None
+
         return Sets(set_id=str(ULID()), set_name=json_data["set_name"],
-                    set_description=json_data.get("set_description", None),
+                    set_description=set_description,
                     set_modification_date=str(datetime.now()),
-                    set_category=json_data.get("set_category", None),
+                    set_category=set_category,
                     user_id=user_id,
-                    organization_id=json_data.get("organization_id", None))
+                    organization_id=organization_id)
 
     @classmethod
     def create_flashcards(cls, json_data, set_id: str):
         flashcards_objects = []
         for flashcard in json_data.get("flashcards", []):
+            notes = flashcard.get("notes", None)
+            if notes == "":
+                notes = None
+
             flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard["term"],
                                                  definition=flashcard["definition"],
-                                                 notes=flashcard.get("notes", None),
+                                                 notes=notes,
                                                  set_id=set_id))
         return flashcards_objects
 
@@ -51,13 +66,19 @@ class SetsController:
 
         CommonRepository.add_many_objects_to_db(flashcards)
 
-        return {"message": "Set added to db"}, 200
+        return {"set_id": set_obj.set_id}, 200
+
+    @classmethod
+    def get_all_flashcards_for_set(cls, set_id: str) -> List[Dict[str, Any]]:
+        return [flashcard.to_json() for flashcard in FlashcardsRepository.get_flashcards_by_set_id(set_id)]
 
     @classmethod
     def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
-        if result := CommonRepository.get_all_objects_from_db(Sets):
-            return {"sets": [sets.to_json(SetsRepository.get_creator_username(sets.get_user_id()))
-                             for sets in result]}, 200
+        sets: List[Sets] = CommonRepository.get_all_objects_from_db(Sets)
+        if sets:
+            return {"sets": [set_obj.to_json(username=SetsRepository.get_creator_username(set_obj.get_user_id()),
+                                             flashcards=cls.get_all_flashcards_for_set(set_obj.set_id))
+                             for set_obj in sets]}, 200
 
         return {"message": "No sets were found"}, 404
 
@@ -65,7 +86,10 @@ class SetsController:
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         if set_obj := SetsRepository.get_set_by_id(set_id):
             username = SetsRepository.get_creator_username(set_obj.get_user_id())
-            return {"set": set_obj.to_json(username)}, 200
+            flashcards = cls.get_all_flashcards_for_set(set_obj.set_id)
+
+            return {"set": set_obj.to_json(username=username,
+                                           flashcards=flashcards)}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
 

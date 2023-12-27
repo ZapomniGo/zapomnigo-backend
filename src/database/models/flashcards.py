@@ -18,6 +18,13 @@ class Flashcards(db.Model):
 
     def to_json(self):
         return {"flashcard_id": self.flashcard_id,
+                "term": self.term,
+                "definition": self.definition,
+                "notes": self.notes,
+                }
+
+    def single_to_json(self):
+        return {"flashcard_id": self.flashcard_id,
                 "set_id": self.set_id,
                 "term": self.term,
                 "definition": self.definition,
