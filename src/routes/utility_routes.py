@@ -7,5 +7,5 @@ utility_bp = Blueprint("utility", __name__)
 
 
 @utility_bp.get("/health")
-def health() -> Tuple[Dict[str, str], int]:
+async def health() -> Tuple[Dict[str, str], int]:
     return c.get_health()

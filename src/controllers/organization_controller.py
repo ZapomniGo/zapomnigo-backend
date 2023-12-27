@@ -48,8 +48,7 @@ class OrganizationsController:
                              subscription_model_id=subscription_model_id)
 
     @classmethod
-    def add_organization(cls) -> Tuple[Dict[str, Any], int]:
-        json_data = request.get_json()
+    def add_organization(cls,json_data) -> Tuple[Dict[str, Any], int]:
         if validation_errors := validate_json_body(json_data, OrganizationModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
@@ -66,8 +65,7 @@ class OrganizationsController:
         return {"message": "Organization with such id doesn't exist"}, 404
 
     @classmethod
-    def update_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
-        json_data = request.get_json()
+    def update_organization(cls, organization_id: str,json_data) -> Tuple[Dict[str, Any], int]:
         organization = OrganizationsRepository.get_organization_by_id(organization_id)
 
         if not organization:
