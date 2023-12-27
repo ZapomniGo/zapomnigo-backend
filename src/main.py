@@ -1,8 +1,5 @@
-import quart_flask_patch
-
 from quart import Quart
 from quart_cors import cors
-from flask_migrate import Migrate
 
 from src.config import DevConfig, ProdConfig, IS_OFFLINE
 from src.database.models.base import db
@@ -22,6 +19,8 @@ Routes.register_blueprints(app)
 ExceptionHandlers.register_error_handlers(app)
 
 db.init_app(app)
+
+
 # migrate.init_app(app, db)
 
 
