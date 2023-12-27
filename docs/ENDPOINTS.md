@@ -164,6 +164,27 @@ Example body: (You pass only the fields you wand to change)
 ```json
 {"organization_name": "Nasko"}
 ```
+
+### `GET /organizations/01HG6QGNWTZK2N0TBQCHDEWAJQ/sets`
+Responses:
+```json
+{
+    "Sets": [
+        {
+            "organization": "01HG6QGNWTZK2N0TBQCHDEWAJQ",
+            "set_category": "01HJ6DSCG5YG6YQMGFT9PVZJQA",
+            "set_description": "naskoebobur",
+            "set_id": "01HJM8KH8EW70K977WHDW30ARF",
+            "set_modification_date": "2023-12-27 01:50:50.382284",
+            "set_name": "TestORG",
+            "username": "ivanobreshkov"
+        }
+    ]
+}
+```
+* `{"message": "Organization with such id doesn't exist"}, 404`
+* `{"message": "No sets were found for this organization"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
 ---
 ### `POST /categories` - create a category
 
