@@ -18,20 +18,35 @@ from src.utilities.parsers import validate_json_body
 class SetsController:
     @classmethod
     def create_set(cls, json_data, user_id: str):
+        set_description = json_data.get("set_description", None)
+        set_category = json_data.get("set_category", None)
+        organization_id = json_data.get("organization_id", None)
+
+        if set_description == "":
+            set_description = None
+        if set_category == "":
+            set_category = None
+        if organization_id == "":
+            organization_id = None
+
         return Sets(set_id=str(ULID()), set_name=json_data["set_name"],
-                    set_description=json_data.get("set_description", None),
+                    set_description=set_description,
                     set_modification_date=str(datetime.now()),
-                    set_category=json_data.get("set_category", None),
+                    set_category=set_category,
                     user_id=user_id,
-                    organization_id=json_data.get("organization_id", None))
+                    organization_id=organization_id)
 
     @classmethod
     def create_flashcards(cls, json_data, set_id: str):
         flashcards_objects = []
         for flashcard in json_data.get("flashcards", []):
+            notes = flashcard.get("notes", None)
+            if notes == "":
+                notes = None
+
             flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard["term"],
                                                  definition=flashcard["definition"],
-                                                 notes=flashcard.get("notes", None),
+                                                 notes=notes,
                                                  set_id=set_id))
         return flashcards_objects
 
