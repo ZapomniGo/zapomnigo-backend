@@ -11,20 +11,11 @@ from src.utilities.parsers import validate_json_body
 
 
 class FlashcardsController:
-    @classmethod
-    def get_all_flashcards(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        if not SetsRepository.get_set_by_id(set_id):
-            return {"message": "Set with such id doesn't exist"}, 404
-
-        if result := FlashcardsRepository.get_flashcards_by_set_id(set_id):
-            return {"Flashcards": [flashcard.to_json() for flashcard in result]}, 200
-
-        return {"message": "No flashcards were found for this set"}, 404
 
     @classmethod
     def get_flashcard(cls, flashcard_id: str) -> Tuple[Dict[str, Any], int]:
         if flashcard := FlashcardsRepository.get_flashcard_by_id(flashcard_id):
-            return {"flashcard": flashcard.to_json()}, 200
+            return {"flashcard": flashcard.single_to_json()}, 200
 
         return {"message": "Flashcard with such id doesn't exist"}, 404
 

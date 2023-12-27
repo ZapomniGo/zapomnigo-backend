@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import jwt
 from flask_bcrypt import check_password_hash
 
-from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig, SECRET_KEY
+from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig, SECRET_KEY, ADMIN_USERNAME
 from src.database.models import Users
 from src.database.repositories.users_repository import UsersRepository
 
@@ -15,13 +15,20 @@ class JwtCreation:
         user: Users = kwargs.get("user")
         raw_password = kwargs.get("password")
         username = kwargs.get("username")
+        refresh = kwargs.get("refresh")
 
-        if username:
-            user = UsersRepository.get_user_by_username(username)
-            is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
+        if refresh:
+            if username == ADMIN_USERNAME:
+                is_admin = True
+            else:
+                is_admin = False
         else:
-            is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
-            username = user.username
+            if username:
+                user = UsersRepository.get_user_by_username(username)
+                is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
+            else:
+                is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
+                username = user.username
 
         payload = {
             "username": username,
@@ -36,7 +43,7 @@ class JwtCreation:
     @classmethod
     def create_refresh_jwt_token(cls, username: str) -> str:
         payload = {"username": username,
-                   "exp": datetime.utcnow() + timedelta(hours=2)}
+                   "exp": datetime.utcnow() + timedelta(days=30)}
 
         if IS_OFFLINE:
             token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")

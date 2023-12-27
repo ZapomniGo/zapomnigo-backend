@@ -8,11 +8,6 @@ from src.controllers.flashcards_contoller import FlashcardsController as c
 flashcards_bp = Blueprint("flashcards", __name__)
 
 
-@flashcards_bp.get("sets/<set_id>/flashcards")
-def get_flashcards(set_id: str) -> Tuple[Dict[str, Any], int]:
-    return c.get_all_flashcards(set_id)
-
-
 @flashcards_bp.get("/flashcards/<flashcard_id>")
 def get_flashcard(flashcard_id: str) -> Tuple[Dict[str, Any], int]:
     return c.get_flashcard(flashcard_id)
