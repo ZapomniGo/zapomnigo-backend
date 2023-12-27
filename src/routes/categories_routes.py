@@ -1,13 +1,19 @@
-from quart import Blueprint
+from quart import Blueprint, current_app
 
 from src.auth.jwt_decorators import admin_required, jwt_required
 from src.controllers.categories_controller import CategoriesController as c
+from src.services.mailer import send_mail_async
 
 categories_bp = Blueprint("categories", __name__)
 
 
+async def background_task():
+    await send_mail_async("ivanobreshkov12@gmail.com", "Test", "Nasko e gei")
+
+
 @categories_bp.get("/categories")
 async def get_categories():
+    current_app.add_background_task(background_task)
     return c.get_all_categories()
 
 

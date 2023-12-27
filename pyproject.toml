@@ -24,6 +24,7 @@ flask-cors = "^4.0.0"
 quart = "^0.19.4"
 quart-cors = "^0.7.0"
 quart-flask-patch = "^0.3.0"
+aiosmtplib = "^3.0.1"
 
 [tool.poetry.scripts]
 start = "src.main:start"

@@ -9,7 +9,7 @@ from src.database.models.base import db
 from src.routes import Routes
 from src.utilities.exception_handlers import ExceptionHandlers
 
-migrate = Migrate(directory="database/migrations")
+# migrate = Migrate(directory="database/migrations")
 app = Quart(__name__, instance_relative_config=True)
 app = cors(app, allow_origin="*")
 
@@ -22,7 +22,7 @@ Routes.register_blueprints(app)
 ExceptionHandlers.register_error_handlers(app)
 
 db.init_app(app)
-migrate.init_app(app, db)
+# migrate.init_app(app, db)
 
 
 def start() -> None:
