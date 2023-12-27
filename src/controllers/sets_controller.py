@@ -22,7 +22,8 @@ class SetsController:
                     set_description=json_data.get("set_description", None),
                     set_modification_date=str(datetime.now()),
                     set_category=json_data.get("set_category", None),
-                    user_id=user_id)
+                    user_id=user_id,
+                    organization_id=json_data.get("organization_id", None))
 
     @classmethod
     def create_flashcards(cls, json_data, set_id: str):

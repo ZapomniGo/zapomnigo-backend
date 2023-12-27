@@ -6,6 +6,7 @@ from src.pydantic_models.flashcards_model import FlashcardsModel
 
 SET_DESCRIPTION = Annotated[str, StringConstraints(min_length=2, max_length=4096)]
 SET_NAME = Annotated[str, StringConstraints(min_length=1, max_length=255)]
+ORGANIZATION_ID = Annotated[str, StringConstraints(min_length=1, max_length=26)]
 
 
 class SetsModel(BaseModel):
@@ -13,6 +14,7 @@ class SetsModel(BaseModel):
     set_description: Optional[SET_DESCRIPTION] = None
     set_category: str
     flashcards: List[FlashcardsModel]
+    organization_id: Optional[ORGANIZATION_ID]
 
     @model_validator(mode='before')
     def check_empty_flashcards(cls, values):

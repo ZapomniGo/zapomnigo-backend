@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from src.database.models.base import db
 from src.database.models.sets import Sets
@@ -15,6 +15,10 @@ class SetsRepository:
     @classmethod
     def get_set_by_id(cls, set_id: str) -> Sets | None:
         return db.session.query(Sets).filter_by(set_id=set_id).first()
+
+    @classmethod
+    def get_organization_sets(cls, organization_id: str) -> List[Sets] | None:
+        return db.session.query(Sets).filter_by(organization_id=organization_id).all()
 
     @classmethod
     def edit_set(cls, set_obj: Sets, json_data: Dict[str, Any]) -> None:

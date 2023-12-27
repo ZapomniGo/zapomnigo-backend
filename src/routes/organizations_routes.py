@@ -19,6 +19,12 @@ def get_organization(organization_id: str) -> Tuple[Dict[str, Any], int]:
     return c.get_organization(organization_id)
 
 
+@organizations_bp.get("/organizations/<organization_id>/sets")
+@admin_required
+def get_sets_for_organization(organization_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.get_sets_for_organization(organization_id)
+
+
 @organizations_bp.post("/organizations")
 @admin_required
 def register_organization() -> Tuple[Dict[str, Any], int]:

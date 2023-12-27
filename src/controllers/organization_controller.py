@@ -6,6 +6,7 @@ from ulid import ULID
 from src.database.models import Organizations
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.organizations_repository import OrganizationsRepository
+from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.subscription_models_repository import SubscriptionModelsRepository
 from src.pydantic_models.organization_model import OrganizationModel, UpdateOrganizationModel
 from src.utilities.parsers import validate_json_body
@@ -25,6 +26,18 @@ class OrganizationsController:
             return {"organization": organization.to_json()}, 200
 
         return {"message": "Organization with such id doesn't exist"}, 404
+
+    @classmethod
+    def get_sets_for_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
+        organization = OrganizationsRepository.get_organization_by_id(organization_id)
+        if not organization:
+            return {"message": "Organization with such id doesn't exist"}, 404
+
+        if sets := SetsRepository.get_organization_sets(organization_id):
+            return {"Sets": [set_obj.to_json(SetsRepository.get_creator_username(set_obj.get_user_id()))
+                             for set_obj in sets]}, 200
+
+        return {"message": "No sets were found for this organization"}, 404
 
     @staticmethod
     def create_organization(json_data):
