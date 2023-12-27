@@ -1,8 +1,10 @@
+import quart_flask_patch
+
 from typing import Tuple, Dict, Any
 
-from flask import request, make_response, Response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
+from quart import request, Response, make_response
 from ulid import ULID
 
 from src.auth.jwt_creation import JwtCreation
@@ -30,9 +32,7 @@ class UsersController:
                      marketing_consent=json_data["marketing_consent"])
 
     @classmethod
-    def register_user(cls) -> Tuple[Dict[str, Any], int]:
-        json_data = request.get_json()
-
+    def register_user(cls, json_data) -> Tuple[Dict[str, Any], int]:
         validation_errors = validate_json_body(json_data, RegistrationModel)  # type: ignore
         if validation_errors:
             return {"validation errors": validation_errors}, 422
@@ -51,9 +51,7 @@ class UsersController:
         return {"message": "user added to db"}, 200
 
     @classmethod
-    def login_user(cls) -> Response | Tuple[Dict[str, Any], int]:
-        json_data = request.get_json()
-
+    async def login_user(cls, json_data) -> Response | Tuple[Dict[str, Any], int]:
         validation_errors = validate_json_body(json_data, LoginModel)  # type: ignore
         if validation_errors:
             return {"validation errors": validation_errors}, 422
@@ -69,29 +67,29 @@ class UsersController:
         access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
         refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
 
-        response = make_response({"message": "user logged in"}, 200)
+        response = await make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, secure=True, samesite="Strict")
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="Strict")
         return response
 
     @classmethod
-    def logout(cls) -> Response:
-        response = make_response({"message": "user logged out"}, 200)
+    async def logout(cls) -> Response:
+        response = await make_response({"message": "user logged out"}, 200)
         response.set_cookie('access_token', '', expires=0, secure=True, samesite='Strict')
         response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite='Strict')
         return response
 
     @classmethod
-    def refresh_token(cls) -> Response:
+    async def refresh_token(cls) -> Response:
         refresh_token = request.cookies.get('refresh_token')
         decoded_token = decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
 
         # TODO: Implement Refresh Token Reuse Detection with Redis
 
-        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"),refresh=True)
+        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"), refresh=True)
         new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
 
-        response = make_response({'message': 'Token refreshed'}, 200)
+        response = await make_response({'message': 'Token refreshed'}, 200)
         response.set_cookie('access_token', new_access_token, secure=True, samesite='Strict')
         response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite='Strict')
 

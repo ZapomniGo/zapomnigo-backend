@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Tuple, Dict, Any, List
 
-from flask import request
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
@@ -51,8 +50,7 @@ class SetsController:
         return flashcards_objects
 
     @classmethod
-    def add_set(cls):
-        json_data = request.json
+    def add_set(cls, json_data):
         user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username()).user_id
         if validation_errors := validate_json_body(json_data, SetsModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
@@ -94,8 +92,7 @@ class SetsController:
         return {"message": "set with such id doesn't exist"}, 404
 
     @classmethod
-    def update_set(cls, set_id: str):
-        json_data = request.get_json()
+    def update_set(cls, set_id: str, json_data):
         set_obj = SetsRepository.get_set_by_id(set_id)
 
         if not set_obj:

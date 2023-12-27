@@ -1,7 +1,5 @@
 from typing import Tuple, Dict, Any
 
-from flask import request
-
 from src.controllers.utility_controller import UtilityController
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
@@ -30,8 +28,7 @@ class FlashcardsController:
             return result
 
     @classmethod
-    def update_flashcard(cls, flashcard_id: str):
-        json_data = request.get_json()
+    def update_flashcard(cls, flashcard_id: str, json_data):
         flashcard = FlashcardsRepository.get_flashcard_by_id(flashcard_id)
 
         if not flashcard:
