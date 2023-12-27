@@ -263,19 +263,17 @@ Responses:
 Example body
 ```json
 {
-    "set_name": "TestBratme",
+    "set_name": "TestORG",
     "set_description": "naskoebobur",
     "set_category": "01HJ6DSCG5YG6YQMGFT9PVZJQA",
-    "organization_id": "01HG6QGNWTZK2N0TBQCHDEWAJQ", (Optional)
+    "organization_id": "01HG6QGNWTZK2N0TBQCHDEWAJQ",
     "flashcards": [
         {
-            "definition": "capital of Бulgaria",
-            "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",
+            "definition": "capital of bulgaria",
             "term": "sofia"
         },
         {
             "definition": "capital of UK",
-            "flashcard_id": "01HJECRT8FTKNMVVBR7DEGKBGG",
             "notes": "testtesttestsetest",
             "term": "london"
         }
