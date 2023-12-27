@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, List
 
 from flask import request
 from ulid import ULID
@@ -54,10 +54,16 @@ class SetsController:
         return {"set_id": set_obj.set_id}, 200
 
     @classmethod
+    def get_all_flashcards_for_set(cls, set_id: str) -> List[Dict[str, Any]]:
+        return [flashcard.to_json() for flashcard in FlashcardsRepository.get_flashcards_by_set_id(set_id)]
+
+    @classmethod
     def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
-        if result := CommonRepository.get_all_objects_from_db(Sets):
-            return {"sets": [sets.to_json(SetsRepository.get_creator_username(sets.get_user_id()))
-                             for sets in result]}, 200
+        sets: List[Sets] = CommonRepository.get_all_objects_from_db(Sets)
+        if sets:
+            return {"sets": [set_obj.to_json(username=SetsRepository.get_creator_username(set_obj.get_user_id()),
+                                             flashcards=cls.get_all_flashcards_for_set(set_obj.set_id))
+                             for set_obj in sets]}, 200
 
         return {"message": "No sets were found"}, 404
 
@@ -65,7 +71,10 @@ class SetsController:
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         if set_obj := SetsRepository.get_set_by_id(set_id):
             username = SetsRepository.get_creator_username(set_obj.get_user_id())
-            return {"set": set_obj.to_json(username)}, 200
+            flashcards = cls.get_all_flashcards_for_set(set_obj.set_id)
+
+            return {"set": set_obj.to_json(username=username,
+                                           flashcards=flashcards)}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
 

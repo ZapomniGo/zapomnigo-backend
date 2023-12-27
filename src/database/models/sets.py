@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -30,7 +30,8 @@ class Sets(db.Model):
     def get_user_id(self):
         return self.user_id
 
-    def to_json(self, username, flashcards):
+    def to_json(self, username: str, flashcards: List[Any]):
+        flashcards = flashcards or []
         return {"set_id": self.set_id,
                 "set_name": self.set_name,
                 "set_description": self.set_description,
