@@ -36,7 +36,7 @@ class JwtCreation:
     @classmethod
     def create_refresh_jwt_token(cls, username: str) -> str:
         payload = {"username": username,
-                   "exp": datetime.utcnow() + timedelta(hours=2)}
+                   "exp": datetime.utcnow() + timedelta(days=30)}
 
         if IS_OFFLINE:
             token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
