@@ -51,7 +51,7 @@ class SetsController:
 
         CommonRepository.add_many_objects_to_db(flashcards)
 
-        return {"message": "Set added to db"}, 200
+        return {"set_id": set_obj.set_id}, 200
 
     @classmethod
     def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
