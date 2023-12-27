@@ -18,9 +18,7 @@ class CategoriesController:
         return Categories(category_id=str(ULID()), category_name=str(json_data["category_name"]).lower())
 
     @classmethod
-    def add_category(cls):
-        json_data = request.json
-
+    def add_category(cls, json_data):
         if validation_errors := validate_json_body(json_data, CategoriesModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
@@ -43,8 +41,7 @@ class CategoriesController:
         return {"message": "Category with such id doesn't exist"}, 404
 
     @classmethod
-    def update_category(cls, category_id: str):
-        json_data = request.get_json()
+    def update_category(cls, category_id: str, json_data):
         category = CategoriesRepository.get_category_by_id(category_id)
 
         if not category:
