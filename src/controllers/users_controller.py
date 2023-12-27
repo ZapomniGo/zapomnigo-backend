@@ -1,5 +1,3 @@
-import quart_flask_patch
-
 from typing import Tuple, Dict, Any
 
 from flask_bcrypt import generate_password_hash, check_password_hash
