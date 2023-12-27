@@ -8,7 +8,8 @@ from src.utilities.exception_handlers import ExceptionHandlers
 
 # migrate = Migrate(directory="database/migrations")
 app = Quart(__name__, instance_relative_config=True)
-app = cors(app, allow_origin="*")
+app = cors(app, allow_origin=["http://127.0.0.1:3884", "https://zapomnigo-server-aaea6dc84a09.herokuapp.com/",
+                              "http://0.0.0.0:3884"], allow_credentials=True)
 
 if IS_OFFLINE:
     app.config.from_object(DevConfig)
