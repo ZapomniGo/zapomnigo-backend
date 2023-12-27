@@ -1,6 +1,6 @@
 from typing import Tuple, Any, Dict
 
-from flask import request
+from quart import request
 from ulid import ULID
 
 from src.database.models import Categories

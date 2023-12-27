@@ -1,3 +1,4 @@
+import quart_flask_patch
 from src.database.models.categories import Categories
 from src.database.models.comments import Comments
 from src.database.models.flashcards import Flashcards

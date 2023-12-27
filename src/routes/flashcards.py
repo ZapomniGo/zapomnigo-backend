@@ -1,6 +1,6 @@
 from typing import Tuple, Dict, Any
 
-from flask import Blueprint
+from quart import Blueprint
 
 from src.auth.jwt_decorators import jwt_required
 from src.controllers.flashcards_contoller import FlashcardsController as c

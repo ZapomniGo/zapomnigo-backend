@@ -1,6 +1,6 @@
 from typing import List
 
-from flask import Blueprint, Flask
+from quart import Blueprint, Quart
 
 from src.routes.categories_routes import categories_bp
 from src.routes.flashcards import flashcards_bp
@@ -16,6 +16,6 @@ class Routes:
                                     sets_bp, flashcards_bp]
 
     @classmethod
-    def register_blueprints(cls, app: Flask) -> None:
+    def register_blueprints(cls, app: Quart) -> None:
         for blueprint in cls._blueprints:
             app.register_blueprint(blueprint, url_prefix="/v1")

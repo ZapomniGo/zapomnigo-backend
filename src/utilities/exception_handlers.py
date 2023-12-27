@@ -1,6 +1,6 @@
 from traceback import format_exc
 
-from flask import request, Flask
+from quart import request, Quart
 from jwt import ExpiredSignatureError, InvalidSignatureError, DecodeError
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import HTTPException
@@ -47,7 +47,7 @@ class ExceptionHandlers:
         return {"message": "Invalid or missing auth token."}, 499
 
     @classmethod
-    def register_error_handlers(cls, app: Flask):
+    def register_error_handlers(cls, app: Quart):
         if IS_OFFLINE:
             app.register_error_handler(Exception, cls.handle_uncaught_exception)
 
