@@ -14,7 +14,7 @@ class SetsModel(BaseModel):
     set_description: Optional[SET_DESCRIPTION] = None
     set_category: str
     flashcards: List[FlashcardsModel]
-    organization_id: Optional[ORGANIZATION_ID]
+    organization_id: Optional[ORGANIZATION_ID] = None
 
     @model_validator(mode='before')
     def check_empty_flashcards(cls, values):
