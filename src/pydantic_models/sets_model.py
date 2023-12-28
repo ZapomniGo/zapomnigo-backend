@@ -12,7 +12,7 @@ ORGANIZATION_ID = Annotated[str, StringConstraints(max_length=26)]
 class SetsModel(BaseModel):
     set_name: SET_NAME
     set_description: Optional[SET_DESCRIPTION] = None
-    set_category: str
+    set_category: Optional[ORGANIZATION_ID] = None
     flashcards: List[FlashcardsModel]
     organization_id: Optional[ORGANIZATION_ID] = None
 
@@ -28,5 +28,5 @@ class UpdateSetsModel(BaseModel):
     model_config = ConfigDict(extra='forbid')
     set_name: Optional[SET_NAME] = None
     set_description: Optional[SET_DESCRIPTION] = None
-    set_category: Optional[str] = None
+    set_category: Optional[ORGANIZATION_ID] = None
     flashcards: List[FlashcardsModel] = None
