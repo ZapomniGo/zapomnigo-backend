@@ -31,6 +31,20 @@ files = [
 ]
 
 [[package]]
+name = "asgiref"
+version = "3.7.2"
+description = "ASGI specs, helper code, and adapters"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "asgiref-3.7.2-py3-none-any.whl", hash = "sha256:89b2ef2247e3b562a16eef663bc0e2e703ec6468e2fa8a5cd61cd449786d4f6e"},
+    {file = "asgiref-3.7.2.tar.gz", hash = "sha256:9e0ce3aa93a819ba5b45120216b23878cf6e8525eb3848653452b4192b92afed"},
+]
+
+[package.extras]
+tests = ["mypy (>=0.800)", "pytest", "pytest-asyncio"]
+
+[[package]]
 name = "bcrypt"
 version = "4.0.1"
 description = "Modern password hashing for your software and your servers"
@@ -918,4 +932,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "e51cc99c03f51481de61108c3b5c3d71de58c13a3e9ed2b5465cbf0740603661"
+content-hash = "08b0f4cec0eb8ffc19ce756aa19f8fffb83db0a7d8b561ca9a33e0dbf009cbd9"
