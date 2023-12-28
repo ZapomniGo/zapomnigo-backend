@@ -15,3 +15,8 @@ class UsersRepository:
     @classmethod
     def get_user_by_email(cls, email: str) -> Users | None:
         return db.session.query(Users).filter_by(email=email).first()
+
+    @classmethod
+    def change_verified_status(cls, user: Users) -> None:
+        user.verified = True
+        db.session.commit()

@@ -66,6 +66,11 @@ class UsersController:
         if not check_password_hash(hashed_user_password, json_data["password"]):
             return {"message": "invalid password"}, 401
 
+        if not user.verified:
+            return {"user_info": {"email": user.email,
+                                  "user_id": user.user_id,
+                                  "username": user.username}}, 418
+
         access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
         refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
 
