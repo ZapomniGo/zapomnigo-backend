@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Tuple, Dict, Any, List
 
 from flask import request
+from flask_sqlalchemy.query import Query
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
@@ -73,14 +74,44 @@ class SetsController:
         return [flashcard.to_json() for flashcard in FlashcardsRepository.get_flashcards_by_set_id(set_id)]
 
     @classmethod
-    def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
-        sets: List[Sets] = CommonRepository.get_all_objects_from_db(Sets)
-        if sets:
-            return {"sets": [set_obj.to_json(username=SetsRepository.get_creator_username(set_obj.get_user_id()),
-                                             flashcards=cls.get_all_flashcards_for_set(set_obj.set_id))
-                             for set_obj in sets]}, 200
+    def get_all_sets(cls,) -> Tuple[Dict[str, Any], int]:
+        page = request.args.get('page', default=1, type=int)
+        per_page = request.args.get('size', default=20, type=int)
+        result = SetsRepository.get_all_sets(page, per_page)
+        if not result:
+            return {"message": "No sets were found"}, 404
 
-        return {"message": "No sets were found"}, 404
+        sets_list = cls.display_sets_info(result)
+        last_page = result.pages if result.pages > 0 else 1
+
+        return {'sets': sets_list, 'total_pages': result.pages, 'current_page': result.page,
+                'last_page': last_page}, 200
+
+    @classmethod
+    def display_sets_info(cls, result: Query) -> List[Dict[str, Any]]:
+        sets_list = []
+        for row in result:
+            set_dict = {
+                'set_id': row.set_id,
+                'set_name': row.set_name,
+                'set_description': row.set_description,
+                'set_modification_date': row.set_modification_date,
+                'category_name': row.category_name,
+                'organization_name': row.organization_name,
+                'flashcards': []
+            }
+
+            flashcard_dict = {
+                'flashcard_id': row.flashcard_id,
+                'term': row.term,
+                'definition': row.definition,
+                'notes': row.notes
+            }
+
+            set_dict['flashcards'].append(flashcard_dict)
+            sets_list.append(set_dict)
+
+        return sets_list
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
