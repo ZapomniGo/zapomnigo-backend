@@ -74,9 +74,9 @@ class SetsController:
         return [flashcard.to_json() for flashcard in FlashcardsRepository.get_flashcards_by_set_id(set_id)]
 
     @classmethod
-    def get_all_sets(cls,) -> Tuple[Dict[str, Any], int]:
-        page = request.args.get('page', default=1, type=int)
-        per_page = request.args.get('size', default=20, type=int)
+    def get_all_sets(cls, ) -> Tuple[Dict[str, Any], int]:
+        page = request.args.get('page', type=int)
+        per_page = request.args.get('size', type=int)
         result = SetsRepository.get_all_sets(page, per_page)
         if not result:
             return {"message": "No sets were found"}, 404
