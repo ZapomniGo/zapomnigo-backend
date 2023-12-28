@@ -4,7 +4,7 @@ from pydantic import BaseModel, StringConstraints, ConfigDict
 
 from src.pydantic_models.common import NAME
 
-TERM_DEFINITION = Annotated[str, StringConstraints(min_length=1, max_length=16384)]
+TERM_DEFINITION = Annotated[str, StringConstraints(min_length=1, max_length=524288)]
 
 
 class FlashcardsModel(BaseModel):
