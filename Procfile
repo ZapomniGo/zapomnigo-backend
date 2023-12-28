@@ -1,1 +1,1 @@
-web: hypercorn "src.main:asgi_app" --workers 4
+web: hypercorn "src.main:asgi_app" --bind 0.0.0.0:${PORT} --workers 4
