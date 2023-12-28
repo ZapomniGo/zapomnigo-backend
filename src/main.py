@@ -1,3 +1,4 @@
+from asgiref.wsgi import WsgiToAsgi
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -29,6 +30,9 @@ def create_app() -> Flask:
         db.create_all()
 
     return app
+
+
+asgi_app = WsgiToAsgi(create_app())
 
 
 def start() -> None:
