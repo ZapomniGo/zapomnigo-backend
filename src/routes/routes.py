@@ -9,11 +9,12 @@ from src.routes.sets_routes import sets_bp
 from src.routes.subscription_models_routes import subscription_models_bp
 from src.routes.users_routes import users_bp
 from src.routes.utility_routes import utility_bp
+from src.routes.verification_routes import verification_bp
 
 
 class Routes:
     _blueprints: List[Blueprint] = [utility_bp, users_bp, subscription_models_bp, organizations_bp, categories_bp,
-                                    sets_bp, flashcards_bp]
+                                    sets_bp, flashcards_bp, verification_bp]
 
     @classmethod
     def register_blueprints(cls, app: Flask) -> None:

@@ -1,9 +1,12 @@
+import asyncio
 from typing import Tuple, Dict, Any
 
 from flask import request
 from jwt import decode
 
+from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY, ADMIN_USERNAME
+from src.services.mailer import send_email_background_task
 
 
 class UtilityController:
@@ -27,3 +30,17 @@ class UtilityController:
     @classmethod
     def get_session_username(cls) -> str | None:
         return decode(request.cookies.get('refresh_token'), SECRET_KEY, algorithms=["HS256"]).get("username")
+
+    @classmethod
+    async def send_mail_logic(cls, email: str, user_id: str, username: str):
+        token = JwtCreation.create_verification_jwt(user_id)
+        BODY_HTML = f"""<html>
+                <head></head>
+                <body>
+                  <h1>Hi welcome to our app, {username}</h1>
+                  <p>Please verify your email by clicking
+                    <a href='https://zapomnigo-server-aaea6dc84a09.herokuapp.com/v1/verify?token={token}'>here</a></p>
+                </body>
+                </html>
+                            """
+        asyncio.create_task(send_email_background_task(email, "TEST", BODY_HTML))

@@ -82,6 +82,35 @@ Example body:
 ```json
 {"email_or_username":"test4@test.com","password": "T3stpswd"}
 ```
+* 418
+`{"user_info": 
+{"email": user.email,
+"user_id": user.user_id,
+"username": user.username}}`
+
+### `GET /verify?token=jwt` - verifies a registered user
+* `{"message": "Your account has been verified"}, 200`
+* `{"message": "user doesn't exist"}, 404`
+* `{"message": "Verification link expired."}, 420`
+* `{"message": "Invalid verification token signature."}, 401`
+* `{"message": "Invalid or missing verification token."}, 499`
+* `{"message": "No user_id provided"}, 499`
+
+### `POST /send-email` - sends an email to a registered user
+Example body:
+```json
+{"user_id": "01HF4S35XAGB1KC52XBCWW8Z5N",
+"username": "test",
+"email": "test@test.com"}
+```
+Responses:
+* 200
+```json
+{
+    "message": "Email send to test@test.com"
+}
+```
+* 422
 
 ### `POST /logout` logs out the user
 

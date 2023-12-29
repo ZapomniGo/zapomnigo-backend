@@ -8,8 +8,8 @@ users_bp = Blueprint("users", __name__)
 
 
 @users_bp.post("/register")
-def register() -> Tuple[Dict[str, Any], int]:
-    return c.register_user()
+async def register() -> Tuple[Dict[str, Any], int]:
+    return await c.register_user()
 
 
 @users_bp.post("/login")
