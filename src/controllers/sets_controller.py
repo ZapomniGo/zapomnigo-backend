@@ -91,7 +91,7 @@ class SetsController:
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         if result := SetsRepository.get_set_info(set_id):
-            return {"set": cls.display_sets_info(result)}, 200
+            return {"set": cls.display_sets_info(result)[0]}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
 
