@@ -96,6 +96,22 @@ Example body:
 * `{"message": "Invalid or missing verification token."}, 499`
 * `{"message": "No user_id provided"}, 499`
 
+### `POST /send-email` - sends an email to a registered user
+Example body:
+```json
+{"user_id": "01HF4S35XAGB1KC52XBCWW8Z5N",
+"username": "test",
+"email": "test@test.com"}
+```
+Responses:
+* 200
+```json
+{
+    "message": "Email send to test@test.com"
+}
+```
+* 422
+
 ### `POST /logout` logs out the user
 
 Responses:
