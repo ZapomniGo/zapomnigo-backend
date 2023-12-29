@@ -411,13 +411,22 @@ Responses:
 * 200
 ```json
 {
-   "set": {
-      "set_category": null,
-      "set_description": "forza4",
-      "set_id": "01HJBKF9WTWRYZY2GAMACTC7AN",
-      "set_modification_date": "2023-12-23 17:07:36.218534",
-      "set_name": "TEst",
-      "username": "aleks"
+    "set": {
+        "category_name": "biologybratle",
+        "flashcards": [
+            {
+                "definition": "capital of Bulgaria",
+                "flashcard_id": "01HJM17CGYC6XMCDYZDTDQXCX2",
+                "notes": null,
+                "term": "sofia"
+            }
+        ],
+        "organization_name": null,
+        "set_description": "bobreee",
+        "set_id": "01HJM17CGHV66Q9940GAP8AJXK",
+        "set_modification_date": "2023-12-26 23:41:52.273972",
+        "set_name": "Capitals",
+        "username": "ivanobreshkov"
     }
 }
 ```
