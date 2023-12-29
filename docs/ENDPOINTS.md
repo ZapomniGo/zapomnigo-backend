@@ -281,37 +281,101 @@ Example body
 }
 ```
 
-### `GET /sets` - get all sets from the db
-
+### `GET /sets?page=1&size=2` - get all sets from the db
+/sets could also be used and the default params are 1 and 20
 Responses:
 * 200
 ```json
 {
-  "sets": [
-    {
-      "set_category": "01HJ6DSCG5YG6YQMGFT9PVZJQA",
-      "set_description": "naskoebobur",
-      "set_id": "01HJBKF94QV95TW35F5S7DZQAP",
-      "set_modification_date": "2023-12-23 17:07:35.447655",
-      "set_name": "TEst",
-      "username": "nasko"
-    },
-    {
-      "set_category": null,
-      "set_description": "forza4",
-      "set_id": "01HJBKF9WTWRYZY2GAMACTC7AN",
-      "set_modification_date": "2023-12-23 17:07:36.218534",
-      "set_name": "TEst",
-      "username": "aleks"
-    }
-  ]
+    "current_page": 1,
+    "last_page": 10,
+    "sets": [
+        {
+            "category_name": "biologybratle",
+            "flashcards": [
+                {
+                    "definition": "capital of Bulgaria",
+                    "flashcard_id": "01HJM17CGYC6XMCDYZDTDQXCX2",
+                    "notes": null,
+                    "term": "sofia"
+                }
+            ],
+            "organization_name": null,
+            "set_description": "bobreee",
+            "set_id": "01HJM17CGHV66Q9940GAP8AJXK",
+            "set_modification_date": "2023-12-26 23:41:52.273972",
+            "set_name": "Capitals",
+            "username": "ivanobreshkov"
+        },
+        {
+            "category_name": "biologybratle",
+            "flashcards": [
+                {
+                    "definition": "capital of UK",
+                    "flashcard_id": "01HJM17CGYWCPPYY6DWQ9Y1FKX",
+                    "notes": "testtesttestsetest",
+                    "term": "london"
+                }
+            ],
+            "organization_name": null,
+            "set_description": "bobreee",
+            "set_id": "01HJM17CGHV66Q9940GAP8AJXK",
+            "set_modification_date": "2023-12-26 23:41:52.273972",
+            "set_name": "Capitals",
+            "username": "ivanobreshkov"
+        }
+    ],
+    "total_pages": 10
 }
 ```
 * 404
 ```json
 {"message": "No sets were found"}
 ```
+### `GET /users/01HF4S35XAGB1KC52XBCWW8Z5N/sets?page=1&size=20` - get all sets  for a specific user
+/users/01HF4S35XAGB1KC52XBCWW8Z5N/sets could also be used and the default params are 1 and 20
 
+Responses:
+* 200
+```json
+{
+    "current_page": 1,
+    "last_page": 20,
+    "sets": [
+        {
+            "category_name": "biologybratle",
+            "flashcards": [
+                {
+                    "definition": "capital of Bulgaria",
+                    "flashcard_id": "01HJM17CGYC6XMCDYZDTDQXCX2",
+                    "notes": null,
+                    "term": "sofia"
+                }
+            ],
+            "organization_name": null,
+            "set_description": "bobreee",
+            "set_id": "01HJM17CGHV66Q9940GAP8AJXK",
+            "set_modification_date": "2023-12-26 23:41:52.273972",
+            "set_name": "Capitals",
+            "username": "ivanobreshkov"
+        }
+    ],
+    "total_pages": 20
+}
+```
+* 404
+
+```json
+{
+    "message": "user doesn't exist"
+}
+```
+or
+```json
+{
+    "message": "No sets were found"
+}
+```
 ### `GET /set/id` - get info for specific set
 
 Responses:

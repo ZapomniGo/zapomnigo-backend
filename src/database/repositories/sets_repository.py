@@ -1,6 +1,11 @@
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
+from flask_sqlalchemy.pagination import Pagination
+from flask_sqlalchemy.query import Query
+from sqlalchemy import select, Row
+
+from src.database.models import Organizations, Categories, Flashcards, OrganizationsUsers, Users
 from src.database.models.base import db
 from src.database.models.sets import Sets
 from src.database.repositories.users_repository import UsersRepository
@@ -13,12 +18,39 @@ class SetsRepository:
         return str(UsersRepository.get_user_by_ulid(user_id).username)
 
     @classmethod
+    def get_organization_sets(cls, organization_id: str) -> List[Sets] | None:
+        return db.session.query(Sets).filter_by(organization_id=organization_id).all()
+
+    @classmethod
     def get_set_by_id(cls, set_id: str) -> Sets | None:
         return db.session.query(Sets).filter_by(set_id=set_id).first()
 
     @classmethod
-    def get_organization_sets(cls, organization_id: str) -> List[Sets] | None:
-        return db.session.query(Sets).filter_by(organization_id=organization_id).all()
+    def _base_query(cls) -> Query:
+        return db.session.query(
+            Sets.set_id, Sets.set_name, Sets.set_description, Sets.set_modification_date,
+            Categories.category_name, Organizations.organization_name,
+            Flashcards.flashcard_id, Flashcards.term, Flashcards.definition, Flashcards.notes, Users.username
+        ).join(Flashcards, Sets.set_id == Flashcards.set_id) \
+            .outerjoin(Categories, Categories.category_id == Sets.set_category) \
+            .join(Users, Users.user_id == Sets.user_id) \
+            .outerjoin(OrganizationsUsers, Users.user_id == OrganizationsUsers.user_id) \
+            .outerjoin(Organizations, Organizations.organization_id == OrganizationsUsers.organization_id)
+
+    @classmethod
+    def get_set_info(cls, set_id: str) -> List[Tuple[...]]:
+        return cls._base_query().filter(Sets.set_id == set_id).all()
+
+    @classmethod
+    def get_all_sets(cls, page: int = 1, size: int = 20, user_id: str = "") -> Pagination:
+        if user_id:
+            pagination: Pagination = cls._base_query().filter(Users.user_id == user_id).paginate(page=page,
+                                                                                                 per_page=size,
+                                                                                                 error_out=True)
+        else:
+            pagination: Pagination = cls._base_query().paginate(page=page, per_page=size, error_out=True)
+
+        return pagination
 
     @classmethod
     def edit_set(cls, set_obj: Sets, json_data: Dict[str, Any]) -> None:
