@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Tuple, Dict, Any, List
 
 from flask import request
+from flask_sqlalchemy.pagination import Pagination
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
@@ -73,25 +74,60 @@ class SetsController:
         return [flashcard.to_json() for flashcard in FlashcardsRepository.get_flashcards_by_set_id(set_id)]
 
     @classmethod
-    def get_all_sets(cls) -> Tuple[Dict[str, Any], int]:
-        sets: List[Sets] = CommonRepository.get_all_objects_from_db(Sets)
-        if sets:
-            return {"sets": [set_obj.to_json(username=SetsRepository.get_creator_username(set_obj.get_user_id()),
-                                             flashcards=cls.get_all_flashcards_for_set(set_obj.set_id))
-                             for set_obj in sets]}, 200
+    def get_all_sets(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
+        page = request.args.get('page', type=int)
+        size = request.args.get('size', type=int)
+        result = SetsRepository.get_all_sets(page, size, user_id)
+        sets_list = cls.display_sets_info(result)
 
-        return {"message": "No sets were found"}, 404
+        if not sets_list:
+            return {"message": "No sets were found"}, 404
+
+        last_page = result.pages if result.pages > 0 else 1
+
+        return {'sets': sets_list, 'total_pages': result.pages, 'current_page': result.page,
+                'last_page': last_page}, 200
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        if set_obj := SetsRepository.get_set_by_id(set_id):
-            username = SetsRepository.get_creator_username(set_obj.get_user_id())
-            flashcards = cls.get_all_flashcards_for_set(set_obj.set_id)
-
-            return {"set": set_obj.to_json(username=username,
-                                           flashcards=flashcards)}, 200
+        if result := SetsRepository.get_set_info(set_id):
+            return {"set": cls.display_sets_info(result)[0]}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
+
+    @classmethod
+    def get_sets_for_user(cls, user_id: str):
+        if not UsersRepository.get_user_by_ulid(user_id):
+            return {"message": "user doesn't exist"}, 404
+
+        return cls.get_all_sets(user_id)
+
+    @classmethod
+    def display_sets_info(cls, result: Pagination | List[Tuple[...]]) -> List[Dict[str, Any]]:
+        sets_list = []
+        for row in result:
+            set_dict = {
+                'set_id': row.set_id,
+                'set_name': row.set_name,
+                'set_description': row.set_description,
+                'set_modification_date': row.set_modification_date,
+                'category_name': row.category_name,
+                'organization_name': row.organization_name,
+                'username': row.username,
+                'flashcards': []
+            }
+
+            flashcard_dict = {
+                'flashcard_id': row.flashcard_id,
+                'term': row.term,
+                'definition': row.definition,
+                'notes': row.notes
+            }
+
+            set_dict['flashcards'].append(flashcard_dict)
+            sets_list.append(set_dict)
+
+        return sets_list
 
     @classmethod
     def update_set(cls, set_id: str):

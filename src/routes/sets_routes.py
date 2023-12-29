@@ -23,6 +23,7 @@ def get_set(set_id: str) -> Tuple[Dict[str, Any], int]:
 def create_set() -> Tuple[Dict[str, Any], int]:
     return c.add_set()
 
+
 @sets_bp.delete("/sets/<set_id>")
 @jwt_required
 def delete_set(set_id: str) -> Tuple[Dict[str, Any], int]:
@@ -33,3 +34,8 @@ def delete_set(set_id: str) -> Tuple[Dict[str, Any], int]:
 @jwt_required
 def update_set(set_id: str) -> Tuple[Dict[str, Any], int]:
     return c.update_set(set_id)
+
+
+@sets_bp.get("users/<user_id>/sets")
+def get_sets_for_user(user_id: str):
+    return c.get_sets_for_user(user_id)
