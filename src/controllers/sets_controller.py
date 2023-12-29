@@ -76,12 +76,13 @@ class SetsController:
     @classmethod
     def get_all_sets(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
         page = request.args.get('page', type=int)
-        per_page = request.args.get('size', type=int)
-        result = SetsRepository.get_all_sets(page, per_page, user_id)
-        if not result:
+        size = request.args.get('size', type=int)
+        result = SetsRepository.get_all_sets(page, size, user_id)
+        sets_list = cls.display_sets_info(result)
+
+        if not sets_list:
             return {"message": "No sets were found"}, 404
 
-        sets_list = cls.display_sets_info(result)
         last_page = result.pages if result.pages > 0 else 1
 
         return {'sets': sets_list, 'total_pages': result.pages, 'current_page': result.page,
