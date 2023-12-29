@@ -70,10 +70,6 @@ class SetsController:
         return {"set_id": set_obj.set_id}, 200
 
     @classmethod
-    def get_all_flashcards_for_set(cls, set_id: str) -> List[Dict[str, Any]]:
-        return [flashcard.to_json() for flashcard in FlashcardsRepository.get_flashcards_by_set_id(set_id)]
-
-    @classmethod
     def get_all_sets(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
         page = request.args.get('page', type=int)
         size = request.args.get('size', type=int)
@@ -90,8 +86,15 @@ class SetsController:
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        page = request.args.get('page', type=int)
+        size = request.args.get('size', type=int)
         if result := SetsRepository.get_set_info(set_id):
-            return {"set": cls.display_sets_info(result)[0]}, 200
+            flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size)
+            last_page = flashcards.pages if flashcards.pages > 0 else 1
+
+            return {"set": cls.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
+                    'current_page': flashcards.page,
+                    'last_page': last_page}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
 
@@ -103,7 +106,7 @@ class SetsController:
         return cls.get_all_sets(user_id)
 
     @classmethod
-    def display_sets_info(cls, result: Pagination | List[Tuple[...]]) -> List[Dict[str, Any]]:
+    def display_sets_info(cls, result: Pagination | List[Tuple[...]], flashcards=None) -> List[Dict[str, Any]]:
         sets_list = []
         for row in result:
             set_dict = {
@@ -114,18 +117,23 @@ class SetsController:
                 'category_name': row.category_name,
                 'organization_name': row.organization_name,
                 'username': row.username,
-                'flashcards': []
             }
-
-            flashcard_dict = {
-                'flashcard_id': row.flashcard_id,
-                'term': row.term,
-                'definition': row.definition,
-                'notes': row.notes
-            }
-
-            set_dict['flashcards'].append(flashcard_dict)
             sets_list.append(set_dict)
+
+        if not flashcards:
+            return sets_list
+
+        flashcards_list = []
+        for flashcard in flashcards:
+            flashcard_dict = {
+                'flashcard_id': flashcard.flashcard_id,
+                'term': flashcard.term,
+                'definition': flashcard.definition,
+                'notes': flashcard.notes
+            }
+            flashcards_list.append(flashcard_dict)
+
+        sets_list[0]["flashcards"] = flashcards_list
 
         return sets_list
 

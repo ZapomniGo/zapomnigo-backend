@@ -29,10 +29,8 @@ class SetsRepository:
     def _base_query(cls) -> Query:
         return db.session.query(
             Sets.set_id, Sets.set_name, Sets.set_description, Sets.set_modification_date,
-            Categories.category_name, Organizations.organization_name,
-            Flashcards.flashcard_id, Flashcards.term, Flashcards.definition, Flashcards.notes, Users.username
-        ).join(Flashcards, Sets.set_id == Flashcards.set_id) \
-            .outerjoin(Categories, Categories.category_id == Sets.set_category) \
+            Categories.category_name, Organizations.organization_name, Users.username
+        ).outerjoin(Categories, Categories.category_id == Sets.set_category) \
             .join(Users, Users.user_id == Sets.user_id) \
             .outerjoin(OrganizationsUsers, Users.user_id == OrganizationsUsers.user_id) \
             .outerjoin(Organizations, Organizations.organization_id == OrganizationsUsers.organization_id)
