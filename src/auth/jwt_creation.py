@@ -51,3 +51,15 @@ class JwtCreation:
             token = jwt.encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
 
         return token
+
+    @classmethod
+    def create_verification_jwt(cls, user_id: str) -> str:
+        payload = {"sub": user_id,
+                   "exp": datetime.utcnow() + timedelta(hours=48)}
+
+        if IS_OFFLINE:
+            token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
+        else:
+            token = jwt.encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
+
+        return token

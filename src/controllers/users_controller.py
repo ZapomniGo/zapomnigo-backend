@@ -1,3 +1,4 @@
+import asyncio
 from typing import Tuple, Dict, Any
 
 from flask import request, make_response, Response
@@ -7,11 +8,13 @@ from ulid import ULID
 
 from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
+from src.controllers.utility_controller import UtilityController
 from src.database.models import Users, OrganizationsUsers
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models import RegistrationModel, LoginModel
+from src.services.mailer import send_email_background_task
 from src.utilities.parsers import validate_json_body
 
 
@@ -30,7 +33,7 @@ class UsersController:
                      marketing_consent=json_data["marketing_consent"])
 
     @classmethod
-    def register_user(cls) -> Tuple[Dict[str, Any], int]:
+    async def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         validation_errors = validate_json_body(json_data, RegistrationModel)  # type: ignore
@@ -48,6 +51,7 @@ class UsersController:
             else:
                 return {"message": "Organization with such id doesn't exist"}, 404
 
+        await UtilityController.send_mail_logic(user.email, user.user_id, user.username)
         return {"message": "user added to db"}, 200
 
     @classmethod
@@ -93,7 +97,7 @@ class UsersController:
 
         # TODO: Implement Refresh Token Reuse Detection with Redis
 
-        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"),refresh=True)
+        new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"), refresh=True)
         new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
 
         response = make_response({'message': 'Token refreshed'}, 200)
