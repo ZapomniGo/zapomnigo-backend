@@ -44,12 +44,10 @@ class UsersController:
         CommonRepository.add_object_to_db(user)
 
         if organization_id := json_data.get("organization", None):
-            if OrganizationsRepository.get_organization_by_id(organization_id):
+
                 obj = OrganizationsUsers(organization_user_id=str(ULID()),
                                          user_id=user.user_id, organization_id=str(organization_id))
                 CommonRepository.add_object_to_db(obj)
-            else:
-                return {"message": "Organization with such id doesn't exist"}, 404
 
         await UtilityController.send_mail_logic(user.email, user.user_id, user.username)
         return {"message": "user added to db"}, 200
