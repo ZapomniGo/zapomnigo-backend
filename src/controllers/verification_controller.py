@@ -19,7 +19,7 @@ class VerificationController:
             return {"message": "user doesn't exist"}, 404
 
         UsersRepository.change_verified_status(user)
-        return response, status_code
+        return {"message": "Your account has been verified"}, 200
 
     @classmethod
     def verify_token(cls, token) -> Tuple[Dict[str, str], int]:
@@ -36,4 +36,4 @@ class VerificationController:
         if not user_id:
             return {"message": "No user_id provided"}, 499
 
-        return {"message": "Your account has been verified"}, 200
+        return {"user_id": user_id}, 200
