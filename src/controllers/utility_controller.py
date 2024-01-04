@@ -40,7 +40,7 @@ class UtilityController:
                     <body>
                       <h1>Hi welcome to our app, {username}</h1>
                       <p>Please verify your email by clicking
-                        <a href='https://zapomnigo-server-aaea6dc84a09.herokuapp.com/v1/verify?token={token}'>here</a></p>
+                        <a href='http://localhost:5173/verify?token={token}'>here</a></p>
                     </body>
                     </html>
                                 """
