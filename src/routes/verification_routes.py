@@ -17,14 +17,6 @@ def verify_user_route():
     return c.verify_user(verification_token)
 
 
-@verification_bp.get("/forgot-password")
-def verify_resting_of_password():
-    verification_token = request.args.get("token")
-    if not verification_token:
-        return {"Invalid verification link"}, 400
-    return c.verify_token(verification_token, is_verification=False)
-
-
 @verification_bp.post("/send-email")
 async def send_email():
     json_data = request.get_json()
@@ -39,5 +31,6 @@ async def send_email():
     if not UsersRepository.get_user_by_username(username):
         return {"message": "user doesn't exist"}, 404
 
-    await UtilityController.send_mail_logic(email, username, is_verification=True)
+    await UtilityController.send_mail_logic(email, username,
+                                            is_verification=True)
     return {"message": f"Email send to {email}"}, 200

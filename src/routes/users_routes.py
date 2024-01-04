@@ -27,7 +27,7 @@ def logout() -> Response:
 @users_bp.post("/refresh")
 def refresh():
     return c.refresh_token()
-@users_bp.post("/reset-password")
+@users_bp.post("/forgot-password")
 def reset_password_route():
     json_data = request.get_json()
 
