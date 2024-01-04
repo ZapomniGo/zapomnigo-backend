@@ -11,7 +11,9 @@ verification_bp = Blueprint("verification", __name__)
 
 @verification_bp.get("/verify")
 def verify_user_route():
-    verification_token = request.args["token"]
+    verification_token = request.args.get("token")
+    if not verification_token:
+        return {"Invalid verification link"}, 400
     return c.verify_user(verification_token)
 
 
@@ -19,19 +21,16 @@ def verify_user_route():
 async def send_email():
     json_data = request.get_json()
 
-    validation_errors = validate_json_body(json_data, MailSenderModel)  # type: ignore
+    validation_errors = validate_json_body(json_data, MailSenderModel)
     if validation_errors:
         return {"validation errors": validation_errors}, 422
 
-    user_id = json_data["user_id"]
     username = json_data["username"]
     email = json_data["email"]
 
-    if not UsersRepository.get_user_by_ulid(user_id):
+    if not UsersRepository.get_user_by_username(username):
         return {"message": "user doesn't exist"}, 404
 
-    await UtilityController.send_mail_logic(email, user_id, username)
+    await UtilityController.send_mail_logic(email, username,
+                                            is_verification=True)
     return {"message": f"Email send to {email}"}, 200
-
-
-

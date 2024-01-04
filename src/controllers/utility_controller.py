@@ -32,15 +32,27 @@ class UtilityController:
         return decode(request.cookies.get('refresh_token'), SECRET_KEY, algorithms=["HS256"]).get("username")
 
     @classmethod
-    async def send_mail_logic(cls, email: str, user_id: str, username: str):
-        token = JwtCreation.create_verification_jwt(user_id)
-        BODY_HTML = f"""<html>
-                <head></head>
-                <body>
-                  <h1>Hi welcome to our app, {username}</h1>
-                  <p>Please verify your email by clicking
-                    <a href='https://zapomnigo-server-aaea6dc84a09.herokuapp.com/v1/verify?token={token}'>here</a></p>
-                </body>
-                </html>
-                            """
+    async def send_mail_logic(cls, email: str, username: str, is_verification = True):
+        token = JwtCreation.create_verification_jwt(username)
+        if is_verification:
+            BODY_HTML = f"""<html>
+                    <head></head>
+                    <body>
+                      <h1>Hi welcome to our app, {username}</h1>
+                      <p>Please verify your email by clicking
+                        <a href='https://zapomnigo-server-aaea6dc84a09.herokuapp.com/v1/verify?token={token}'>here</a></p>
+                    </body>
+                    </html>
+                                """
+        else:
+            BODY_HTML = f"""<html>
+                    <head></head>
+                    <body>
+                      <h1>Hello, {username}</h1>
+                      <p>Please reset your password by clicking
+                        <a href='https://zapomnigo-server-aaea6dc84a09.herokuapp.com/forgot-password?token={token}'>here</a></p>
+                    </body>
+                    </html>
+                                """
+
         asyncio.create_task(send_email_background_task(email, "TEST", BODY_HTML))

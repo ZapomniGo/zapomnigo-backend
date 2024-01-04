@@ -1,3 +1,5 @@
+from flask_bcrypt import generate_password_hash
+
 from src.database.models import Users
 from src.database.models.base import db
 
@@ -19,4 +21,10 @@ class UsersRepository:
     @classmethod
     def change_verified_status(cls, user: Users) -> None:
         user.verified = True
+        db.session.commit()
+    @classmethod
+    def reset_password(cls, user: Users, new_password: str) -> None:
+        hashed_password = generate_password_hash(new_password).decode(
+            "utf-8")
+        user.password = hashed_password
         db.session.commit()
