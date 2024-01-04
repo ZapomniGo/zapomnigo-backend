@@ -45,6 +45,14 @@ class UtilityController:
                     </html>
                                 """
         else:
-            BODY_HTML = """"""
+            BODY_HTML = f"""<html>
+                    <head></head>
+                    <body>
+                      <h1>Hello, {username}</h1>
+                      <p>Please reset your password by clicking
+                        <a href='http://127.0.0.1:8000/v1/forgot-password?token={token}'>here</a></p>
+                    </body>
+                    </html>
+                                """
 
         asyncio.create_task(send_email_background_task(email, "TEST", BODY_HTML))

@@ -9,11 +9,13 @@ from ulid import ULID
 from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY
 from src.controllers.utility_controller import UtilityController
+from src.controllers.verification_controller import VerificationController
 from src.database.models import Users, OrganizationsUsers
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models import RegistrationModel, LoginModel
+from src.pydantic_models.reset_password_model import ResetPasswordModel
 from src.services.mailer import send_email_background_task
 from src.utilities.parsers import validate_json_body
 
@@ -104,6 +106,23 @@ class UsersController:
 
         return response
 
+    @classmethod
+    def reset_password(cls, json_data) -> Tuple[Dict[str, Any], int]:
+        validation_errors = validate_json_body(json_data, ResetPasswordModel)
+        if validation_errors:
+            return {"validation errors": validation_errors}, 422
+
+        response, status_code = VerificationController.verify_token(json_data["token"], is_verification=False)
+
+        if status_code != 200:
+            return response, status_code
+
+        user = UsersRepository.get_user_by_username(response.get("username"))
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        UsersRepository.reset_password(user, json_data["new_password"])
+        return {"message": "Your password has been changed"}, 200
     @classmethod
     def check_if_user_exists(cls, json_data) -> Users | None:
         email_or_username = json_data["email_or_username"]
