@@ -49,7 +49,7 @@ class UsersController:
                                          user_id=user.user_id, organization_id=str(organization_id))
                 CommonRepository.add_object_to_db(obj)
 
-        await UtilityController.send_mail_logic(user.email, user.user_id, user.username)
+        await UtilityController.send_mail_logic(user.email, user.username)
         return {"message": "user added to db"}, 200
 
     @classmethod

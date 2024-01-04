@@ -14,10 +14,9 @@ class VerificationController:
         if status_code != 200:
             return response, status_code
 
-        user = UsersRepository.get_user_by_ulid(response.get("user_id"))
+        user = UsersRepository.get_user_by_username(response.get("username"))
         if not user:
             return {"message": "user doesn't exist"}, 404
-
         UsersRepository.change_verified_status(user)
         return {"message": "Your account has been verified"}, 200
 
@@ -32,8 +31,8 @@ class VerificationController:
         except jwt.exceptions.DecodeError:
             return {"message": "Invalid or missing verification token."}, 499
 
-        user_id = decoded_token.get("sub", None)
-        if not user_id:
+        username = decoded_token.get("sub", None)
+        if not username:
             return {"message": "No user_id provided"}, 499
 
-        return {"user_id": user_id}, 200
+        return {"username": username}, 200
