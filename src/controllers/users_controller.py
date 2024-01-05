@@ -80,15 +80,15 @@ class UsersController:
 
         response = make_response({"message": "user logged in"}, 200)
         print("test",request.host)
-        response.set_cookie('access_token', access_token, secure=True, samesite="None", domain='zapomnigo-server-aaea6dc84a09.herokuapp.com')
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None", domain='zapomnigo-server-aaea6dc84a09.herokuapp.com')
+        response.set_cookie('access_token', access_token, secure=True, samesite="None")
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None")
         return response
 
     @classmethod
     def logout(cls) -> Response:
         response = make_response({"message": "user logged out"}, 200)
-        response.set_cookie('access_token', '', expires=0, secure=True, samesite="None",domain='zapomnigo-server-aaea6dc84a09.herokuapp.com')
-        response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite="None", domain='zapomnigo-server-aaea6dc84a09.herokuapp.com')
+        response.set_cookie('access_token', '', expires=0, secure=True, samesite="None")
+        response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite="None")
         return response
 
     @classmethod
@@ -102,8 +102,8 @@ class UsersController:
         new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
 
         response = make_response({'message': 'Token refreshed'}, 200)
-        response.set_cookie('access_token', new_access_token, secure=True, samesite="None", domain='zapomnigo-server-aaea6dc84a09.herokuapp.com')
-        response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite="None", domain='zapomnigo-server-aaea6dc84a09.herokuapp.com')
+        response.set_cookie('access_token', new_access_token, secure=True, samesite="None")
+        response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite="None")
 
         return response
 
