@@ -8,5 +8,4 @@ USER_ID = Annotated[str, StringConstraints(min_length=1, max_length=26)]
 
 
 class MailSenderModel(BaseModel):
-    username: NAME  # type: ignore
     email: EmailStr

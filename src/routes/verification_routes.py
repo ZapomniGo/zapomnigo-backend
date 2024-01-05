@@ -25,12 +25,11 @@ async def send_email():
     if validation_errors:
         return {"validation errors": validation_errors}, 422
 
-    username = json_data["username"]
     email = json_data["email"]
 
-    if not UsersRepository.get_user_by_username(username):
+    if not UsersRepository.get_user_by_email(email):
         return {"message": "user doesn't exist"}, 404
 
-    await UtilityController.send_mail_logic(email, username,
+    await UtilityController.send_mail_logic(email, email,
                                             is_verification=True)
     return {"message": f"Email send to {email}"}, 200
