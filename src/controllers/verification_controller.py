@@ -36,7 +36,7 @@ class VerificationController:
             message = "Invalid verification link." if is_verification else "Invalid reset password link."
             return {"message": message}, 499
 
-        return decoded_token
+        return decoded_token, 200
 
     @classmethod
     def verify_token(cls, token, is_verification=True) -> Tuple[Dict[str, str], int]:
