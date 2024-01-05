@@ -80,8 +80,8 @@ class UsersController:
 
         response = make_response({"message": "user logged in"}, 200)
         response.set_cookie('access_token', access_token, secure=True,
-                            samesite="None", domain="localhost:5173")
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None",domain="localhost:5173")
+                            samesite="None", domain="localhost:5173/login")
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None",domain="localhost:5173/login")
         return response
 
     @classmethod
