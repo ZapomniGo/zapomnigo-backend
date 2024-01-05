@@ -13,7 +13,7 @@ migrate = Migrate(directory="database/migrations")
 
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
-    CORS(app, resources={r"/v1/*": {"origins": "*"}}, supports_credentials=True)
+    CORS(app, resources={r"/v1/*": {"origins": ["http://localhost:5173/", "https://zapomnigo-client-212cb0858f90.herokuapp.com/"]}}, supports_credentials=True)
 
     if IS_OFFLINE:
         app.config.from_object(DevConfig)
