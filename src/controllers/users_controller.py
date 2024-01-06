@@ -78,13 +78,13 @@ class UsersController:
         access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
         refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
         response = make_response({"message": "user logged in"}, 200)
-        if not IS_OFFLINE:
-            response.set_cookie('access_token', access_token, secure=True, samesite="None", domain=".herokuapp.com")
-            response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None", domain=".herokuapp.com")
-        else:
-            response.set_cookie('access_token', access_token, secure=True,
+        # if not IS_OFFLINE:
+        #     response.set_cookie('access_token', access_token, secure=True, samesite="None", domain=".herokuapp.com")
+        #     response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None", domain=".herokuapp.com")
+        # else:
+        response.set_cookie('access_token', access_token, secure=True,
                                 samesite="None")
-            response.set_cookie('refresh_token', refresh_token, httponly=True,
+        response.set_cookie('refresh_token', refresh_token, httponly=True,
                                 secure=True, samesite="None")
         return response
 
