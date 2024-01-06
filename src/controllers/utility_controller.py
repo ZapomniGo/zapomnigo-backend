@@ -52,9 +52,9 @@ class UtilityController:
             BODY_HTML = f"""<html>
                     <head></head>
                     <body>
-                      <h1>Hello</h1>
+                      <h1>Hello, {username}</h1>
                       <p>Please reset your password by clicking
-                        <a href='https://zapomnigo-server-aaea6dc84a09.herokuapp.com/forgot-password?token={token}'>here</a></p>
+                        <a href='https://localhost:5173/forgot-password?token={token}'>here</a></p>
                     </body>
                     </html>
                                 """

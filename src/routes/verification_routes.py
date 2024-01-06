@@ -4,7 +4,7 @@ from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController as c
 from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models.mail_sender_model import MailSenderModel
-from src.utilities.parsers import validate_json_body
+from src.utilities.parsers import validate_json_body, eval_bool
 
 verification_bp = Blueprint("verification", __name__)
 
@@ -19,17 +19,24 @@ def verify_user_route():
 
 @verification_bp.post("/send-email")
 async def send_email():
-    json_data = request.get_json()
+    is_verification = request.args.get("verification")
+    if not is_verification:
+        return {"message": "invalid argument provided"}, 404
+    if is_verification.lower() == "true" or is_verification.lower() == "false":
+        is_verification = eval_bool(is_verification)
+    else:
+        return {"message": "invalid argument provided"}, 404
 
+    json_data = request.get_json()
     validation_errors = validate_json_body(json_data, MailSenderModel)
     if validation_errors:
         return {"validation errors": validation_errors}, 422
 
     email = json_data["email"]
-
-    if not UsersRepository.get_user_by_email(email):
+    user = UsersRepository.get_user_by_email(email)
+    if not user:
         return {"message": "user doesn't exist"}, 404
 
-    await UtilityController.send_mail_logic(email, email,
-                                            is_verification=True)
+    await UtilityController.send_mail_logic(email, user.username,
+                                            is_verification=is_verification)
     return {"message": f"Email send to {email}"}, 200
