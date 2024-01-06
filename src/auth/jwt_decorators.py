@@ -9,7 +9,7 @@ from src.config import SECRET_KEY
 def admin_required(f):
     @wraps(f)
     def admin_token_check(*args, **kwargs):
-        access_token = request.cookies.get("access_token")
+        access_token = request.headers.get('Authorization')
         if access_token:
 
             decoded_token = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
@@ -27,13 +27,13 @@ def admin_required(f):
 def jwt_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        access_token = request.cookies.get("access_token")
-
+        access_token = str(request.headers.get('Authorization')).strip()
+        print("TOKEN",access_token)
         if access_token:
             jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
             return f(*args, **kwargs)
 
         else:
-            return {"message": "Invalid or missing auth token."}, 499
+            return {"message": "Invalid or missing auth token."}, 420
 
     return wrapper

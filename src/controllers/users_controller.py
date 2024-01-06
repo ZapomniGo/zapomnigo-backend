@@ -77,34 +77,23 @@ class UsersController:
 
         access_token = JwtCreation.create_access_jwt_token(user=user, password=json_data["password"])
         refresh_token = JwtCreation.create_refresh_jwt_token(user.username)
-        response = make_response({"message": "user logged in"}, 200)
-        # if not IS_OFFLINE:
-        #     response.set_cookie('access_token', access_token, secure=True, samesite="None", domain=".herokuapp.com")
-        #     response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None", domain=".herokuapp.com")
-        # else:
-        response.set_cookie('access_token', access_token, secure=True,
-                                samesite="None", domain="zapomnigo-server-aaea6dc84a09.herokuapp.com")
-        response.set_cookie('refresh_token', refresh_token, httponly=True,
-                                secure=True, samesite="None", domain="zapomnigo-server-aaea6dc84a09.herokuapp.com")
+
+        response = make_response({"message": "user logged in", "access_token": access_token, "refresh_token": refresh_token}, 200)
+        # response.set_cookie('access_token', access_token, secure=True, samesite="None", domain="localhost")
+        # response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None", domain="localhost")
         return response
 
     @classmethod
     def logout(cls) -> Response:
         response = make_response({"message": "user logged out"}, 200)
-        if not IS_OFFLINE:
-            response.set_cookie('access_token', '', expires=0,secure=True, samesite="None", domain="herokuapp.com")
-            response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite="None", domain="herokuapp.com")
-        else:
-            response.set_cookie('access_token', '', expires=0,secure=True,
-                                samesite="None")
-            response.set_cookie('refresh_token', '', expires=0,httponly=True,
-                                secure=True, samesite="None")
-
+        # response.set_cookie('access_token', '', expires=0, secure=True, samesite="None", domain="localhost")
+        # response.set_cookie('refresh_token', '', expires=0, httponly=True, secure=True, samesite="None", domain="localhost")
         return response
 
     @classmethod
     def refresh_token(cls) -> Response:
-        refresh_token = request.cookies.get('refresh_token')
+        json_data = request.get_json()
+        refresh_token = json_data.get("refresh_token", "")
         decoded_token = decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
 
         # TODO: Implement Refresh Token Reuse Detection with Redis
@@ -112,15 +101,9 @@ class UsersController:
         new_access_token = JwtCreation.create_access_jwt_token(username=decoded_token.get("username"), refresh=True)
         new_refresh_token = JwtCreation.create_refresh_jwt_token(decoded_token.get("username"))
 
-        response = make_response({'message': 'Token refreshed'}, 200)
-        if not IS_OFFLINE:
-            response.set_cookie('access_token', new_access_token, secure=True, samesite="None", domain="herokuapp.com")
-            response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite="None", domain="herokuapp.com")
-        else:
-            response.set_cookie('access_token', new_access_token, secure=True,
-                                samesite="None")
-            response.set_cookie('refresh_token', new_refresh_token, httponly=True,
-                                secure=True, samesite="None")
+        response = make_response({'message': 'Token refreshed', 'access_token': new_access_token, "refresh_token": new_refresh_token}, 200)
+        # response.set_cookie('access_token', new_access_token, secure=True, samesite="None", domain="localhost")
+        # response.set_cookie('refresh_token', new_refresh_token, httponly=True, secure=True, samesite="None", domain="localhost")
 
         return response
 
