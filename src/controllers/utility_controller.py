@@ -29,7 +29,11 @@ class UtilityController:
 
     @classmethod
     def get_session_username(cls) -> str | None:
-        return decode(request.cookies.get('refresh_token'), SECRET_KEY, algorithms=["HS256"]).get("username")
+        access_token = request.headers.get('Authorization')
+        if access_token:
+            return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("username")
+        else:
+            return None
 
     @classmethod
     async def send_mail_logic(cls, email: str, username: str, is_verification = True):

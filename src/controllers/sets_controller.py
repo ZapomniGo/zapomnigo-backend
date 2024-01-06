@@ -55,6 +55,9 @@ class SetsController:
     def add_set(cls):
         json_data = request.json
         user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username()).user_id
+        if not user_id:
+            return {"message": "No token provided"}, 499
+
         if validation_errors := validate_json_body(json_data, SetsModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
