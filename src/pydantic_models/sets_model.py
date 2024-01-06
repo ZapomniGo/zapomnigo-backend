@@ -25,8 +25,8 @@ class SetsModel(BaseModel):
 
 
 class UpdateSetsModel(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    # model_config = ConfigDict(extra='forbid')
     set_name: Optional[SET_NAME] = None
     set_description: Optional[SET_DESCRIPTION] = None
     set_category: Optional[ORGANIZATION_ID] = None
-    flashcards: List[FlashcardsModel] = None
+    flashcards: Optional[List[FlashcardsModel]] = None
