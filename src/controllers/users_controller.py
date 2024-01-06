@@ -83,9 +83,9 @@ class UsersController:
         #     response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite="None", domain=".herokuapp.com")
         # else:
         response.set_cookie('access_token', access_token, secure=True,
-                                samesite="None", domain="zapomnigo-client-212cb0858f90.herokuapp.com")
+                                samesite="None", domain="zapomnigo-server-aaea6dc84a09.herokuapp.com")
         response.set_cookie('refresh_token', refresh_token, httponly=True,
-                                secure=True, samesite="None", domain="zapomnigo-client-212cb0858f90.herokuapp.com")
+                                secure=True, samesite="None", domain="zapomnigo-server-aaea6dc84a09.herokuapp.com")
         return response
 
     @classmethod
