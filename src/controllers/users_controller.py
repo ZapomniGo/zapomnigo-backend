@@ -92,8 +92,7 @@ class UsersController:
 
     @classmethod
     def refresh_token(cls) -> Response:
-        json_data = request.get_json()
-        refresh_token = json_data.get("refresh_token", "")
+        refresh_token = request.headers.get('Authorization')
         decoded_token = decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
 
         # TODO: Implement Refresh Token Reuse Detection with Redis
