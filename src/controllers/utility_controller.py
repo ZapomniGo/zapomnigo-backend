@@ -54,7 +54,7 @@ class UtilityController:
                     <body>
                       <h1>Hello, {username}</h1>
                       <p>Please reset your password by clicking
-                        <a href='https://localhost:5173/forgot-password?token={token}'>here</a></p>
+                        <a href='http://localhost:5173/forgot-password?token={token}'>here</a></p>
                     </body>
                     </html>
                                 """
