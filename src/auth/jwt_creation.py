@@ -5,6 +5,8 @@ from flask_bcrypt import check_password_hash
 
 from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig, SECRET_KEY, ADMIN_USERNAME
 from src.database.models import Users
+from src.database.repositories.organizations_users_repository import \
+    OrganizationsUsersRepository
 from src.database.repositories.users_repository import UsersRepository
 
 
@@ -16,6 +18,7 @@ class JwtCreation:
         raw_password = kwargs.get("password")
         username = kwargs.get("username")
         refresh = kwargs.get("refresh")
+        user_id = user.user_id
 
         if refresh:
             if username == ADMIN_USERNAME:
@@ -26,12 +29,20 @@ class JwtCreation:
             if username:
                 user = UsersRepository.get_user_by_username(username)
                 is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
+                user_id = user.user_id
             else:
                 is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
                 username = user.username
+                user_id = user.user_id
 
+        if organization := OrganizationsUsersRepository.get_organization_by_user_id(user_id):
+            organization_name = organization.organization_name
+        else:
+            organization_name = None
         payload = {
+            "sub": user_id,
             "username": username,
+            "institution": organization_name,
             "admin": is_admin,
             "exp": datetime.utcnow() + timedelta(hours=12)
         }
