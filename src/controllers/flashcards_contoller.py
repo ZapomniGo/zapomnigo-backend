@@ -20,7 +20,7 @@ class FlashcardsController:
         return {"message": "Flashcard with such id doesn't exist"}, 404
 
     @classmethod
-    def check_if_user_can_delete_flashcard(cls, set_id: str):
+    def check_if_user_can_edit_or_delete_flashcard(cls, set_id: str):
         set_obj = SetsRepository.get_set_by_id(set_id)
         if not set_obj:
             return {"message": "Set with such id doesn't exist"}, 404
@@ -37,7 +37,7 @@ class FlashcardsController:
         if not flashcard:
             return {"message": "Flashcard with such id doesn't exist"}, 404
 
-        cls.check_if_user_can_delete_flashcard(flashcard.set_id)
+        cls.check_if_user_can_edit_or_delete_flashcard(flashcard.set_id)
 
         if validation_errors := validate_json_body(json_data, UpdateFlashcardsModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
@@ -52,7 +52,7 @@ class FlashcardsController:
         if not flashcard:
             return {"message": "Flashcard with such id doesn't exist"}, 404
 
-        cls.check_if_user_can_delete_flashcard(flashcard.set_id)
+        cls.check_if_user_can_edit_or_delete_flashcard(flashcard.set_id)
 
         CommonRepository.delete_object_from_db(flashcard)
         return {"message": "Flashcard successfully deleted"}, 200
