@@ -156,13 +156,12 @@ class SetsController:
             return {"validation errors": validation_errors}, 422
 
         SetsRepository.edit_set(set_obj, json_data)
-        flashcards = json_data.get("flashcards")
-        print(flashcards)
-        # if flashcards := cls.create_flashcards(json_data, set_obj.set_id):
-        #     if len(FlashcardsRepository.get_flashcards_by_set_id(set_obj.set_id)) + len(flashcards) > 2000:
-        #         return {"message": "Cannot create more than 2000 flashcards per set"}, 400
-        #     else:
-        #         CommonRepository.add_many_objects_to_db(flashcards)
+        FlashcardsRepository.delete_flashcards_by_set_id(set_id)
+        flashcards = cls.create_flashcards(json_data, set_id)
+        if len(flashcards) > 2000:
+            return {"message": "Cannot create more than 2000 flashcards per set"}, 400
+
+        CommonRepository.add_many_objects_to_db(flashcards)
 
         return {"message": "set successfully updated"}, 200
 
