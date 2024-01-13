@@ -533,3 +533,24 @@ Example body
     "definition": "capital of UK"
 }
 ```
+
+### `PUT /flashcard/flashcard_id/study` - updates a flashcards confidence
+Responses:
+* `{"message": "Confidence level of flashcard updated!"}, 200`
+* `{"message": "Flashcard with such id doesn't exist"}, 404`
+* 409
+```json
+{
+    "error": "Key (user_id)=(pomo6t) is not present in table \"users\"."
+}
+```
+* 401, 403, 498, 499 As it is a protected endpoint
+Example body
+```json
+{
+    "correctness": 0,
+    "username": "ivan",
+    "user_id": "01HJSJSXHNYG58SQJJPYB84Q5Z"
+}
+```
+
