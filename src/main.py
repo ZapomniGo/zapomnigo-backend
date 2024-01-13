@@ -15,7 +15,8 @@ def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     CORS(app, resources={r"/v1/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173",
                                                 "https://dev-client-zapomnigo-192299046f7f.herokuapp.com",
-                                                "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com"]}}
+                                                "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com",
+                                                "zapomnigo.com"]}}
          , supports_credentials=True)
 
     if IS_OFFLINE and not IS_PROD and not IS_DEV:
