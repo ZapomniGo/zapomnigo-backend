@@ -43,7 +43,7 @@ class JwtCreation:
             organization_name = None
 
         payload = {
-            "sub": UsersRepository.get_user_by_username(username).user_id,
+            "sub": user_id,
             "username": username,
             "institution": organization_name,
             "admin": is_admin,
