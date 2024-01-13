@@ -54,6 +54,7 @@ class JwtCreation:
 
         return token
 
+    # TODO: REFACTOR!!!!!
     @classmethod
     def create_refresh_jwt_token(cls, username: str) -> str:
         payload = {"username": username,
