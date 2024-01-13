@@ -55,7 +55,7 @@ class UtilityController:
         if IS_DEV:
             base_url = "https://dev-client-zapomnigo-192299046f7f.herokuapp.com"
         elif IS_PROD:
-            base_url = "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com"
+            base_url = "https://zapomnigo.com"
 
         if is_verification:
             template_path = 'resources/email_templates/BG_VerifyEmail.html'
