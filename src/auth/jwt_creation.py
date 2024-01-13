@@ -18,7 +18,8 @@ class JwtCreation:
         raw_password = kwargs.get("password")
         username = kwargs.get("username")
         refresh = kwargs.get("refresh")
-        user_id = user.user_id
+        if user:
+            user_id = user.user_id
 
         if refresh:
             if username == ADMIN_USERNAME:
