@@ -23,3 +23,7 @@ def delete_flashcard(flashcard_id: str) -> Tuple[Dict[str, Any], int]:
 @jwt_required
 def update_flashcard(flashcard_id: str) -> Tuple[Dict[str, Any], int]:
     return c.update_flashcard(flashcard_id)
+@flashcards_bp.put("/flashcards/<flashcard_id>/study")
+@jwt_required
+def study_flashcard(flashcard_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.study_flashcard(flashcard_id)
