@@ -24,7 +24,6 @@ class Sets(db.Model):
     liked_sets: Mapped[List["LikedSets"]] = relationship(back_populates="sets", cascade="all")
     reviews_sets: Mapped[List["ReviewsSets"]] = relationship(back_populates="sets", cascade="all")
     liked_flashcards: Mapped[List["LikedFlashcards"]] = relationship(back_populates="sets", cascade="all")
-    reviews_flashcards: Mapped[List["ReviewsFlashcards"]] = relationship(back_populates="sets", cascade="all")
     organizations: Mapped[List["Organizations"]] = relationship(back_populates="sets")
 
     def get_user_id(self):
