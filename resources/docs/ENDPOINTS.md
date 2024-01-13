@@ -490,6 +490,11 @@ Responses:
     ]
 }
 ```
+### POST /sets/set_id/copy - create a copy set of the passed one in the db
+Responses:
+* `{"set_id": 01HJBKFAJQMMAS0ZKWC83VV1AY}, 200`
+* `{"message": "set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
 
 ### `GET /flashcards/flashcard_id` - get info for a given flashcard
 

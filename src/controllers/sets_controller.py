@@ -178,3 +178,31 @@ class SetsController:
 
         CommonRepository.delete_object_from_db(set_obj)
         return {"message": "Set successfully deleted"}, 200
+
+    @classmethod
+    def copy_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        set_obj = SetsRepository.get_set_by_id(set_id=set_id)
+
+        if not set_obj:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        new_set_obj = Sets(set_id=str(ULID()), set_name=set_obj.set_name,
+                                          set_description=set_obj.set_description,
+                                          set_modification_date=str(datetime.now()),
+                                          set_category=set_obj.set_category,
+                                          user_id=UsersRepository.get_user_by_username(
+                                              UtilityController.get_session_username()).user_id,
+                                          organization_id=None)
+
+        flashcards = FlashcardsRepository.get_flashcards_by_set_id(set_id)
+        new_flashcards = []
+        for flashcard in flashcards:
+            new_flashcards.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
+                                                 definition=flashcard.definition,
+                                                 notes=flashcard.notes,
+                                                 set_id=new_set_obj.set_id))
+
+        CommonRepository.add_object_to_db(new_set_obj)
+        CommonRepository.add_many_objects_to_db(new_flashcards)
+
+        return {"set_id": new_set_obj.set_id}, 200
