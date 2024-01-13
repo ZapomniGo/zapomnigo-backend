@@ -14,34 +14,36 @@ class JwtCreation:
 
     @classmethod
     def create_access_jwt_token(cls, **kwargs) -> str:
+        # These are passed on login
         user: Users = kwargs.get("user")
         raw_password = kwargs.get("password")
+
+        # These are passed when refreshing jwt
         username = kwargs.get("username")
         refresh = kwargs.get("refresh")
-        if user:
-            user_id = user.user_id
 
-        if refresh:
+        if refresh and username:
             if username == ADMIN_USERNAME:
                 is_admin = True
             else:
                 is_admin = False
+
+            user = UsersRepository.get_user_by_username(username)
+            user_id = user.user_id
+
         else:
-            if username:
-                user = UsersRepository.get_user_by_username(username)
-                is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
-                user_id = user.user_id
-            else:
-                is_admin = (user.email == ADMIN_EMAIL and check_password_hash(user.password, raw_password))
-                username = user.username
-                user_id = user.user_id
+            is_admin = (user.email == ADMIN_EMAIL and check_password_hash(
+                user.password, raw_password))
+            username = user.username
+            user_id = user.user_id
 
         if organization := OrganizationsUsersRepository.get_organization_by_user_id(user_id):
             organization_name = organization.organization_name
         else:
             organization_name = None
+
         payload = {
-            "sub": user_id,
+            "sub": UsersRepository.get_user_by_username(username).user_id,
             "username": username,
             "institution": organization_name,
             "admin": is_admin,
