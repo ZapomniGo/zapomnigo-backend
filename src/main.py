@@ -3,7 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-from src.config import DevConfig, ProdConfig, IS_OFFLINE
+from src.config import DevConfig, ProdConfig, IS_OFFLINE, LocalConfig, IS_PROD, IS_DEV
 from src.database.models.base import db
 from src.routes import Routes
 from src.utilities.exception_handlers import ExceptionHandlers
@@ -18,10 +18,12 @@ def create_app() -> Flask:
                                                 "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com"]}}
          , supports_credentials=True)
 
-    if IS_OFFLINE:
-        app.config.from_object(DevConfig)
-    else:
+    if IS_OFFLINE and not IS_PROD and not IS_DEV:
+        app.config.from_object(LocalConfig)
+    elif IS_PROD:
         app.config.from_object(ProdConfig)
+    elif IS_DEV:
+        app.config.from_object(DevConfig)
 
     Routes.register_blueprints(app)
     ExceptionHandlers.register_error_handlers(app)

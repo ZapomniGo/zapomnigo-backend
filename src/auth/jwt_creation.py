@@ -47,7 +47,7 @@ class JwtCreation:
             "username": username,
             "institution": organization_name,
             "admin": is_admin,
-            "exp": datetime.utcnow() + timedelta(minutes=1)
+            "exp": datetime.utcnow() + timedelta(hours=12)
         }
 
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")

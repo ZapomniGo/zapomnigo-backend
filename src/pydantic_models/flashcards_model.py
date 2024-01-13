@@ -1,6 +1,6 @@
 from typing import Optional, Annotated
 
-from pydantic import BaseModel, StringConstraints, ConfigDict
+from pydantic import BaseModel, StringConstraints, ConfigDict, Field, conint
 
 from src.pydantic_models.common import NAME
 
@@ -18,3 +18,9 @@ class UpdateFlashcardsModel(BaseModel):
     term: Optional[NAME] = None
     definition: Optional[TERM_DEFINITION] = None
     notes: Optional[TERM_DEFINITION] = None
+
+
+class StudyFlashcardsModel(BaseModel):
+    correctness: conint(ge=0, le=1)
+    username: NAME
+    user_id: Annotated[str, StringConstraints(max_length=26)]
