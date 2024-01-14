@@ -496,6 +496,27 @@ Responses:
 * `{"message": "set with such id doesn't exist"}, 404`
 * 401, 403, 498, 499 As it is a protected endpoint
 
+### POST /sets/set_id/study - get flashcards with confidence levels
+Responses:
+* 200
+```json
+    "flashcards": [
+        {
+            "confidence": null,
+            "definition": "capital of bulgaria",
+            "flashcard_id": "01HJPF4S35MCRP12BT8247J1KN",
+            "term": "sofia"
+        },
+        {
+            "confidence": null,
+            "definition": "capital of UK",
+            "flashcard_id": "01HJPF4S35XABGJMW8W6E6BX4M",
+            "term": "london"
+        }]
+```
+* `{"message": "set with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+
 ### `GET /flashcards/flashcard_id` - get info for a given flashcard
 
 Responses:
