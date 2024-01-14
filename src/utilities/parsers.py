@@ -27,3 +27,6 @@ def validate_json_body(json_data: Dict[str, Any], pydantic_model) -> List[Dict[s
             errors.append(error_dict)
 
         return errors
+
+def arg_to_bool(value: str) -> bool:
+    return value.lower() == 'true'
