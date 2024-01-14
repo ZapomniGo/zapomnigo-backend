@@ -54,7 +54,7 @@ class SetsController:
     @classmethod
     def add_set(cls):
         json_data = request.json
-        user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username()).user_id
+        user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username_or_user_id()).user_id
         if not user_id:
             return {"message": "No token provided"}, 499
 
@@ -141,6 +141,20 @@ class SetsController:
         return sets_list
 
     @classmethod
+    def display_study_info(cls, flashcards: Pagination) -> List[Dict[str, Any]]:
+        flashcards_list = []
+        for flashcard in flashcards:
+            flashcard_dict = {
+                'flashcard_id': flashcard.flashcard_id,
+                'term': flashcard.term,
+                'definition': flashcard.definition,
+                'confidence': flashcard.confidence
+            }
+            flashcards_list.append(flashcard_dict)
+
+        return flashcards_list
+
+    @classmethod
     def update_set(cls, set_id: str):
         json_data = request.get_json()
         set_obj = SetsRepository.get_set_by_id(set_id)
@@ -187,22 +201,36 @@ class SetsController:
             return {"message": "set with such id doesn't exist"}, 404
 
         new_set_obj = Sets(set_id=str(ULID()), set_name=set_obj.set_name,
-                                          set_description=set_obj.set_description,
-                                          set_modification_date=str(datetime.now()),
-                                          set_category=set_obj.set_category,
-                                          user_id=UsersRepository.get_user_by_username(
-                                              UtilityController.get_session_username()).user_id,
-                                          organization_id=None)
+                           set_description=set_obj.set_description,
+                           set_modification_date=str(datetime.now()),
+                           set_category=set_obj.set_category,
+                           user_id=UsersRepository.get_user_by_username(
+                               UtilityController.get_session_username_or_user_id()).user_id,
+                           organization_id=None)
 
         flashcards = FlashcardsRepository.get_flashcards_by_set_id(set_id)
         new_flashcards = []
         for flashcard in flashcards:
             new_flashcards.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
-                                                 definition=flashcard.definition,
-                                                 notes=flashcard.notes,
-                                                 set_id=new_set_obj.set_id))
+                                             definition=flashcard.definition,
+                                             notes=flashcard.notes,
+                                             set_id=new_set_obj.set_id))
 
         CommonRepository.add_object_to_db(new_set_obj)
         CommonRepository.add_many_objects_to_db(new_flashcards)
 
         return {"set_id": new_set_obj.set_id}, 200
+
+    @classmethod
+    def study_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        set_obj = SetsRepository.get_set_by_id(set_id)
+
+        if not set_obj:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        page = request.args.get('page', type=int)
+        size = request.args.get('size', type=int)
+        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
+        flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size, user_id, is_study=True)
+
+        return {"flashcards": cls.display_study_info(flashcards)}, 200

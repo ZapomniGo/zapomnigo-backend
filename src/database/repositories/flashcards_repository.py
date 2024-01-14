@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import delete
 
-from src.database.models import Flashcards
+from src.database.models import Flashcards, ReviewsFlashcards
 from src.database.models.base import db
 
 
@@ -18,8 +18,25 @@ class FlashcardsRepository:
         return db.session.query(Flashcards).filter_by(set_id=set_id).all()
 
     @classmethod
-    def paginate_flashcards_for_set(cls, set_id: str, page: int = 1, size: int = 20, ) -> Pagination:
-        return db.session.query(Flashcards).filter_by(set_id=set_id).paginate(page=page, per_page=size, error_out=True)
+    def paginate_flashcards_for_set(cls, set_id: str, page: int = 1,
+                                    size: int = 20, user_id: str = None, is_study=False) -> Pagination:
+        if not is_study:
+            return db.session.query(Flashcards).filter_by(set_id=set_id).paginate(page=page, per_page=size,
+                                                                                  error_out=True)
+
+        return db.session.query(
+            Flashcards.flashcard_id,
+            Flashcards.term,
+            Flashcards.definition,
+            ReviewsFlashcards.confidence
+        ).outerjoin(
+            ReviewsFlashcards,
+            (Flashcards.flashcard_id == ReviewsFlashcards.flashcard_id) &
+            (ReviewsFlashcards.user_id == user_id)
+        ).filter(
+            Flashcards.set_id == set_id
+        ).paginate(page=page, per_page=size,
+                   error_out=True)
 
     @classmethod
     def edit_flashcard(cls, flashcard: Flashcards, json_data: Dict[str, Any]) -> None:

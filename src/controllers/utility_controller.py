@@ -18,7 +18,7 @@ class UtilityController:
     @classmethod
     def check_user_access(cls, username: str) -> Tuple[Dict[str, Any], int] | None:
         """Returns a JSON Response if there is an error or the user doesn't have access"""
-        logged_in_username = cls.get_session_username()
+        logged_in_username = cls.get_session_username_or_user_id()
         if not logged_in_username:
             return {"message": "No username provided"}, 400
 
@@ -28,10 +28,13 @@ class UtilityController:
         return {"message": "Admin privileges required."}, 403
 
     @classmethod
-    def get_session_username(cls) -> str | None:
+    def get_session_username_or_user_id(cls, get_username=True) -> str | None:
         access_token = request.headers.get('Authorization')
         if access_token:
-            return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("username")
+            if get_username:
+                return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("username")
+            else:
+                return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("sub")
         else:
             return None
 

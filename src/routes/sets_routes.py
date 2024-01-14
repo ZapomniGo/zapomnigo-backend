@@ -45,3 +45,8 @@ def get_sets_for_user(user_id: str):
 @jwt_required
 def copy_set(set_id: str):
     return c.copy_set(set_id)
+
+@sets_bp.get("/sets/<set_id>/study")
+@jwt_required
+def study_set(set_id: str):
+    return c.study_set(set_id)
