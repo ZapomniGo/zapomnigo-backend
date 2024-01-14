@@ -3,7 +3,8 @@ from typing import Dict, Any, List, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from sqlalchemy import select, Row
+from sqlalchemy import select, Row, desc, asc, func
+from ulid import ULID
 
 from src.database.models import Organizations, Categories, Flashcards, OrganizationsUsers, Users
 from src.database.models.base import db
@@ -40,13 +41,40 @@ class SetsRepository:
         return cls._base_query().filter(Sets.set_id == set_id).all()
 
     @classmethod
-    def get_all_sets(cls, page: int = 1, size: int = 20, user_id: str = "") -> Pagination:
+    def get_all_sets(
+            cls,
+            page: int = 1,
+            size: int = 20,
+            user_id: str = "",
+            sort_by_date: bool = True,
+            ascending: bool = False,
+    ) -> Pagination:
+        """
+        Retrieve a paginated list of sets from the database.
+
+        Args:
+            page (int): The page number to retrieve (default is 1).
+            size (int): The number of sets per page (default is 20).
+            user_id (str): If provided, fetch sets associated with the specified user (default is an empty string).
+            sort_by_date (bool): If True (default), the sets are ordered by creation date.
+            ascending (bool): If True, the sets are ordered in ascending order, else in descending order.
+
+        Returns:
+            Pagination: A paginated result containing sets based on the specified parameters.
+        """
+
+        query = cls._base_query()
+
         if user_id:
-            pagination: Pagination = cls._base_query().filter(Users.user_id == user_id).paginate(page=page,
-                                                                                                 per_page=size,
-                                                                                                 error_out=True)
+            query = query.filter(Users.user_id == user_id)
+
+        if sort_by_date:
+            order_by_clause = desc(func.substring(Sets.set_id, 1, 10)) if not ascending else asc(
+                func.substring(Sets.set_id, 1, 10))
         else:
-            pagination: Pagination = cls._base_query().paginate(page=page, per_page=size, error_out=True)
+            order_by_clause = asc(Sets.set_name) if ascending else desc(Sets.set_name)
+
+        pagination: Pagination = query.order_by(order_by_clause).paginate(page=page, per_page=size, error_out=True)
 
         return pagination
 

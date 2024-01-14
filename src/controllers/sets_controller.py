@@ -13,7 +13,7 @@ from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
-from src.utilities.parsers import validate_json_body
+from src.utilities.parsers import validate_json_body, arg_to_bool
 
 
 class SetsController:
@@ -74,9 +74,17 @@ class SetsController:
 
     @classmethod
     def get_all_sets(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
+        """If a user_id is passed it gets the sets for a given user"""
+
         page = request.args.get('page', type=int)
         size = request.args.get('size', type=int)
-        result = SetsRepository.get_all_sets(page, size, user_id)
+        sort_by_date = request.args.get('sort_by_date', type=str, default='true')
+        ascending = request.args.get('ascending', type=str, default='false')
+
+        sort_by_date = arg_to_bool(sort_by_date)
+        ascending = arg_to_bool(ascending)
+
+        result = SetsRepository.get_all_sets(page, size, user_id, sort_by_date, ascending)
         sets_list = cls.display_sets_info(result)
 
         if not sets_list:
