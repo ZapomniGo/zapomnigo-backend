@@ -556,3 +556,148 @@ Example body
     "user_id": "01HJSJSXHNYG58SQJJPYB84Q5Z"
 }
 ```
+### `POST /folders` - create a folder
+
+Responses:
+*`{"message": "Set added to db"}, 200`
+* 409:
+```json
+{
+    "error": "Key (category_id)=(test) is not present in table \"categories\"."
+}
+
+{
+    "error": "Key (organization_id)=(fdafsda) is not present in table \"organizations\"."
+}
+
+{
+    "error": "Key (set_id)=(dfasa) is not present in table \"sets\"."
+}
+
+{
+    "error": "Key (folder_id, set_id)=(01HM6MDDWHX0MYNKJ06081W7NT, 01HJPEXW8Y21R5P4JGME8X5Q19) already exists."
+}
+```
+* 422
+* 401, 403, 498, 499 As it is a protected endpoint
+
+Example body
+```json
+{
+    "folder_title": "test_folder1",
+    "folder_description": "test_description",
+    "category_id": "01HJM17CGHV66Q9940GAP8AJXK",
+    "organization_id": "01HJPEXW8Y21R5P4JGME8X5Q19",
+    "sets": [
+        "01HJM17CGHV66Q9940GAP8AJXK",
+        "01HJPEXW8Y21R5P4JGME8X5Q19"
+    ]
+}
+```
+
+### `GET /folders/folder_id/sets?page=1&size=2&sort_by_date=false&ascending=true` - get all sets from the db
+/sets could also be used and the default params are 1 and 20 for page and size
+true for sort_by_date and false for ascending 
+Responses:
+* 200
+```json
+{
+    "folder_creator": "ivanobreshkov",
+    "folder_description": "test_description",
+    "folder_title": "test_folder1",
+    "pagination_of_sets": {
+        "current_page": 1,
+        "last_page": 1,
+        "total_pages": 1
+    },
+    "sets": [
+        {
+            "category_name": "biologybratle",
+            "organization_name": null,
+            "set_description": "naskoebobur",
+            "set_id": "01HJPEXW8Y21R5P4JGME8X5Q19",
+            "set_modification_date": "2023-12-27 22:19:49.662733",
+            "set_name": "TestORG",
+            "username": "ivanobreshkov"
+        },
+        {
+            "category_name": "biologybratle",
+            "organization_name": null,
+            "set_description": "bobreee",
+            "set_id": "01HJM17CGHV66Q9940GAP8AJXK",
+            "set_modification_date": "2023-12-26 23:41:52.273972",
+            "set_name": "Capitals",
+            "username": "ivanobreshkov"
+        }
+    ]
+}
+```
+* 404 
+```json
+{
+    "message": "Folder with such id doesn't exist"
+}
+```
+
+### `DELETE /folders/folder_id` - delete a folder without deleting the sets
+Responses:
+*`{"message": "Set successfully deleted"}, 200`
+*`{"message": "Folder with such id doesn't exist"}, 404`
+* 401, 403, 498, 499 As it is a protected endpoint
+---
+
+
+### `PUT /folders/folder_id`- edit a folder
+
+Example body:
+```json
+{
+    "folder_title": "test_folder1",
+    "folder_description": "test_description",
+    "category_id": "01HJM17CGHV66Q9940GAP8AJXK",
+    "sets": [
+        "01HJM17CGHV66Q9940GAP8AJXK",
+        "01HJPEXW8Y21R5P4JGME8X5Q19"
+    ]
+}
+```
+Responses:
+* `{"message": "Folder with such id doesn't exist"}, 404`
+* `{"message": "Folder successfully updated"}, 200`
+* 401, 403, 498, 499 As it is a protected endpoint
+* 422
+
+### `GET users/<user_id>/folders`
+
+Responses:
+* 200
+```json
+{
+  "folders": [
+    {
+      "folder_category": null,
+      "folder_description": "test_description",
+      "folder_id": "01HM6WNA6VNQBBSNXQBR2A8Z29",
+      "folder_modification_date": "2024-01-15 17:43:21.819724",
+      "folder_title": "test_folder1",
+      "organization": null,
+      "username": "ivanobreshkov"
+    },
+    {
+      "folder_category": null,
+      "folder_description": "test_description",
+      "folder_id": "01HM6WNP8X6WGJFSR6K1X46VEC",
+      "folder_modification_date": "2024-01-15 17:45:58.589274",
+      "folder_title": "test_folder2",
+      "organization": null,
+      "username": "ivanobreshkov"
+    }
+  ]
+}
+```
+* 404
+```json
+{
+    "message": "user doesn't exist"
+}
+```
