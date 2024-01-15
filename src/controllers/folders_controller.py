@@ -10,6 +10,7 @@ from src.database.models import Folders, FoldersSets
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.sets_repository import SetsRepository
+from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models.folders_model import FoldersModel
 from src.pydantic_models.sets_model import UpdateSetsModel
 from src.utilities.parsers import validate_json_body, arg_to_bool
@@ -87,7 +88,14 @@ class FoldersController:
 
     @classmethod
     def get_all_folders_for_user(cls, user_id: str):
-        pass
+        if not UsersRepository.get_user_by_ulid(user_id):
+            return {"message": "user doesn't exist"}, 404
+
+        if result := FoldersRepository.get_folders_by_user_id(user_id):
+            return {"folders": [folders.to_json(FoldersRepository.get_creator_username(folders.user_id))
+                                for folders in result]}, 200
+
+        return {"message": "No folders were found for the given user"}, 404
 
     @classmethod
     def edit_folder(cls, folder_id: str):
