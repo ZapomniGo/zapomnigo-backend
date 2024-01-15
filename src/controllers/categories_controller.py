@@ -15,7 +15,7 @@ class CategoriesController:
 
     @classmethod
     def create_category(cls, json_data):
-        return Categories(category_id=str(ULID()), category_name=str(json_data["category_name"]).lower())
+        return Categories(category_id=str(ULID()), category_name=str(json_data["category_name"]).strip())
 
     @classmethod
     def add_category(cls):
