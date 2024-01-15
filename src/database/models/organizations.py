@@ -15,7 +15,7 @@ class Organizations(db.Model):
     organizations_users: Mapped["OrganizationsUsers"] = relationship(back_populates="organizations",
                                                                      cascade="all")
     sets: Mapped["Sets"] = relationship(back_populates="organizations", cascade="all")
-    folders: Mapped["Folders"] = relationship(back_populates="organizations", cascade="all")
+
     def to_json(self):
         return {"organization_id": self.organization_id,
                 "organization_name": self.organization_name,
