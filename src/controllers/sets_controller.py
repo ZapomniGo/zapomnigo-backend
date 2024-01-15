@@ -54,7 +54,7 @@ class SetsController:
     @classmethod
     def add_set(cls):
         json_data = request.json
-        user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username_or_user_id()).user_id
+        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
         if not user_id:
             return {"message": "No token provided"}, 499
 
