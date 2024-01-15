@@ -467,55 +467,6 @@ Responses:
 * 401, 403, 498, 499 As it is a protected endpoint
 ---
 
-[//]: # (### `GET sets/set_id/flashcards` - get all flashcards for a given set)
-
-[//]: # (Responses:)
-
-[//]: # (* `{"message": "set with such id doesn't exist"}, 404`)
-
-[//]: # (* `{"message": "No flashcards were found for this set"}, 404`)
-
-[//]: # (* 200 -)
-
-[//]: # (```json)
-
-[//]: # ({)
-
-[//]: # (    "flashcards": [)
-
-[//]: # (        {)
-
-[//]: # (            "definition": "capital of bulgaria",)
-
-[//]: # (            "flashcard_id": "01HJECQHJTJSWJZ852364SJ51Z",)
-
-[//]: # (            "notes": null,)
-
-[//]: # (            "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",)
-
-[//]: # (            "term": "sofia")
-
-[//]: # (        },)
-
-[//]: # (        {)
-
-[//]: # (            "definition": "capital of UK",)
-
-[//]: # (            "flashcard_id": "01HJECRT8FTKNMVVBR7DEGKBGG",)
-
-[//]: # (            "notes": "testtesttestsetest",)
-
-[//]: # (            "set_id": "01HJBKFAJQMMAS0ZKWC83VV1AY",)
-
-[//]: # (            "term": "london")
-
-[//]: # (        })
-
-[//]: # (    ])
-
-[//]: # (})
-
-[//]: # (```)
 ### POST /sets/set_id/copy - create a copy set of the passed one in the db
 Responses:
 * `{"set_id": 01HJBKFAJQMMAS0ZKWC83VV1AY}, 200`
@@ -605,4 +556,3 @@ Example body
     "user_id": "01HJSJSXHNYG58SQJJPYB84Q5Z"
 }
 ```
-
