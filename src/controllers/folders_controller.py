@@ -7,6 +7,7 @@ from ulid import ULID
 from src.controllers.utility_controller import UtilityController
 from src.database.models import Folders, FoldersSets
 from src.database.repositories.common_repository import CommonRepository
+from src.database.repositories.folders_repository import FoldersRepository
 from src.pydantic_models.folders_model import FoldersModel
 from src.utilities.parsers import validate_json_body
 
@@ -68,9 +69,19 @@ class FoldersController:
         pass
 
     @classmethod
-    def edit_folder(cls, folder_id):
+    def edit_folder(cls, folder_id: str):
         pass
 
     @classmethod
-    def delete_folder(cls, folder_id):
-        pass
+    def delete_folder(cls, folder_id: str):
+        folder_obj = FoldersRepository.get_folder_by_id(folder_id)
+
+        if not folder_obj:
+            return {"message": "Folder with such id doesn't exist"}, 404
+
+        username = FoldersRepository.get_creator_username(folder_obj.user_id)
+        if result := UtilityController.check_user_access(username):
+            return result
+
+        CommonRepository.delete_object_from_db(folder_obj)
+        return {"message": "Set successfully deleted"}, 200

@@ -12,3 +12,9 @@ folders_bp = Blueprint("folders", __name__)
 @jwt_required
 def create_folder() -> Tuple[Dict[str, Any], int]:
     return c.add_folder()
+
+
+@folders_bp.delete("/folders/<folder_id>")
+@jwt_required
+def delete_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.delete_folder(folder_id)

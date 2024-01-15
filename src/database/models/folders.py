@@ -18,5 +18,5 @@ class Folders(db.Model):
     # Creates a bidirectional relationship between tables
     users: Mapped["Users"] = relationship(back_populates="folders")
     categories: Mapped["Categories"] = relationship(back_populates="folders")
-    folders_sets: Mapped["FoldersSets"] = relationship(back_populates="folders", cascade="all")
+    folders_sets: Mapped[List["FoldersSets"]] = relationship(back_populates="folders", cascade="all")
     organizations: Mapped[List["Organizations"]] = relationship(back_populates="folders")
