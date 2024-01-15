@@ -11,7 +11,7 @@ class FoldersSets(db.Model):
 
     # Creates a bidirectional relationship between tables
     folders: Mapped["Folders"] = relationship(back_populates="folders_sets", cascade="all")
-    sets: Mapped["Sets"] = relationship(back_populates="folders_sets", cascade="all")
+    sets: Mapped["Sets"] = relationship(back_populates="folders_sets")
 
     # Make the combination of organization_id and user_id unique
     __table_args__ = (UniqueConstraint("folder_id", "set_id"),)

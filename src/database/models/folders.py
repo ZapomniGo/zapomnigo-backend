@@ -16,7 +16,7 @@ class Folders(db.Model):
     organization_id: Mapped[str] = mapped_column(ForeignKey("organizations.organization_id"), nullable=True)
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="folders", cascade="all")
-    categories: Mapped["Categories"] = relationship(back_populates="folders", cascade="all")
+    users: Mapped["Users"] = relationship(back_populates="folders")
+    categories: Mapped["Categories"] = relationship(back_populates="folders")
     folders_sets: Mapped["FoldersSets"] = relationship(back_populates="folders", cascade="all")
-    organizations: Mapped[List["Organizations"]] = relationship(back_populates="sets")
+    organizations: Mapped[List["Organizations"]] = relationship(back_populates="folders")
