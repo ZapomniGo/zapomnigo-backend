@@ -54,7 +54,7 @@ class SetsController:
     @classmethod
     def add_set(cls):
         json_data = request.json
-        user_id = UsersRepository.get_user_by_username(UtilityController.get_session_username_or_user_id()).user_id
+        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
         if not user_id:
             return {"message": "No token provided"}, 499
 
@@ -84,7 +84,7 @@ class SetsController:
         sort_by_date = arg_to_bool(sort_by_date)
         ascending = arg_to_bool(ascending)
 
-        result = SetsRepository.get_all_sets(page, size, user_id, sort_by_date, ascending)
+        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, sort_by_date=sort_by_date, ascending=ascending)
         sets_list = cls.display_sets_info(result)
 
         if not sets_list:
