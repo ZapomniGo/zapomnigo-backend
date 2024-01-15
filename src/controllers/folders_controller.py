@@ -4,13 +4,15 @@ from typing import List
 from flask import request
 from ulid import ULID
 
+from src.controllers.sets_controller import SetsController
 from src.controllers.utility_controller import UtilityController
 from src.database.models import Folders, FoldersSets
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
+from src.database.repositories.sets_repository import SetsRepository
 from src.pydantic_models.folders_model import FoldersModel
 from src.pydantic_models.sets_model import UpdateSetsModel
-from src.utilities.parsers import validate_json_body
+from src.utilities.parsers import validate_json_body, arg_to_bool
 
 
 class FoldersController:
@@ -63,7 +65,25 @@ class FoldersController:
 
     @classmethod
     def get_all_sets_in_folder(cls, folder_id: str):
-        pass
+        page = request.args.get('page', type=int)
+        size = request.args.get('size', type=int)
+        sort_by_date = request.args.get('sort_by_date', type=str, default='true')
+        ascending = request.args.get('ascending', type=str, default='false')
+
+        sort_by_date = arg_to_bool(sort_by_date)
+        ascending = arg_to_bool(ascending)
+
+        result = SetsRepository.get_all_sets(page=page, size=size, folder_id=folder_id, sort_by_date=sort_by_date,
+                                             ascending=ascending)
+        sets_list = SetsController.display_sets_info(result)
+
+        if not sets_list:
+            return {"message": "No sets were found"}, 404
+
+        last_page = result.pages if result.pages > 0 else 1
+
+        return {'sets': sets_list, 'total_pages': result.pages, 'current_page': result.page,
+                'last_page': last_page}, 200
 
     @classmethod
     def get_all_folders_for_user(cls, user_id: str):

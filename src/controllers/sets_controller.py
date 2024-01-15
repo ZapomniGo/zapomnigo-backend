@@ -84,7 +84,7 @@ class SetsController:
         sort_by_date = arg_to_bool(sort_by_date)
         ascending = arg_to_bool(ascending)
 
-        result = SetsRepository.get_all_sets(page, size, user_id, sort_by_date, ascending)
+        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, sort_by_date=sort_by_date, ascending=ascending)
         sets_list = cls.display_sets_info(result)
 
         if not sets_list:

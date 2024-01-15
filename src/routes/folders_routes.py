@@ -24,3 +24,7 @@ def delete_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
 @jwt_required
 def edit_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
     return c.edit_folder(folder_id)
+
+@folders_bp.get("/folders/<folder_id>/sets")
+def get_sets_for_folder(folder_id: str)-> Tuple[Dict[str, Any], int]:
+    return c.get_all_sets_in_folder(folder_id)
