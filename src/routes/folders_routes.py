@@ -18,3 +18,9 @@ def create_folder() -> Tuple[Dict[str, Any], int]:
 @jwt_required
 def delete_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
     return c.delete_folder(folder_id)
+
+
+@folders_bp.put("/folders/<folder_id>")
+@jwt_required
+def edit_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.edit_folder(folder_id)

@@ -9,6 +9,7 @@ from src.database.models import Folders, FoldersSets
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
 from src.pydantic_models.folders_model import FoldersModel
+from src.pydantic_models.sets_model import UpdateSetsModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -70,7 +71,25 @@ class FoldersController:
 
     @classmethod
     def edit_folder(cls, folder_id: str):
-        pass
+        json_data = request.get_json()
+        folder = FoldersRepository.get_folder_by_id(folder_id)
+
+        if not folder:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        username = FoldersRepository.get_creator_username(folder.user_id)
+        if result := UtilityController.check_user_access(username):
+            return result
+
+        if validation_errors := validate_json_body(json_data, UpdateSetsModel):
+            return {"validation errors": validation_errors}, 422
+
+        FoldersRepository.edit_folder(folder, json_data)
+        FoldersRepository.delete_folders_sets_by_folder_id(folder_id)
+        folder_sets = cls.create_folder_sets(json_data, folder.folder_id)
+        CommonRepository.add_many_objects_to_db(folder_sets)
+
+        return {"message": "Folder successfully updated"}, 200
 
     @classmethod
     def delete_folder(cls, folder_id: str):
