@@ -7,8 +7,10 @@ from ulid import ULID
 from src.controllers.sets_controller import SetsController
 from src.controllers.utility_controller import UtilityController
 from src.database.models import Folders, FoldersSets
+from src.database.repositories.categories_repository import CategoriesRepository
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
+from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.pydantic_models.folders_model import FoldersModel
@@ -85,6 +87,8 @@ class FoldersController:
 
         return {'folder_title': folder.folder_title, 'folder_description': folder.folder_description,
                 'folder_creator': FoldersRepository.get_creator_username(folder.user_id),
+                'category_name': CategoriesRepository.get_category_name_by_id(folder.category_id),
+                "organization_name": OrganizationsRepository.get_organization_name_by_id(folder.organization_id),
                 'sets': sets_list, 'pagination_of_sets': {'total_pages': result.pages, 'current_page': result.page,
                                                           'last_page': last_page}}, 200
 

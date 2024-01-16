@@ -10,6 +10,10 @@ class CategoriesRepository:
         return db.session.query(Categories).filter_by(category_id=category_id).first()
 
     @classmethod
+    def get_category_name_by_id(cls, organization_id: str) -> str | None:
+        return db.session.query(Categories).filter_by(organization_id=organization_id).first().category_name
+
+    @classmethod
     def edit_category(cls, category: Categories, json_data: Dict[str, Any]) -> None:
         category.category_name = json_data.get("category_name", category.category_name).lower()
         db.session.commit()

@@ -11,6 +11,10 @@ class OrganizationsRepository:
         return db.session.query(Organizations).filter_by(organization_id=organization_id).first()
 
     @classmethod
+    def get_organization_name_by_id(cls, organization_id: str) -> str | None:
+        return db.session.query(Organizations).filter_by(organization_id=organization_id).first().organization_name
+
+    @classmethod
     def edit_organization(cls, organization: Organizations, json_data: Dict[str, Any]) -> None:
         organization.organization_name = json_data.get("organization_name", organization.organization_name)
         organization.organization_domain = json_data.get("organization_domain", organization.organization_domain)
