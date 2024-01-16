@@ -12,7 +12,10 @@ class OrganizationsRepository:
 
     @classmethod
     def get_organization_name_by_id(cls, organization_id: str) -> str | None:
-        return db.session.query(Organizations).filter_by(organization_id=organization_id).first().organization_name
+        if organization := cls.get_organization_by_id(organization_id):
+            return organization.organization_name
+
+        return None
 
     @classmethod
     def edit_organization(cls, organization: Organizations, json_data: Dict[str, Any]) -> None:
