@@ -24,12 +24,11 @@ class FlashcardsController:
 
     @classmethod
     def check_if_user_can_edit_or_delete_flashcard(cls, set_id: str):
-        set_obj = SetsRepository.get_set_by_id(set_id)
+        set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
         if not set_obj:
             return {"message": "Set with such id doesn't exist"}, 404
 
-        username = SetsRepository.get_creator_username(set_obj.get_user_id())
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
     @classmethod
@@ -46,7 +45,7 @@ class FlashcardsController:
         if validation_errors := validate_json_body(json_data, UpdateFlashcardsModel):
             return {"validation errors": validation_errors}, 422
 
-        FlashcardsRepository.edit_flashcard(flashcard, json_data)
+        CommonRepository.edit_object(flashcard, UpdateFlashcardsModel(**json_data))
         return {"message": "Flashcard successfully updated"}, 200
 
     @classmethod
@@ -73,13 +72,13 @@ class FlashcardsController:
         if validation_errors := validate_json_body(json_data, StudyFlashcardsModel):
             return {"validation errors": validation_errors}, 422
 
+        # Here it's just faster to get the user_id from the raw json instead through the pydantic model
         if result := ReviewsFlashcardsRepository.get_review_by_flashcard_id(flashcard_id, json_data["user_id"]):
-            ReviewsFlashcardsRepository.edit_review_flashcard(result, json_data)
+            ReviewsFlashcardsRepository.edit_review_flashcard(result, StudyFlashcardsModel(**json_data))
 
         else:
             study_flashcard_obj = ReviewsFlashcards(reviews_flashcards_id=str(ULID()), user_id=json_data["user_id"],
-                                                    flashcard_id=flashcard_id, confidence=0
-                                                    )
+                                                    flashcard_id=flashcard_id, confidence=0)
             CommonRepository.add_object_to_db(study_flashcard_obj)
 
         return {"message": "Confidence level of flashcard updated!"}, 200

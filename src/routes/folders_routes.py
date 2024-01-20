@@ -2,8 +2,8 @@ from typing import Tuple, Any, Dict
 
 from flask import Blueprint
 
-from src.auth.jwt_decorators import jwt_required
 from src.controllers.folders_controller import FoldersController as c
+from src.functionality.auth.jwt_decorators import jwt_required
 
 folders_bp = Blueprint("folders", __name__)
 

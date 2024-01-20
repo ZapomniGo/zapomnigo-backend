@@ -2,8 +2,8 @@ from typing import Tuple, Dict, Any
 
 from flask import Blueprint
 
-from src.auth.jwt_decorators import admin_required
 from src.controllers.organization_controller import OrganizationsController as c
+from src.functionality.auth.jwt_decorators import admin_required
 
 organizations_bp = Blueprint("organizations", __name__)
 

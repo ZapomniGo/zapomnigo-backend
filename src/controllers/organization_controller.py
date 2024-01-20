@@ -27,6 +27,7 @@ class OrganizationsController:
 
         return {"message": "Organization with such id doesn't exist"}, 404
 
+    # TODO: Refactor
     @classmethod
     def get_sets_for_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
         organization = OrganizationsRepository.get_organization_by_id(organization_id)
@@ -40,20 +41,20 @@ class OrganizationsController:
         return {"message": "No sets were found for this organization"}, 404
 
     @staticmethod
-    def create_organization(json_data):
-        subscription_model_id = SubscriptionModelsRepository.get_subscription_model_id(json_data["subscription_model"])
-
-        return Organizations(organization_id=str(ULID()), organization_name=json_data["organization_name"],
-                             organization_domain=json_data["organization_domain"],
-                             subscription_model_id=subscription_model_id)
+    def create_organization(json_data: OrganizationModel):
+        return Organizations(organization_id=str(ULID()), organization_name=json_data.organization_name,
+                             organization_domain=json_data.organization_domain,
+                             subscription_model_id=SubscriptionModelsRepository.get_subscription_model_id(
+                                 json_data.subscription_model))
 
     @classmethod
     def add_organization(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
-        if validation_errors := validate_json_body(json_data, OrganizationModel):  # type: ignore
+
+        if validation_errors := validate_json_body(json_data, OrganizationModel):
             return {"validation errors": validation_errors}, 422
 
-        CommonRepository.add_object_to_db(cls.create_organization(json_data))
+        CommonRepository.add_object_to_db(cls.create_organization(OrganizationModel(**json_data)))
 
         return {"message": "Organization added to db"}, 200
 
@@ -68,13 +69,13 @@ class OrganizationsController:
     @classmethod
     def update_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
-        organization = OrganizationsRepository.get_organization_by_id(organization_id)
 
-        if not organization:
+        organization_obj = OrganizationsRepository.get_organization_by_id(organization_id)
+        if not organization_obj:
             return {"message": "Organization with such id doesn't exist"}, 404
 
-        if validation_errors := validate_json_body(json_data, UpdateOrganizationModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, UpdateOrganizationModel):
             return {"validation errors": validation_errors}, 422
 
-        OrganizationsRepository.edit_organization(organization, json_data)
+        CommonRepository.edit_object(organization_obj, UpdateOrganizationModel(**json_data))
         return {"message": "Organization successfully updated"}, 200

@@ -12,59 +12,46 @@ from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
+from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
 from src.utilities.parsers import validate_json_body, arg_to_bool
 
 
 class SetsController:
     @classmethod
-    def create_set(cls, json_data, user_id: str):
-        set_description = json_data.get("set_description", None)
-        set_category = json_data.get("set_category", None)
-        organization_id = json_data.get("organization_id", None)
-
-        if set_description == "":
-            set_description = None
-        if set_category == "":
-            set_category = None
-        if organization_id == "":
-            organization_id = None
-
-        return Sets(set_id=str(ULID()), set_name=json_data["set_name"],
-                    set_description=set_description,
+    def create_set(cls, json_data: SetsModel, user_id: str) -> Sets:
+        return Sets(set_id=str(ULID()), set_name=json_data.set_name,
+                    set_description=json_data.set_description,
                     set_modification_date=str(datetime.now()),
-                    set_category=set_category,
+                    set_category=json_data.set_category,
                     user_id=user_id,
-                    organization_id=organization_id)
+                    organization_id=json_data.organization_id)
 
     @classmethod
-    def create_flashcards(cls, json_data, set_id: str):
+    def create_flashcards(cls, json_data: SetsModel, set_id: str):
         flashcards_objects = []
-        for flashcard in json_data.get("flashcards", []):
-            notes = flashcard.get("notes", None)
-            if notes == "":
-                notes = None
-
-            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard["term"],
-                                                 definition=flashcard["definition"],
-                                                 notes=notes,
+        for flashcard in json_data.flashcards:
+            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
+                                                 definition=flashcard.definition,
+                                                 notes=flashcard.notes,
                                                  set_id=set_id))
         return flashcards_objects
 
     @classmethod
     def add_set(cls):
-        json_data = request.json
-        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
+        json_data = request.get_json()
+
+        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
         if not user_id:
             return {"message": "No token provided"}, 499
 
-        if validation_errors := validate_json_body(json_data, SetsModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, SetsModel):
             return {"validation errors": validation_errors}, 422
 
-        set_obj = cls.create_set(json_data, user_id)
+        set_obj = cls.create_set(SetsModel(**json_data), user_id)
         CommonRepository.add_object_to_db(set_obj)
 
-        flashcards = cls.create_flashcards(json_data, set_obj.set_id)
+        flashcards = cls.create_flashcards(SetsModel(**json_data), set_obj.set_id)
         if len(flashcards) > 2000:
             return {"message": "Cannot create more than 2000 flashcards per set"}, 400
 
@@ -84,7 +71,8 @@ class SetsController:
         sort_by_date = arg_to_bool(sort_by_date)
         ascending = arg_to_bool(ascending)
 
-        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, sort_by_date=sort_by_date, ascending=ascending)
+        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, sort_by_date=sort_by_date,
+                                             ascending=ascending)
         sets_list = cls.display_sets_info(result)
 
         if not sets_list:
@@ -165,21 +153,21 @@ class SetsController:
     @classmethod
     def update_set(cls, set_id: str):
         json_data = request.get_json()
-        set_obj = SetsRepository.get_set_by_id(set_id)
+        set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
 
-        username = SetsRepository.get_creator_username(set_obj.get_user_id())
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
-        if validation_errors := validate_json_body(json_data, UpdateSetsModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, UpdateSetsModel):
             return {"validation errors": validation_errors}, 422
 
-        SetsRepository.edit_set(set_obj, json_data)
+        CommonRepository.edit_object(set_obj, UpdateSetsModel(**json_data), field_to_drop="flashcards")
         FlashcardsRepository.delete_flashcards_by_set_id(set_id)
-        flashcards = cls.create_flashcards(json_data, set_id)
+
+        flashcards = cls.create_flashcards(SetsModel(**json_data), set_id)
         if len(flashcards) > 2000:
             return {"message": "Cannot create more than 2000 flashcards per set"}, 400
 
@@ -189,13 +177,12 @@ class SetsController:
 
     @classmethod
     def delete_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj = SetsRepository.get_set_by_id(set_id)
+        set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
 
-        username = SetsRepository.get_creator_username(set_obj.get_user_id())
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
         CommonRepository.delete_object_from_db(set_obj)
@@ -203,7 +190,7 @@ class SetsController:
 
     @classmethod
     def copy_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj = SetsRepository.get_set_by_id(set_id=set_id)
+        set_obj = SetsRepository.get_set_by_id(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
@@ -212,8 +199,7 @@ class SetsController:
                            set_description=set_obj.set_description,
                            set_modification_date=str(datetime.now()),
                            set_category=set_obj.set_category,
-                           user_id=UsersRepository.get_user_by_username(
-                               UtilityController.get_session_username_or_user_id()).user_id,
+                           user_id=AuthFunctionality.get_session_username_or_user_id(request, get_username=False),
                            organization_id=None)
 
         flashcards = FlashcardsRepository.get_flashcards_by_set_id(set_id)
@@ -238,7 +224,7 @@ class SetsController:
 
         page = request.args.get('page', type=int)
         size = request.args.get('size', type=int)
-        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
+        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
         flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size, user_id, is_study=True)
 
         return {"flashcards": cls.display_study_info(flashcards)}, 200

@@ -13,55 +13,44 @@ from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
-from src.pydantic_models.folders_model import FoldersModel
-from src.pydantic_models.sets_model import UpdateSetsModel
+from src.functionality.auth.auth_functionality import AuthFunctionality
+from src.pydantic_models.folders_model import FoldersModel, UpdateFoldersModel
 from src.utilities.parsers import validate_json_body, arg_to_bool
 
 
 class FoldersController:
     @classmethod
-    def create_folder(cls, json_data, user_id: str):
-        folder_description = json_data.get("folder_description", None)
-        category_id = json_data.get("category_id", None)
-        organization_id = json_data.get("organization_id", None)
-
-        if folder_description == "":
-            folder_description = None
-        if category_id == "":
-            category_id = None
-        if organization_id == "":
-            organization_id = None
-
-        return Folders(folder_id=str(ULID()), folder_title=json_data["folder_title"],
-                       folder_description=folder_description,
+    def create_folder(cls, json_data: FoldersModel, user_id: str) -> Folders:
+        return Folders(folder_id=str(ULID()), folder_title=json_data.folder_title,
+                       folder_description=json_data.folder_description,
                        folder_modification_date=str(datetime.now()),
-                       category_id=category_id,
+                       category_id=json_data.category_id,
                        user_id=user_id,
-                       organization_id=organization_id)
+                       organization_id=json_data.organization_id)
 
     @classmethod
-    def create_folder_sets(cls, json_data, folder_obj_id: str) -> List[FoldersSets]:
+    def create_folder_sets(cls, set_ids: List[str], folder_obj_id: str) -> List[FoldersSets]:
         folder_sets_objects = []
-        for set_id in json_data["sets"]:
+        for set_id in set_ids:
             folder_sets_objects.append(FoldersSets(folder_set_id=str(ULID()), folder_id=folder_obj_id, set_id=set_id))
 
         return folder_sets_objects
 
     @classmethod
     def add_folder(cls):
-        json_data = request.json
-        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
+        json_data = request.get_json()
 
+        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
         if not user_id:
             return {"message": "No token provided"}, 499
 
         if validation_errors := validate_json_body(json_data, FoldersModel):
             return {"validation errors": validation_errors}, 422
 
-        folder_obj = cls.create_folder(json_data, user_id)
+        folder_obj = cls.create_folder(FoldersModel(**json_data), user_id)
         CommonRepository.add_object_to_db(folder_obj)
 
-        folder_sets = cls.create_folder_sets(json_data, folder_obj.folder_id)
+        folder_sets = cls.create_folder_sets(json_data["sets"], folder_obj.folder_id)
         CommonRepository.add_many_objects_to_db(folder_sets)
 
         return {"folder_id": folder_obj.folder_id}, 200
@@ -106,34 +95,36 @@ class FoldersController:
     @classmethod
     def edit_folder(cls, folder_id: str):
         json_data = request.get_json()
-        folder = FoldersRepository.get_folder_by_id(folder_id)
 
-        if not folder:
+        folder_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,
+                                                                                                      get_set=False)
+
+        if not folder_obj:
             return {"message": "Folder with such id doesn't exist"}, 404
 
-        username = FoldersRepository.get_creator_username(folder.user_id)
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
-        if validation_errors := validate_json_body(json_data, UpdateSetsModel):
+        if validation_errors := validate_json_body(json_data, UpdateFoldersModel):
             return {"validation errors": validation_errors}, 422
 
-        FoldersRepository.edit_folder(folder, json_data)
+        CommonRepository.edit_object(folder_obj, UpdateFoldersModel(**json_data), field_to_drop="sets")
         FoldersRepository.delete_folders_sets_by_folder_id(folder_id)
-        folder_sets = cls.create_folder_sets(json_data, folder.folder_id)
+
+        folder_sets = cls.create_folder_sets(json_data["sets"], folder_obj.folder_id)
         CommonRepository.add_many_objects_to_db(folder_sets)
 
         return {"message": "Folder successfully updated"}, 200
 
     @classmethod
     def delete_folder(cls, folder_id: str):
-        folder_obj = FoldersRepository.get_folder_by_id(folder_id)
+        folder_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,
+                                                                                                      get_set=False)
 
         if not folder_obj:
             return {"message": "Folder with such id doesn't exist"}, 404
 
-        username = FoldersRepository.get_creator_username(folder_obj.user_id)
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
         CommonRepository.delete_object_from_db(folder_obj)

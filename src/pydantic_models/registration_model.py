@@ -1,15 +1,16 @@
 import string
-from typing import Annotated, Literal, Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from src.pydantic_models.common import NAME
+
+from src.pydantic_models.common import NAME, PASSWORD
 
 
 class RegistrationModel(BaseModel):
-    name: NAME  # type: ignore
-    username: NAME  # type: ignore
+    name: NAME
+    username: NAME
     email: EmailStr
-    password: Annotated[str, Field(min_length=8, max_length=80)]
+    password: PASSWORD
     age: int = Field(..., gt=5, le=99)
     gender: Literal["M", "F", "O"]
     organization: Optional[str] = None
@@ -18,7 +19,6 @@ class RegistrationModel(BaseModel):
     marketing_consent: bool
 
     @field_validator("password")
-    @classmethod
     def validate_password(cls, value):
         if not any(c.isupper() for c in value):
             raise ValueError("Password must contain at least one uppercase letter")

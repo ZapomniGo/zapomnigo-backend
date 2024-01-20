@@ -1,9 +1,8 @@
-from typing import Dict, Any
-
 from sqlalchemy import and_
 
 from src.database.models import ReviewsFlashcards
 from src.database.models.base import db
+from src.pydantic_models.flashcards_model import StudyFlashcardsModel
 
 
 class ReviewsFlashcardsRepository:
@@ -15,9 +14,10 @@ class ReviewsFlashcardsRepository:
                 ReviewsFlashcards.user_id == user_id
             )
         ).first()
+
     @classmethod
-    def edit_review_flashcard(cls, set_obj: ReviewsFlashcards, json_data: Dict[str, Any]) -> None:
-        if json_data["correctness"] == 0:
+    def edit_review_flashcard(cls, set_obj: ReviewsFlashcards, json_data: StudyFlashcardsModel) -> None:
+        if json_data.correctness == 0:
             set_obj.confidence -= 1
         else:
             set_obj.confidence += 1

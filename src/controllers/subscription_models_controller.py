@@ -19,8 +19,8 @@ class SubscriptionModelsController:
     @classmethod
     def add_subscription_model(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
-        validation_errors = validate_json_body(json_data, SubscriptionModel)  # type: ignore
-        if validation_errors:
+
+        if validation_errors := validate_json_body(json_data, SubscriptionModel):
             return {"validation errors": validation_errors}, 422
 
         CommonRepository.add_object_to_db(cls.create_subscription_model(json_data))

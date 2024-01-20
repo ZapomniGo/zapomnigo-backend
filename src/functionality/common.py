@@ -1,0 +1,2 @@
+class CommonFunctionality:
+    pass

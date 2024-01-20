@@ -2,8 +2,8 @@ from typing import Tuple, Dict, Any
 
 from flask import Blueprint
 
-from src.auth.jwt_decorators import admin_required, jwt_required
 from src.controllers.sets_controller import SetsController as c
+from src.functionality.auth.jwt_decorators import jwt_required
 
 sets_bp = Blueprint("sets", __name__)
 
