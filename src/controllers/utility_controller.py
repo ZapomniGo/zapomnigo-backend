@@ -4,8 +4,8 @@ from typing import Tuple, Dict, Any
 from flask import request
 from jwt import decode
 
-from src.auth.jwt_creation import JwtCreation
 from src.config import SECRET_KEY, ADMIN_USERNAME, IS_OFFLINE, IS_PROD, IS_DEV
+from src.functionality.auth.jwt_creation import JwtCreation
 from src.services.mailer import send_email_background_task
 
 

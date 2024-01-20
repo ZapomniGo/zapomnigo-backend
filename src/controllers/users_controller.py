@@ -1,4 +1,3 @@
-import asyncio
 from typing import Tuple, Dict, Any
 
 from flask import request, make_response, Response
@@ -6,17 +5,15 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
 from ulid import ULID
 
-from src.auth.jwt_creation import JwtCreation
-from src.config import SECRET_KEY, IS_OFFLINE
+from src.config import SECRET_KEY
 from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController
 from src.database.models import Users, OrganizationsUsers
 from src.database.repositories.common_repository import CommonRepository
-from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.users_repository import UsersRepository
+from src.functionality.auth.jwt_creation import JwtCreation
 from src.pydantic_models import RegistrationModel, LoginModel
 from src.pydantic_models.reset_password_model import ResetPasswordModel
-from src.services.mailer import send_email_background_task
 from src.utilities.parsers import validate_json_body
 
 

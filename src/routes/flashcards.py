@@ -2,8 +2,8 @@ from typing import Tuple, Dict, Any
 
 from flask import Blueprint
 
-from src.auth.jwt_decorators import jwt_required
 from src.controllers.flashcards_contoller import FlashcardsController as c
+from src.functionality.auth.jwt_decorators import jwt_required
 
 flashcards_bp = Blueprint("flashcards", __name__)
 
