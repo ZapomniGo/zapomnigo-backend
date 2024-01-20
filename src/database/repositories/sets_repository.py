@@ -8,14 +8,9 @@ from sqlalchemy import desc, asc, func
 from src.database.models import Organizations, Categories, OrganizationsUsers, Users, FoldersSets
 from src.database.models.base import db
 from src.database.models.sets import Sets
-from src.database.repositories.users_repository import UsersRepository
 
 
 class SetsRepository:
-
-    @classmethod
-    def get_creator_username(cls, user_id: str) -> str:
-        return str(UsersRepository.get_user_by_ulid(user_id).username)
 
     @classmethod
     def get_organization_sets(cls, organization_id: str) -> List[Sets] | None:
@@ -24,6 +19,19 @@ class SetsRepository:
     @classmethod
     def get_set_by_id(cls, set_id: str) -> Sets | None:
         return db.session.query(Sets).filter_by(set_id=set_id).first()
+
+    @classmethod
+    def get_set_by_id_with_creator_username(cls, set_id: str) -> Tuple[Sets | None, str | None]:
+        set_info = db.session.query(Sets, Users.username) \
+            .join(Users, Sets.user_id == Users.user_id) \
+            .filter(Sets.set_id == set_id) \
+            .first()
+
+        if set_info:
+            set_obj, creator_username = set_info
+            return set_obj, creator_username
+        else:
+            return None, None
 
     @classmethod
     def _base_query(cls) -> Query:

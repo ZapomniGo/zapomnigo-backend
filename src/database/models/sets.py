@@ -25,18 +25,3 @@ class Sets(db.Model):
     reviews_sets: Mapped[List["ReviewsSets"]] = relationship(back_populates="sets", cascade="all")
     liked_flashcards: Mapped[List["LikedFlashcards"]] = relationship(back_populates="sets", cascade="all")
     organizations: Mapped[List["Organizations"]] = relationship(back_populates="sets")
-
-    def get_user_id(self):
-        return self.user_id
-
-    def to_json(self, username: str, flashcards: List[Any]):
-        flashcards = flashcards or []
-        return {"set_id": self.set_id,
-                "set_name": self.set_name,
-                "set_description": self.set_description,
-                "set_modification_date": self.set_modification_date,
-                "set_category": self.set_category,
-                "username": username,
-                "organization": self.organization_id,
-                "flashcards": flashcards
-                }

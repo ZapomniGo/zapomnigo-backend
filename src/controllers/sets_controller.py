@@ -167,16 +167,15 @@ class SetsController:
     @classmethod
     def update_set(cls, set_id: str):
         json_data = request.get_json()
-        set_obj = SetsRepository.get_set_by_id(set_id)
+        set_obj, creator_username = SetsRepository.get_set_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
 
-        username = SetsRepository.get_creator_username(set_obj.get_user_id())
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
-        if validation_errors := validate_json_body(json_data, UpdateSetsModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, UpdateSetsModel):
             return {"validation errors": validation_errors}, 422
 
         SetsRepository.edit_set(set_obj, json_data)
@@ -191,13 +190,12 @@ class SetsController:
 
     @classmethod
     def delete_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj = SetsRepository.get_set_by_id(set_id)
+        set_obj, creator_username = SetsRepository.get_set_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
 
-        username = SetsRepository.get_creator_username(set_obj.get_user_id())
-        if result := UtilityController.check_user_access(username):
+        if result := UtilityController.check_user_access(creator_username):
             return result
 
         CommonRepository.delete_object_from_db(set_obj)
@@ -205,7 +203,7 @@ class SetsController:
 
     @classmethod
     def copy_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj = SetsRepository.get_set_by_id(set_id=set_id)
+        set_obj, _ = SetsRepository.get_set_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
@@ -214,8 +212,7 @@ class SetsController:
                            set_description=set_obj.set_description,
                            set_modification_date=str(datetime.now()),
                            set_category=set_obj.set_category,
-                           user_id=UsersRepository.get_user_by_username(
-                               UtilityController.get_session_username_or_user_id()).user_id,
+                           user_id=AuthFunctionality.get_session_username_or_user_id(request, get_username=False),
                            organization_id=None)
 
         flashcards = FlashcardsRepository.get_flashcards_by_set_id(set_id)
@@ -240,7 +237,7 @@ class SetsController:
 
         page = request.args.get('page', type=int)
         size = request.args.get('size', type=int)
-        user_id = UtilityController.get_session_username_or_user_id(get_username=False)
+        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
         flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size, user_id, is_study=True)
 
         return {"flashcards": cls.display_study_info(flashcards)}, 200

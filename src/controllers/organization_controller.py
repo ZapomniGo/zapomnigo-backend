@@ -27,6 +27,7 @@ class OrganizationsController:
 
         return {"message": "Organization with such id doesn't exist"}, 404
 
+    # TODO: Refactor
     @classmethod
     def get_sets_for_organization(cls, organization_id: str) -> Tuple[Dict[str, Any], int]:
         organization = OrganizationsRepository.get_organization_by_id(organization_id)
@@ -50,7 +51,7 @@ class OrganizationsController:
     @classmethod
     def add_organization(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
-        if validation_errors := validate_json_body(json_data, OrganizationModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, OrganizationModel):
             return {"validation errors": validation_errors}, 422
 
         CommonRepository.add_object_to_db(cls.create_organization(json_data))
@@ -73,7 +74,7 @@ class OrganizationsController:
         if not organization:
             return {"message": "Organization with such id doesn't exist"}, 404
 
-        if validation_errors := validate_json_body(json_data, UpdateOrganizationModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, UpdateOrganizationModel):
             return {"validation errors": validation_errors}, 422
 
         OrganizationsRepository.edit_organization(organization, json_data)
