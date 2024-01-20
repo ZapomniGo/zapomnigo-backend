@@ -12,24 +12,23 @@ from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.mailing_functionality import MailingFunctionality
-from src.pydantic_models import RegistrationModel, LoginModel
-from src.pydantic_models.reset_password_model import ResetPasswordModel
+from src.pydantic_models.users_models import ResetPasswordModel, RegistrationModel, LoginModel
 from src.utilities.parsers import validate_json_body
 
 
 class UsersController:
 
     @staticmethod
-    def create_user(json_data) -> Users:
-        hashed_password = generate_password_hash(json_data["password"]).decode("utf-8")
+    def create_user(json_data: RegistrationModel) -> Users:
+        hashed_password = generate_password_hash(json_data.password).decode("utf-8")
 
-        return Users(user_id=str(ULID()), username=json_data["username"],  # type: ignore
-                     name=json_data["name"], email=json_data["email"],
-                     password=hashed_password, age=json_data.get("age", None),
-                     gender=json_data.get("gender", None),  # type: ignore
-                     privacy_policy=json_data["privacy_policy"],
-                     terms_and_conditions=json_data["terms_and_conditions"],
-                     marketing_consent=json_data["marketing_consent"])
+        return Users(user_id=str(ULID()), username=json_data.username,
+                     name=json_data.name, email=json_data.email,
+                     password=hashed_password, age=json_data.age,
+                     gender=json_data.gender,
+                     privacy_policy=json_data.privacy_policy,
+                     terms_and_conditions=json_data.terms_and_conditions,
+                     marketing_consent=json_data.marketing_consent)
 
     @classmethod
     async def register_user(cls) -> Tuple[Dict[str, Any], int]:
@@ -38,7 +37,7 @@ class UsersController:
         if validation_errors := validate_json_body(json_data, RegistrationModel):
             return {"validation errors": validation_errors}, 422
 
-        user = cls.create_user(json_data)
+        user = cls.create_user(RegistrationModel(**json_data))
         CommonRepository.add_object_to_db(user)
 
         if organization_id := json_data.get("organization", None):
@@ -70,7 +69,7 @@ class UsersController:
                                   "username": user.username}}, 418
 
         access_token = AuthFunctionality.create_access_jwt_token(user=user, password=json_data["password"])
-        refresh_token = AuthFunctionality.create_refresh_jwt_token(user.username)
+        refresh_token = AuthFunctionality.create_jwt_token(user.username)
 
         response = make_response(
             {"message": "user logged in", "access_token": access_token, "refresh_token": refresh_token}, 200)
@@ -94,7 +93,7 @@ class UsersController:
 
         new_access_token = AuthFunctionality.create_access_jwt_token(username=decoded_token.get("username"),
                                                                      refresh=True)
-        new_refresh_token = AuthFunctionality.create_refresh_jwt_token(decoded_token.get("username"))
+        new_refresh_token = AuthFunctionality.create_jwt_token(decoded_token.get("sub"))
 
         response = make_response(
             {'message': 'Token refreshed', 'access_token': new_access_token, "refresh_token": new_refresh_token}, 200)
@@ -104,7 +103,9 @@ class UsersController:
         return response
 
     @classmethod
-    def reset_password(cls, json_data) -> Tuple[Dict[str, Any], int]:
+    def reset_password(cls) -> Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+
         if validation_errors := validate_json_body(json_data, ResetPasswordModel):
             return {"validation errors": validation_errors}, 422
 

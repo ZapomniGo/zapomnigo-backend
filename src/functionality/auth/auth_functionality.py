@@ -58,21 +58,13 @@ class AuthFunctionality:
 
     # TODO: REFACTOR!!!!!
     @classmethod
-    def create_refresh_jwt_token(cls, username: str) -> str:
-        payload = {"username": username,
-                   "exp": datetime.utcnow() + timedelta(days=30)}
+    def create_jwt_token(cls, username: str, is_refresh: bool = True) -> str:
+        exp = datetime.utcnow() + timedelta(days=30)
+        if not is_refresh:
+            exp = datetime.utcnow() + timedelta(hours=24)
 
-        if IS_OFFLINE:
-            token = encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
-        else:
-            token = encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
-
-        return token
-
-    @classmethod
-    def create_verification_jwt(cls, username: str) -> str:
         payload = {"sub": username,
-                   "exp": datetime.utcnow() + timedelta(hours=24)}
+                   "exp": exp}
 
         if IS_OFFLINE:
             token = encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
@@ -82,7 +74,7 @@ class AuthFunctionality:
         return token
 
     @classmethod
-    def get_session_username_or_user_id(cls, request: Request,get_username=True) -> str | None:
+    def get_session_username_or_user_id(cls, request: Request, get_username=True) -> str | None:
         access_token = request.headers.get('Authorization')
         if access_token:
             if get_username:

@@ -32,6 +32,6 @@ class UpdateFoldersModel(BaseModel):
     category_id: Optional[ID] = None
     sets: Optional[List[ID]] = None
 
-    @field_validator('folder_description', 'category_id', 'organization_id', mode='before')
+    @field_validator('folder_description', 'category_id', 'sets', mode='before')
     def convert_empty_string_to_none(cls, value):
         return None if value == "" else value
