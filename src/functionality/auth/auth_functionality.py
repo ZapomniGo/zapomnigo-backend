@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 
 import jwt
+from flask import Request
 from flask_bcrypt import check_password_hash
+from jwt import decode, encode
 
 from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig, SECRET_KEY, ADMIN_USERNAME
 from src.database.models import Users
@@ -10,7 +12,7 @@ from src.database.repositories.organizations_users_repository import \
 from src.database.repositories.users_repository import UsersRepository
 
 
-class JwtCreation:
+class AuthFunctionality:
 
     @classmethod
     def create_access_jwt_token(cls, **kwargs) -> str:
@@ -61,9 +63,9 @@ class JwtCreation:
                    "exp": datetime.utcnow() + timedelta(days=30)}
 
         if IS_OFFLINE:
-            token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
+            token = encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
         else:
-            token = jwt.encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
+            token = encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
 
         return token
 
@@ -73,8 +75,19 @@ class JwtCreation:
                    "exp": datetime.utcnow() + timedelta(hours=24)}
 
         if IS_OFFLINE:
-            token = jwt.encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
+            token = encode(payload, DevConfig.SECRET_KEY, algorithm="HS256")
         else:
-            token = jwt.encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
+            token = encode(payload, ProdConfig.SECRET_KEY, algorithm="HS256")
 
         return token
+
+    @classmethod
+    def get_session_username_or_user_id(cls, request: Request,get_username=True) -> str | None:
+        access_token = request.headers.get('Authorization')
+        if access_token:
+            if get_username:
+                return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("username")
+            else:
+                return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("sub")
+        else:
+            return None

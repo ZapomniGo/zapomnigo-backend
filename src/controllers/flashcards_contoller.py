@@ -78,8 +78,7 @@ class FlashcardsController:
 
         else:
             study_flashcard_obj = ReviewsFlashcards(reviews_flashcards_id=str(ULID()), user_id=json_data["user_id"],
-                                                    flashcard_id=flashcard_id, confidence=0
-                                                    )
+                                                    flashcard_id=flashcard_id, confidence=0)
             CommonRepository.add_object_to_db(study_flashcard_obj)
 
         return {"message": "Confidence level of flashcard updated!"}, 200
