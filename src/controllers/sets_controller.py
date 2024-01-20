@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Tuple, Dict, Any, List
+from typing import Tuple, Dict, Any
 
 from flask import request
-from flask_sqlalchemy.pagination import Pagination
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
@@ -13,6 +12,7 @@ from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
+from src.functionality.sets_functionality import SetsFunctionality
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
 from src.utilities.parsers import validate_json_body, arg_to_bool
 
@@ -73,7 +73,7 @@ class SetsController:
 
         result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, sort_by_date=sort_by_date,
                                              ascending=ascending)
-        sets_list = cls.display_sets_info(result)
+        sets_list = SetsFunctionality.display_sets_info(result)
 
         if not sets_list:
             return {"message": "No sets were found"}, 404
@@ -91,7 +91,7 @@ class SetsController:
             flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size)
             last_page = flashcards.pages if flashcards.pages > 0 else 1
 
-            return {"set": cls.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
+            return {"set": SetsFunctionality.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
                     'current_page': flashcards.page,
                     'last_page': last_page}, 200
 
@@ -103,52 +103,6 @@ class SetsController:
             return {"message": "user doesn't exist"}, 404
 
         return cls.get_all_sets(user_id)
-
-    @classmethod
-    def display_sets_info(cls, result: Pagination | List[Tuple[...]], flashcards=None) -> List[Dict[str, Any]]:
-        sets_list = []
-        for row in result:
-            set_dict = {
-                'set_id': row.set_id,
-                'set_name': row.set_name,
-                'set_description': row.set_description,
-                'set_modification_date': row.set_modification_date,
-                'category_name': row.category_name,
-                'organization_name': row.organization_name,
-                'username': row.username,
-            }
-            sets_list.append(set_dict)
-
-        if not flashcards:
-            return sets_list
-
-        flashcards_list = []
-        for flashcard in flashcards:
-            flashcard_dict = {
-                'flashcard_id': flashcard.flashcard_id,
-                'term': flashcard.term,
-                'definition': flashcard.definition,
-                'notes': flashcard.notes
-            }
-            flashcards_list.append(flashcard_dict)
-
-        sets_list[0]["flashcards"] = flashcards_list
-
-        return sets_list
-
-    @classmethod
-    def display_study_info(cls, flashcards: Pagination) -> List[Dict[str, Any]]:
-        flashcards_list = []
-        for flashcard in flashcards:
-            flashcard_dict = {
-                'flashcard_id': flashcard.flashcard_id,
-                'term': flashcard.term,
-                'definition': flashcard.definition,
-                'confidence': flashcard.confidence
-            }
-            flashcards_list.append(flashcard_dict)
-
-        return flashcards_list
 
     @classmethod
     def update_set(cls, set_id: str):
@@ -227,4 +181,4 @@ class SetsController:
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
         flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size, user_id, is_study=True)
 
-        return {"flashcards": cls.display_study_info(flashcards)}, 200
+        return {"flashcards": SetsFunctionality.display_study_info(flashcards)}, 200
