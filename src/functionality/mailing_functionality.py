@@ -8,7 +8,7 @@ from src.services.mailer import send_email_background_task
 class MailingFunctionality:
     @classmethod
     async def send_mail_logic(cls, email: str, username: str, is_verification=True):
-        token = AuthFunctionality.create_verification_jwt(username)
+        token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
         if is_verification:
             body_html = cls.generate_email_body(username, token, True)
             subject = "Добре дошъл!"
