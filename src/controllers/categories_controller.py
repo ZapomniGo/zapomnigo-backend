@@ -53,7 +53,7 @@ class CategoriesController:
         if validation_errors := validate_json_body(json_data, UpdateCategoriesModel):  # type: ignore
             return {"validation errors": validation_errors}, 422
 
-        CategoriesRepository.edit_category(category, json_data)
+        CategoriesRepository.edit_category(category, CategoriesModel(**json_data))
         return {"message": "Category successfully updated"}, 200
 
     @classmethod
