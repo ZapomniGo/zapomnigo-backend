@@ -1,9 +1,5 @@
-from typing import Dict, Any
-
 from src.database.models import Categories
 from src.database.models.base import db
-from src.pydantic_models.categories_model import CategoriesModel
-from src.utilities.parsers import filter_none_values
 
 
 class CategoriesRepository:
@@ -17,10 +13,3 @@ class CategoriesRepository:
             return category.category_name
 
         return None
-
-    @classmethod
-    def edit_category(cls, category: Categories, json_data: CategoriesModel) -> None:
-        for field_name, value in filter_none_values(json_data).items():
-            setattr(category, field_name, value)
-
-        db.session.commit()

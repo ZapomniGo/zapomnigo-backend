@@ -1,6 +1,9 @@
 from typing import List, Any
 
+from pydantic import BaseModel
+
 from src.database.models.base import db
+from src.utilities.parsers import filter_none_values
 
 
 class CommonRepository:
@@ -22,4 +25,11 @@ class CommonRepository:
     @classmethod
     def delete_object_from_db(cls, obj) -> None:
         db.session.delete(obj)
+        db.session.commit()
+
+    @classmethod
+    def edit_object(cls, obj, json_data: BaseModel) -> None:
+        for field_name, value in filter_none_values(json_data).items():
+            setattr(obj, field_name, value)
+
         db.session.commit()

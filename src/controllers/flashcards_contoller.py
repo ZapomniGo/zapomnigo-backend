@@ -45,7 +45,7 @@ class FlashcardsController:
         if validation_errors := validate_json_body(json_data, UpdateFlashcardsModel):
             return {"validation errors": validation_errors}, 422
 
-        FlashcardsRepository.edit_flashcard(flashcard, json_data)
+        CommonRepository.edit_object(flashcard, UpdateFlashcardsModel(**json_data))
         return {"message": "Flashcard successfully updated"}, 200
 
     @classmethod

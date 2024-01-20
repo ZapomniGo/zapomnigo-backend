@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import List, Dict, Any
+from typing import List
 
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import delete
@@ -37,13 +36,6 @@ class FlashcardsRepository:
             Flashcards.set_id == set_id
         ).paginate(page=page, per_page=size,
                    error_out=True)
-
-    @classmethod
-    def edit_flashcard(cls, flashcard: Flashcards, json_data: Dict[str, Any]) -> None:
-        flashcard.term = json_data.get("term", flashcard.term)
-        flashcard.definition = json_data.get("definition", flashcard.definition)
-        flashcard.notes = json_data.get("notes", flashcard.notes)
-        db.session.commit()
 
     @classmethod
     def delete_flashcards_by_set_id(cls, set_id: str) -> None:

@@ -50,10 +50,10 @@ class CategoriesController:
         if not category:
             return {"message": "Category with such id doesn't exist"}, 404
 
-        if validation_errors := validate_json_body(json_data, UpdateCategoriesModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, UpdateCategoriesModel):
             return {"validation errors": validation_errors}, 422
 
-        CategoriesRepository.edit_category(category, CategoriesModel(**json_data))
+        CommonRepository.edit_object(category, CategoriesModel(**json_data))
         return {"message": "Category successfully updated"}, 200
 
     @classmethod

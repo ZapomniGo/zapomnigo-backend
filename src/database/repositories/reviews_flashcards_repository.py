@@ -15,6 +15,7 @@ class ReviewsFlashcardsRepository:
                 ReviewsFlashcards.user_id == user_id
             )
         ).first()
+
     @classmethod
     def edit_review_flashcard(cls, set_obj: ReviewsFlashcards, json_data: Dict[str, Any]) -> None:
         if json_data["correctness"] == 0:
