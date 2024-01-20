@@ -40,6 +40,7 @@ class SetsController:
     @classmethod
     def add_set(cls):
         json_data = request.get_json()
+
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
         if not user_id:
             return {"message": "No token provided"}, 499
