@@ -1,6 +1,6 @@
 from typing import Optional, Annotated, List
 
-from pydantic import BaseModel, StringConstraints, ConfigDict, model_validator
+from pydantic import BaseModel, StringConstraints, ConfigDict, model_validator, validator, field_validator
 
 from src.pydantic_models.flashcards_model import FlashcardsModel
 
@@ -16,6 +16,10 @@ class SetsModel(BaseModel):
     flashcards: List[FlashcardsModel]
     organization_id: Optional[ID] = None
 
+    @field_validator('set_description', 'set_category', 'organization_id', mode='before')
+    def convert_empty_string_to_none(cls, value):
+        return None if value == "" else value
+
     @model_validator(mode='before')
     def check_empty_flashcards(cls, values):
         flashcards = values.get('flashcards')
@@ -30,3 +34,7 @@ class UpdateSetsModel(BaseModel):
     set_description: Optional[SET_OR_FOLDER_DESCRIPTION] = None
     set_category: Optional[ID] = None
     flashcards: Optional[List[FlashcardsModel]] = None
+
+    @field_validator('set_name', 'set_description', 'set_category', mode='before')
+    def convert_empty_string_to_none(cls, value):
+        return None if value == "" else value

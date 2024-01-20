@@ -19,36 +19,21 @@ from src.utilities.parsers import validate_json_body, arg_to_bool
 
 class SetsController:
     @classmethod
-    def create_set(cls, json_data, user_id: str):
-        set_description = json_data.get("set_description", None)
-        set_category = json_data.get("set_category", None)
-        organization_id = json_data.get("organization_id", None)
-
-        if set_description == "":
-            set_description = None
-        if set_category == "":
-            set_category = None
-        if organization_id == "":
-            organization_id = None
-
-        return Sets(set_id=str(ULID()), set_name=json_data["set_name"],
-                    set_description=set_description,
+    def create_set(cls, json_data: SetsModel, user_id: str) -> Sets:
+        return Sets(set_id=str(ULID()), set_name=json_data.set_name,
+                    set_description=json_data.set_description,
                     set_modification_date=str(datetime.now()),
-                    set_category=set_category,
+                    set_category=json_data.set_category,
                     user_id=user_id,
-                    organization_id=organization_id)
+                    organization_id=json_data.organization_id)
 
     @classmethod
-    def create_flashcards(cls, json_data, set_id: str):
+    def create_flashcards(cls, json_data: SetsModel, set_id: str):
         flashcards_objects = []
-        for flashcard in json_data.get("flashcards", []):
-            notes = flashcard.get("notes", None)
-            if notes == "":
-                notes = None
-
-            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard["term"],
-                                                 definition=flashcard["definition"],
-                                                 notes=notes,
+        for flashcard in json_data.flashcards:
+            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
+                                                 definition=flashcard.definition,
+                                                 notes=flashcard.notes,
                                                  set_id=set_id))
         return flashcards_objects
 
@@ -59,10 +44,10 @@ class SetsController:
         if not user_id:
             return {"message": "No token provided"}, 499
 
-        if validation_errors := validate_json_body(json_data, SetsModel):  # type: ignore
+        if validation_errors := validate_json_body(json_data, SetsModel):
             return {"validation errors": validation_errors}, 422
 
-        set_obj = cls.create_set(json_data, user_id)
+        set_obj = cls.create_set(SetsModel(**json_data), user_id)
         CommonRepository.add_object_to_db(set_obj)
 
         flashcards = cls.create_flashcards(json_data, set_obj.set_id)
