@@ -1,7 +1,8 @@
-from typing import List, Any
+from typing import List, Any, Tuple
 
 from pydantic import BaseModel
 
+from src.database.models import Sets, Folders, Users
 from src.database.models.base import db
 from src.utilities.parsers import filter_none_values
 
@@ -33,3 +34,21 @@ class CommonRepository:
             setattr(obj, field_name, value)
 
         db.session.commit()
+
+    @classmethod
+    def get_set_or_folder_by_id_with_creator_username(cls, set_or_folder_id: str, get_set=True) -> Tuple[
+        (Sets | Folders) | None, str | None]:
+
+        entity_class = Sets if get_set else Folders
+        entity_key = "set_id" if get_set else "folder_id"
+
+        entity_info = db.session.query(entity_class, Users.username) \
+            .join(Users, entity_class.user_id == Users.user_id) \
+            .filter(getattr(entity_class, entity_key) == set_or_folder_id) \
+            .first()
+
+        if entity_info:
+            entity_obj, creator_username = entity_info
+            return entity_obj, creator_username
+        else:
+            return None, None

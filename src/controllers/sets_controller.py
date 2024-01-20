@@ -153,7 +153,7 @@ class SetsController:
     @classmethod
     def update_set(cls, set_id: str):
         json_data = request.get_json()
-        set_obj, creator_username = SetsRepository.get_set_by_id_with_creator_username(set_id)
+        set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
@@ -176,7 +176,7 @@ class SetsController:
 
     @classmethod
     def delete_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj, creator_username = SetsRepository.get_set_by_id_with_creator_username(set_id)
+        set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
@@ -189,7 +189,7 @@ class SetsController:
 
     @classmethod
     def copy_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj, _ = SetsRepository.get_set_by_id_with_creator_username(set_id)
+        set_obj = SetsRepository.get_set_by_id(set_id)
 
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404

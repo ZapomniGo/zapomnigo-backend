@@ -23,19 +23,6 @@ class SetsRepository:
         return db.session.query(Sets).filter_by(set_id=set_id).first()
 
     @classmethod
-    def get_set_by_id_with_creator_username(cls, set_id: str) -> Tuple[Sets | None, str | None]:
-        set_info = db.session.query(Sets, Users.username) \
-            .join(Users, Sets.user_id == Users.user_id) \
-            .filter(Sets.set_id == set_id) \
-            .first()
-
-        if set_info:
-            set_obj, creator_username = set_info
-            return set_obj, creator_username
-        else:
-            return None, None
-
-    @classmethod
     def _base_query(cls) -> Query:
         """"
         SELECT sets.set_id, sets.set_name, sets.set_description, sets.set_modification_date, c.category_name,

@@ -24,7 +24,7 @@ class FlashcardsController:
 
     @classmethod
     def check_if_user_can_edit_or_delete_flashcard(cls, set_id: str):
-        set_obj, creator_username = SetsRepository.get_set_by_id_with_creator_username(set_id)
+        set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
         if not set_obj:
             return {"message": "Set with such id doesn't exist"}, 404
 
