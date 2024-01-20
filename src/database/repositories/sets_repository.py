@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
@@ -8,8 +7,6 @@ from sqlalchemy import desc, asc, func
 from src.database.models import Organizations, Categories, OrganizationsUsers, Users, FoldersSets
 from src.database.models.base import db
 from src.database.models.sets import Sets
-from src.pydantic_models.sets_model import UpdateSetsModel
-from src.utilities.parsers import filter_none_values
 
 
 class SetsRepository:
@@ -92,16 +89,3 @@ class SetsRepository:
         pagination: Pagination = query.order_by(order_by_clause).paginate(page=page, per_page=size, error_out=True)
 
         return pagination
-
-    @classmethod
-    def edit_set(cls, set_obj: Sets, json_data: UpdateSetsModel) -> None:
-        fields_to_be_updated = filter_none_values(json_data)
-        # I drop the flashcards from the request body as I need only the set attributes
-        fields_to_be_updated.pop("flashcards")
-
-        for field_name, value in fields_to_be_updated.items():
-            setattr(set_obj, field_name, value)
-
-        set_obj.set_modification_date = str(datetime.now())
-
-        db.session.commit()

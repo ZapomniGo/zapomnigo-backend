@@ -15,7 +15,6 @@ from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.pydantic_models.folders_model import FoldersModel, UpdateFoldersModel
-from src.pydantic_models.sets_model import UpdateSetsModel
 from src.utilities.parsers import validate_json_body, arg_to_bool
 
 
@@ -109,7 +108,7 @@ class FoldersController:
         if validation_errors := validate_json_body(json_data, UpdateFoldersModel):
             return {"validation errors": validation_errors}, 422
 
-        FoldersRepository.edit_folder(folder_obj, UpdateFoldersModel(**json_data))
+        CommonRepository.edit_object(folder_obj, UpdateFoldersModel(**json_data), field_to_drop="sets")
         FoldersRepository.delete_folders_sets_by_folder_id(folder_id)
 
         folder_sets = cls.create_folder_sets(json_data["sets"], folder_obj.folder_id)
