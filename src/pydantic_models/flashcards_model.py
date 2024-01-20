@@ -1,8 +1,8 @@
 from typing import Optional, Annotated
 
-from pydantic import BaseModel, StringConstraints, ConfigDict, Field, conint, field_validator
+from pydantic import BaseModel, StringConstraints, ConfigDict, conint, field_validator
 
-from src.pydantic_models.common import NAME
+from src.pydantic_models.common import NAME, ID
 
 TERM_DEFINITION = Annotated[str, StringConstraints(min_length=1, max_length=524288)]
 
@@ -31,4 +31,4 @@ class UpdateFlashcardsModel(BaseModel):
 class StudyFlashcardsModel(BaseModel):
     correctness: conint(ge=0, le=1)
     username: NAME
-    user_id: Annotated[str, StringConstraints(max_length=26)]
+    user_id: ID

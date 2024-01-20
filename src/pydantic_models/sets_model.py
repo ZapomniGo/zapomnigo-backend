@@ -1,12 +1,12 @@
 from typing import Optional, Annotated, List
 
-from pydantic import BaseModel, StringConstraints, ConfigDict, model_validator, validator, field_validator
+from pydantic import BaseModel, StringConstraints, model_validator, field_validator
 
+from src.pydantic_models.common import ID
 from src.pydantic_models.flashcards_model import FlashcardsModel
 
 SET_OR_FOLDER_DESCRIPTION = Annotated[str, StringConstraints(min_length=2, max_length=4096)]
 SET_OR_FOLDER_NAME = Annotated[str, StringConstraints(min_length=1, max_length=255)]
-ID = Annotated[str, StringConstraints(max_length=26)]
 
 
 class SetsModel(BaseModel):

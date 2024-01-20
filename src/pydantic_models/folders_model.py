@@ -2,7 +2,8 @@ from typing import Optional, List
 
 from pydantic import BaseModel, model_validator
 
-from src.pydantic_models.sets_model import ID, SET_OR_FOLDER_NAME, SET_OR_FOLDER_DESCRIPTION, SetsModel
+from src.pydantic_models.common import ID
+from src.pydantic_models.sets_model import SET_OR_FOLDER_NAME, SET_OR_FOLDER_DESCRIPTION
 
 
 class FoldersModel(BaseModel):
