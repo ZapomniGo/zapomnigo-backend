@@ -15,8 +15,7 @@ class FoldersModel(BaseModel):
 
     @field_validator('sets', mode='before')
     def check_empty_sets(cls, values):
-        sets = values.get('sets')
-        if not sets:
+        if not values:
             raise ValueError("Sets list cannot be empty")
         return values
 
