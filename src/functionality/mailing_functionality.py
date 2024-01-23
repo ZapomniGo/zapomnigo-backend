@@ -30,10 +30,10 @@ class MailingFunctionality:
 
         if is_verification:
             template_path = 'resources/email_templates/BG_VerifyEmail.html'
-            url = f'{base_url}/verify?token={token}'
+            url = f'{base_url}/app/verify?token={token}'
         else:
             template_path = 'resources/email_templates/BG_ResetPassword.html'
-            url = f'{base_url}/forgot-password?token={token}'
+            url = f'{base_url}/app/forgot-password?token={token}'
 
         html_content = cls.read_html_template(template_path)
         html_content = html_content.replace("{username}", username)
