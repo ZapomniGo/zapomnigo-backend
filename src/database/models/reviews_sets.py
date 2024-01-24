@@ -11,5 +11,5 @@ class ReviewsSets(db.Model):
     review_date: Mapped[str] = mapped_column(String(40), nullable=False)
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="reviews_sets", cascade="all")
-    sets: Mapped["Sets"] = relationship(back_populates="reviews_sets", cascade="all")
+    users: Mapped["Users"] = relationship(back_populates="reviews_sets")
+    sets: Mapped["Sets"] = relationship(back_populates="reviews_sets")

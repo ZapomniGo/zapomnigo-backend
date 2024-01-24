@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import String, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
@@ -11,5 +13,5 @@ class ReviewsFlashcards(db.Model):
     confidence: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Creates a bidirectional relationship between tables
-    users: Mapped["Users"] = relationship(back_populates="reviews_flashcards", cascade="all")
-    flashcards: Mapped["Flashcards"] = relationship(back_populates="reviews_flashcards", cascade="all")
+    users: Mapped["Users"] = relationship(back_populates="reviews_flashcards")
+    flashcards: Mapped[List["Flashcards"]] = relationship(back_populates="reviews_flashcards")
