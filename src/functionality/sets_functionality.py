@@ -1,0 +1,2 @@
+class SetsFunctionality:
+    pass
