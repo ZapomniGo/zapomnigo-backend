@@ -473,7 +473,7 @@ Responses:
 * `{"message": "set with such id doesn't exist"}, 404`
 * 401, 403, 498, 499 As it is a protected endpoint
 
-### POST /sets/set_id/study - get flashcards with confidence levels
+### GET /sets/set_id/study - get flashcards with confidence levels
 Responses:
 * 200
 ```json

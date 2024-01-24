@@ -39,5 +39,14 @@ class FlashcardsRepository:
 
     @classmethod
     def delete_flashcards_by_set_id(cls, set_id: str) -> None:
-        db.session.execute(delete(Flashcards).where(Flashcards.set_id == set_id))
+        flashcards_to_delete = db.session.query(Flashcards).filter_by(
+            set_id=set_id).all()
+
+        for flashcard in flashcards_to_delete:
+            db.session.execute(delete(ReviewsFlashcards).where(
+                ReviewsFlashcards.flashcard_id == flashcard.flashcard_id))
+
+        db.session.execute(
+            delete(Flashcards).where(Flashcards.set_id == set_id))
+
         db.session.commit()

@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
@@ -13,8 +15,8 @@ class Flashcards(db.Model):
 
     # Creates a bidirectional relationship between tables
     sets: Mapped["Sets"] = relationship(back_populates="flashcards")
-    liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="flashcards", cascade="all")
-    reviews_flashcards: Mapped["ReviewsFlashcards"] = relationship(back_populates="flashcards", cascade="all")
+    liked_flashcards: Mapped[List["LikedFlashcards"]] = relationship(back_populates="flashcards", cascade="all")
+    reviews_flashcards: Mapped[List["ReviewsFlashcards"]] = relationship(back_populates="flashcards", cascade="all")
 
     def to_json(self):
         return {"flashcard_id": self.flashcard_id,

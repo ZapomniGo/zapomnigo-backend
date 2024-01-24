@@ -34,7 +34,7 @@ class CommonRepository:
 
         # This filed is dropped from the req body as it is not part of the original SQLAlchemy obj
         if field_to_drop:
-            fields_to_be_updated.pop(field_to_drop)
+            fields_to_be_updated.pop(field_to_drop, None)
 
         for field_name, value in fields_to_be_updated.items():
             setattr(obj, field_name, value)
