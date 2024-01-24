@@ -5,7 +5,8 @@ from flask import Request
 from flask_bcrypt import check_password_hash
 from jwt import decode, encode
 
-from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, ProdConfig, SECRET_KEY, ADMIN_USERNAME
+from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, \
+    ProdConfig, SECRET_KEY, ADMIN_USERNAME
 from src.database.models import Users
 from src.database.repositories.organizations_users_repository import \
     OrganizationsUsersRepository
@@ -39,7 +40,8 @@ class AuthFunctionality:
             username = user.username
             user_id = user.user_id
 
-        if organization := OrganizationsUsersRepository.get_organization_by_user_id(user_id):
+        if organization := OrganizationsUsersRepository.get_organization_by_user_id(
+                user_id):
             organization_name = organization.organization_name
         else:
             organization_name = None
@@ -56,14 +58,14 @@ class AuthFunctionality:
 
         return token
 
-    # TODO: REFACTOR!!!!!
     @classmethod
     def create_jwt_token(cls, username: str, is_refresh: bool = True) -> str:
         exp = datetime.utcnow() + timedelta(days=30)
         if not is_refresh:
+            # This is for transactional emails
             exp = datetime.utcnow() + timedelta(hours=24)
 
-        payload = {"sub": username,
+        payload = {"username": username,
                    "exp": exp}
 
         if IS_OFFLINE:
@@ -74,12 +76,15 @@ class AuthFunctionality:
         return token
 
     @classmethod
-    def get_session_username_or_user_id(cls, request: Request, get_username=True) -> str | None:
+    def get_session_username_or_user_id(cls, request: Request,
+                                        get_username=True) -> str | None:
         access_token = request.headers.get('Authorization')
         if access_token:
             if get_username:
-                return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("username")
+                return decode(access_token, SECRET_KEY,
+                              algorithms=["HS256"]).get("username")
             else:
-                return decode(access_token, SECRET_KEY, algorithms=["HS256"]).get("sub")
+                return decode(access_token, SECRET_KEY,
+                              algorithms=["HS256"]).get("sub")
         else:
             return None
