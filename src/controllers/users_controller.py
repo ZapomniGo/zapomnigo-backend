@@ -40,10 +40,10 @@ class UsersController:
         user = cls.create_user(RegistrationModel(**json_data))
         CommonRepository.add_object_to_db(user)
 
-        if organization_id := json_data.get("organization", None):
-            obj = OrganizationsUsers(organization_user_id=str(ULID()),
-                                     user_id=user.user_id, organization_id=str(organization_id))
-            CommonRepository.add_object_to_db(obj)
+        # if organization_id := json_data.get("organization", None):
+        #     obj = OrganizationsUsers(organization_user_id=str(ULID()),
+        #                              user_id=user.user_id, organization_id=str(organization_id))
+        #     CommonRepository.add_object_to_db(obj)
 
         await MailingFunctionality.send_mail_logic(user.email, user.username)
         return {"message": "user added to db"}, 200
