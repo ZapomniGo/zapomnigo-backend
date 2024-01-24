@@ -52,17 +52,19 @@ class SetsRepository:
             cls,
             page: int = 1,
             size: int = 20,
+            category_id: str = "",
             user_id: str = "",
             folder_id: str = "",
             sort_by_date: bool = True,
             ascending: bool = False,
     ) -> Pagination:
         """
-        Retrieve a paginated list of sets from the database.
+        Retrieve a paginated list of sets from the database based on passed params for filtering and sorting
 
         Args:
             page (int): The page number to retrieve (default is 1).
             size (int): The number of sets per page (default is 20).
+            category_id (str) If passed shows all sets with the given category
             user_id (str): If provided, fetch sets associated with the specified user (default is an empty string).
             folder_id (str): If provided, fetch sets in the given folder (default is an empty string).
             sort_by_date (bool): If True (default), the sets are ordered by creation date.
@@ -73,6 +75,9 @@ class SetsRepository:
         """
 
         query = cls._base_query()
+
+        if category_id:
+            query = query.filter(Categories.category_id == category_id)
 
         if user_id:
             query = query.filter(Users.user_id == user_id)

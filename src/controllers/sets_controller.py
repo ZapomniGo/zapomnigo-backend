@@ -67,11 +67,11 @@ class SetsController:
         size = request.args.get('size', type=int)
         sort_by_date = request.args.get('sort_by_date', type=str, default='true')
         ascending = request.args.get('ascending', type=str, default='false')
-
+        category_id = request.args.get('category_id', type=str)
         sort_by_date = arg_to_bool(sort_by_date)
         ascending = arg_to_bool(ascending)
 
-        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, sort_by_date=sort_by_date,
+        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, category_id=category_id,sort_by_date=sort_by_date,
                                              ascending=ascending)
         sets_list = cls.display_sets_info(result)
 
