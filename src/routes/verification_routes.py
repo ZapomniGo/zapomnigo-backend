@@ -3,6 +3,7 @@ from flask import Blueprint, request
 from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController as c
 from src.database.repositories.users_repository import UsersRepository
+from src.functionality.mailing_functionality import MailingFunctionality
 from src.pydantic_models.mail_sender_model import MailSenderModel
 from src.utilities.parsers import validate_json_body, eval_bool
 
@@ -37,6 +38,5 @@ async def send_email():
     if not user:
         return {"message": "user doesn't exist"}, 404
 
-    await UtilityController.send_mail_logic(email, user.username,
-                                            is_verification=is_verification)
+    await MailingFunctionality.send_mail_logic(user.email, user.username,is_verification=is_verification)
     return {"message": f"Email send to {email}"}, 200
