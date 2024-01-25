@@ -30,5 +30,4 @@ class UpdateFlashcardsModel(BaseModel):
 
 class StudyFlashcardsModel(BaseModel):
     correctness: conint(ge=0, le=1)
-    username: NAME
-    user_id: ID
+

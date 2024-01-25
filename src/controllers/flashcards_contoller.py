@@ -9,6 +9,7 @@ from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.reviews_flashcards_repository import ReviewsFlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
+from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.pydantic_models.flashcards_model import UpdateFlashcardsModel, StudyFlashcardsModel
 from src.utilities.parsers import validate_json_body
 
@@ -71,9 +72,9 @@ class FlashcardsController:
 
         if validation_errors := validate_json_body(json_data, StudyFlashcardsModel):
             return {"validation errors": validation_errors}, 422
-
+        user_id = AuthFunctionality.get_session_username_or_user_id(get_username=False)
         # Here it's just faster to get the user_id from the raw json instead through the pydantic model
-        if result := ReviewsFlashcardsRepository.get_review_by_flashcard_id(flashcard_id, json_data["user_id"]):
+        if result := ReviewsFlashcardsRepository.get_review_by_flashcard_id(flashcard_id, user_id):
             ReviewsFlashcardsRepository.edit_review_flashcard(result, StudyFlashcardsModel(**json_data))
 
         else:
