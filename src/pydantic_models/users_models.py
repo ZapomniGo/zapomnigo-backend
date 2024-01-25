@@ -41,6 +41,18 @@ class ResetPasswordModel(BaseModel):
     token: str
     new_password: PASSWORD
 
+    @field_validator("new_password")
+    def validate_password(cls, value):
+        if not any(c.isupper() for c in value):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not any(c.islower() for c in value):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not any(c.isdigit() for c in value):
+            raise ValueError("Password must contain at least one digit")
+        if not any(c in string.punctuation for c in value):
+            raise ValueError("Password must contain at least one special character")
+
+        return value
     @field_validator("token", mode='before')
     def check_empty_token(cls, values):
         if not values or values == "":
