@@ -72,13 +72,15 @@ class FlashcardsController:
 
         if validation_errors := validate_json_body(json_data, StudyFlashcardsModel):
             return {"validation errors": validation_errors}, 422
+
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+
         # Here it's just faster to get the user_id from the raw json instead through the pydantic model
         if result := ReviewsFlashcardsRepository.get_review_by_flashcard_id(flashcard_id, user_id):
             ReviewsFlashcardsRepository.edit_review_flashcard(result, StudyFlashcardsModel(**json_data))
 
         else:
-            study_flashcard_obj = ReviewsFlashcards(reviews_flashcards_id=str(ULID()), user_id=json_data["user_id"],
+            study_flashcard_obj = ReviewsFlashcards(reviews_flashcards_id=str(ULID()), user_id=user_id,
                                                     flashcard_id=flashcard_id, confidence=0)
             CommonRepository.add_object_to_db(study_flashcard_obj)
 
