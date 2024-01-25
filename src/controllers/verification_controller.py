@@ -45,7 +45,7 @@ class VerificationController:
         if status_code != 200:
             return response, status_code
 
-        username = response.get("sub", None)
+        username = response.get("username", None)
         if not username:
             return {"message": "No username provided"}, 499
 
