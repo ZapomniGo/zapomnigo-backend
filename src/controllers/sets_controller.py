@@ -185,6 +185,7 @@ class SetsController:
         if result := UtilityController.check_user_access(creator_username):
             return result
 
+        FlashcardsRepository.delete_flashcards_by_set_id(set_id)
         CommonRepository.delete_object_from_db(set_obj)
         return {"message": "Set successfully deleted"}, 200
 
