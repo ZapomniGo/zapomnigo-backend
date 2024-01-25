@@ -16,7 +16,7 @@ class MailingFunctionality:
             body_html = cls.generate_email_body(username, token, False)
             subject = "Забравена парола"
 
-        asyncio.create_task(send_email_background_task(email, subject, body_html))
+        await asyncio.create_task(send_email_background_task(email, subject, body_html))
 
     @classmethod
     def generate_email_body(cls, username, token, is_verification):

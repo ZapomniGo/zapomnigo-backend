@@ -43,7 +43,6 @@ class ResetPasswordModel(BaseModel):
 
     @field_validator("token", mode='before')
     def check_empty_token(cls, values):
-        token = values.get('token')
-        if not token or token == "":
+        if not values or values == "":
             raise ValueError("Token field cannot be empty")
         return values
