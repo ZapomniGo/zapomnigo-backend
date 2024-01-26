@@ -87,7 +87,9 @@ class FoldersController:
             return {"message": "user doesn't exist"}, 404
 
         if result := FoldersRepository.get_folders_by_user_id(user_id):
-            return {"folders": [folders.to_json(FoldersRepository.get_creator_username(folders.user_id))
+            return {"folders": [folders.to_json(FoldersRepository.get_creator_username(folders.user_id),
+                                                CategoriesRepository.get_category_name_by_id(folders.category_id),
+                                                OrganizationsRepository.get_organization_name_by_id(folders.organization_id))
                                 for folders in result]}, 200
 
         return {"message": "No folders were found for the given user"}, 404
