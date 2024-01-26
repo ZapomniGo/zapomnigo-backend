@@ -210,8 +210,6 @@ class SetsController:
                                              definition=flashcard.definition,
                                              notes=flashcard.notes,
                                              set_id=new_set_obj.set_id))
-        print(flashcards)
-        print("test",new_flashcards)
 
         CommonRepository.add_object_to_db(new_set_obj)
         CommonRepository.add_many_objects_to_db(new_flashcards)
