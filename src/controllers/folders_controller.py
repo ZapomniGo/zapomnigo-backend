@@ -1,40 +1,21 @@
-from datetime import datetime
-from typing import List
+from typing import Tuple, Dict, Any
 
 from flask import request
-from ulid import ULID
 
-from src.controllers.sets_controller import SetsController
 from src.controllers.utility_controller import UtilityController
-from src.database.models import Folders, FoldersSets
-from src.database.repositories.categories_repository import CategoriesRepository
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
-from src.database.repositories.organizations_repository import OrganizationsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
+from src.functionality.common import CommonFunctionality
+from src.functionality.folders_functionallity import FoldersFunctionality
+from src.functionality.sets_functionality import SetsFunctionality
 from src.pydantic_models.folders_model import FoldersModel, UpdateFoldersModel
-from src.utilities.parsers import validate_json_body, arg_to_bool
+from src.utilities.parsers import validate_json_body
 
 
 class FoldersController:
-    @classmethod
-    def create_folder(cls, json_data: FoldersModel, user_id: str) -> Folders:
-        return Folders(folder_id=str(ULID()), folder_title=json_data.folder_title,
-                       folder_description=json_data.folder_description,
-                       folder_modification_date=str(datetime.now()),
-                       category_id=json_data.category_id,
-                       user_id=user_id,
-                       organization_id=json_data.organization_id)
-
-    @classmethod
-    def create_folder_sets(cls, set_ids: List[str], folder_obj_id: str) -> List[FoldersSets]:
-        folder_sets_objects = []
-        for set_id in set_ids:
-            folder_sets_objects.append(FoldersSets(folder_set_id=str(ULID()), folder_id=folder_obj_id, set_id=set_id))
-
-        return folder_sets_objects
 
     @classmethod
     def add_folder(cls):
@@ -47,52 +28,57 @@ class FoldersController:
         if validation_errors := validate_json_body(json_data, FoldersModel):
             return {"validation errors": validation_errors}, 422
 
-        folder_obj = cls.create_folder(FoldersModel(**json_data), user_id)
+        folder_obj = FoldersFunctionality.create_folder(FoldersModel(**json_data), user_id)
         CommonRepository.add_object_to_db(folder_obj)
 
-        folder_sets = cls.create_folder_sets(json_data["sets"], folder_obj.folder_id)
+        folder_sets = FoldersFunctionality.create_folder_sets(json_data["sets"], folder_obj.folder_id)
         CommonRepository.add_many_objects_to_db(folder_sets)
 
         return {"folder_id": folder_obj.folder_id}, 200
 
     @classmethod
-    def get_all_sets_in_folder(cls, folder_id: str):
-        page = request.args.get('page', type=int)
-        size = request.args.get('size', type=int)
-        sort_by_date = request.args.get('sort_by_date', type=str, default='true')
-        ascending = request.args.get('ascending', type=str, default='false')
+    def get_all_folders(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
+        """If a user_id is passed it gets the folders for a given user"""
 
-        sort_by_date = arg_to_bool(sort_by_date)
-        ascending = arg_to_bool(ascending)
+        if user_id:
+            if not UsersRepository.get_user_by_ulid(user_id):
+                return {"message": "user doesn't exist"}, 404
 
-        folder = FoldersRepository.get_folder_by_id(folder_id)
-        if not folder:
-            return {"message": "Folder with such id doesn't exist"}, 404
+        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+        category_id = request.args.get('category_id', type=str)
 
-        result = SetsRepository.get_all_sets(page=page, size=size, folder_id=folder_id, sort_by_date=sort_by_date,
-                                             ascending=ascending)
-        sets_list = SetsController.display_sets_info(result)
+        result = FoldersRepository.get_all_folders(page=page, size=size, user_id=user_id, category_id=category_id,
+                                                   sort_by_date=sort_by_date,
+                                                   ascending=ascending)
+        folders_list = FoldersFunctionality.display_folders_info(result)
+
+        if not folders_list:
+            return {"message": "No Folders were found"}, 404
+
         last_page = result.pages if result.pages > 0 else 1
 
-        return {'folder_title': folder.folder_title, 'folder_description': folder.folder_description,
-                'folder_creator': FoldersRepository.get_creator_username(folder.user_id),
-                'category_name': CategoriesRepository.get_category_name_by_id(folder.category_id),
-                "organization_name": OrganizationsRepository.get_organization_name_by_id(folder.organization_id),
-                'sets': sets_list, 'pagination_of_sets': {'total_pages': result.pages, 'current_page': result.page,
-                                                          'last_page': last_page}}, 200
+        return {'folders': folders_list, 'total_pages': result.pages, 'current_page': result.page,
+                'last_page': last_page}, 200
 
     @classmethod
-    def get_all_folders_for_user(cls, user_id: str):
-        if not UsersRepository.get_user_by_ulid(user_id):
-            return {"message": "user doesn't exist"}, 404
+    def get_sets_in_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
+        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
 
-        if result := FoldersRepository.get_folders_by_user_id(user_id):
-            return {"folders": [folders.to_json(FoldersRepository.get_creator_username(folders.user_id),
-                                                CategoriesRepository.get_category_name_by_id(folders.category_id),
-                                                OrganizationsRepository.get_organization_name_by_id(folders.organization_id))
-                                for folders in result]}, 200
+        folder = FoldersRepository.get_folder_info(folder_id)
+        if not folder:
+            return {"message": "Folder with such id doesn't exist"}, 404
+        folder_info = FoldersFunctionality.display_folders_info(folder)[0]
 
-        return {"message": "No folders were found for the given user"}, 404
+        sets = SetsRepository.get_all_sets(page=page, size=size, folder_id=folder_id, sort_by_date=sort_by_date)
+        sets_list = SetsFunctionality.display_sets_info(sets)
+
+        if not sets_list:
+            return {"message": "No sets were found"}, 404
+
+        last_page = sets.pages if sets.pages > 0 else 1
+
+        return {"folder": folder_info, 'sets': sets_list, 'total_pages': sets.pages, 'current_page': sets.page,
+                'last_page': last_page}, 200
 
     @classmethod
     def edit_folder(cls, folder_id: str):
@@ -113,7 +99,7 @@ class FoldersController:
         CommonRepository.edit_object(folder_obj, UpdateFoldersModel(**json_data), field_to_drop="sets")
         FoldersRepository.delete_folders_sets_by_folder_id(folder_id)
 
-        folder_sets = cls.create_folder_sets(json_data["sets"], folder_obj.folder_id)
+        folder_sets = FoldersFunctionality.create_folder_sets(json_data["sets"], folder_obj.folder_id)
         CommonRepository.add_many_objects_to_db(folder_sets)
 
         return {"message": "Folder successfully updated"}, 200

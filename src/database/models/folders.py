@@ -20,13 +20,3 @@ class Folders(db.Model):
     categories: Mapped["Categories"] = relationship(back_populates="folders")
     folders_sets: Mapped[List["FoldersSets"]] = relationship(back_populates="folders", cascade="all")
     organizations: Mapped[List["Organizations"]] = relationship(back_populates="folders")
-
-    def to_json(self, username: str, folder_category: str, organization: str):
-        return {"folder_id": self.folder_id,
-                "folder_modification_date": self.folder_modification_date,
-                "folder_title": self.folder_title,
-                "folder_description": self.folder_description,
-                "username": username,
-                "folder_category": folder_category,
-                "organization": organization,
-                }
