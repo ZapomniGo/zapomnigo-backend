@@ -86,7 +86,8 @@ class SetsController:
 
         if result := SetsRepository.get_set_info(set_id):
             flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
-                                                                          sort_by_date=sort_by_date, ascending=ascending)
+                                                                          sort_by_date=sort_by_date,
+                                                                          ascending=ascending)
             last_page = flashcards.pages if flashcards.pages > 0 else 1
 
             return {"set": cls.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
@@ -220,9 +221,11 @@ class SetsController:
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
 
-        page = request.args.get('page', type=int)
-        size = request.args.get('size', type=int)
+        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
-        flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size, user_id, is_study=True)
+        flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
+                                                                      user_id=user_id, is_study=True,
+                                                                      sort_by_date=sort_by_date, ascending=ascending)
 
         return {"flashcards": cls.display_study_info(flashcards)}, 200

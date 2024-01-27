@@ -31,6 +31,11 @@ class FlashcardsRepository:
             return db.session.query(Flashcards).filter_by(set_id=set_id).order_by(order_by_clause).paginate(page=page,
                                                                                                             per_page=size,
                                                                                                             error_out=True)
+        if sort_by_date:
+            order_by_clause = desc(func.substring(Flashcards.flashcard_id, 1, 10)) if not ascending else asc(
+                func.substring(Flashcards.flashcard_id, 1, 10))
+        else:
+            order_by_clause = asc(Flashcards.term) if ascending else desc(Flashcards.term)
 
         return db.session.query(
             Flashcards.flashcard_id,
@@ -43,8 +48,8 @@ class FlashcardsRepository:
             (ReviewsFlashcards.user_id == user_id)
         ).filter(
             Flashcards.set_id == set_id
-        ).paginate(page=page, per_page=size,
-                   error_out=True)
+        ).order_by(order_by_clause).paginate(page=page, per_page=size,
+                                             error_out=True)
 
     @classmethod
     def delete_flashcards_by_set_id(cls, set_id: str) -> None:
