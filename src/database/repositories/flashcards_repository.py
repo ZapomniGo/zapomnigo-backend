@@ -1,7 +1,7 @@
 from typing import List
 
 from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import delete
+from sqlalchemy import delete, desc, func, asc
 
 from src.database.models import Flashcards, ReviewsFlashcards
 from src.database.models.base import db
@@ -18,10 +18,19 @@ class FlashcardsRepository:
 
     @classmethod
     def paginate_flashcards_for_set(cls, set_id: str, page: int = 1,
-                                    size: int = 20, user_id: str = None, is_study=False) -> Pagination:
+                                    size: int = 20, user_id: str = None, is_study=False,
+                                    sort_by_date: bool = True,
+                                    ascending: bool = False) -> Pagination:
         if not is_study:
-            return db.session.query(Flashcards).filter_by(set_id=set_id).paginate(page=page, per_page=size,
-                                                                                  error_out=True)
+            if sort_by_date:
+                order_by_clause = desc(func.substring(Flashcards.flashcard_id, 1, 10)) if not ascending else asc(
+                    func.substring(Flashcards.flashcard_id, 1, 10))
+            else:
+                order_by_clause = asc(Flashcards.term) if ascending else desc(Flashcards.term)
+
+            return db.session.query(Flashcards).filter_by(set_id=set_id).order_by(order_by_clause).paginate(page=page,
+                                                                                                            per_page=size,
+                                                                                                            error_out=True)
 
         return db.session.query(
             Flashcards.flashcard_id,

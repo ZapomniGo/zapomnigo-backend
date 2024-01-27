@@ -13,6 +13,7 @@ from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
+from src.functionality.common import CommonFunctionality
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
 from src.utilities.parsers import validate_json_body, arg_to_bool
 
@@ -63,15 +64,11 @@ class SetsController:
     def get_all_sets(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
         """If a user_id is passed it gets the sets for a given user"""
 
-        page = request.args.get('page', type=int)
-        size = request.args.get('size', type=int)
-        sort_by_date = request.args.get('sort_by_date', type=str, default='true')
-        ascending = request.args.get('ascending', type=str, default='false')
+        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
-        sort_by_date = arg_to_bool(sort_by_date)
-        ascending = arg_to_bool(ascending)
 
-        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, category_id=category_id,sort_by_date=sort_by_date,
+        result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, category_id=category_id,
+                                             sort_by_date=sort_by_date,
                                              ascending=ascending)
         sets_list = cls.display_sets_info(result)
 
@@ -85,10 +82,11 @@ class SetsController:
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        page = request.args.get('page', type=int)
-        size = request.args.get('size', type=int)
+        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+
         if result := SetsRepository.get_set_info(set_id):
-            flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id, page, size)
+            flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
+                                                                          sort_by_date=sort_by_date, ascending=ascending)
             last_page = flashcards.pages if flashcards.pages > 0 else 1
 
             return {"set": cls.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
@@ -114,7 +112,6 @@ class SetsController:
                 'set_description': row.set_description,
                 'set_modification_date': row.set_modification_date,
                 'category_name': row.category_name,
-                'organization_name': row.organization_name,
                 'username': row.username,
             }
             sets_list.append(set_dict)
