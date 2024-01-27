@@ -4,7 +4,7 @@ from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
 from sqlalchemy import desc, asc, func
 
-from src.database.models import Organizations, Categories, OrganizationsUsers, Users, FoldersSets
+from src.database.models import Categories, Users, FoldersSets
 from src.database.models.base import db
 from src.database.models.sets import Sets
 
@@ -22,21 +22,15 @@ class SetsRepository:
     @classmethod
     def _base_query(cls) -> Query:
         """"
-        SELECT sets.set_id, sets.set_name, sets.set_description, sets.set_modification_date, c.category_name,
-        o.organization_name, f.flashcard_id, f.term, f.definition, f.notes
-        FROM sets
-            left join public.categories c on c.category_id = sets.set_category
-            inner join public.users u on u.user_id = sets.user_id
-            left join public.organizations_users ou on u.user_id = ou.user_id
-            left join public.organizations o on o.organization_id = ou.organization_id
+            SELECT s.set_id, s.set_name, s.set_description, c.category_name FROM sets as s
+            LEFT JOIN public.categories c on c.category_id = s.set_category
+            INNER JOIN public.users u on u.user_id = s.user_id
         """
         return db.session.query(
             Sets.set_id, Sets.set_name, Sets.set_description, Sets.set_modification_date,
-            Categories.category_name, Organizations.organization_name, Users.username
+            Categories.category_name, Users.username
         ).outerjoin(Categories, Categories.category_id == Sets.set_category) \
-            .join(Users, Users.user_id == Sets.user_id) \
-            .outerjoin(OrganizationsUsers, Users.user_id == OrganizationsUsers.user_id) \
-            .outerjoin(Organizations, Organizations.organization_id == OrganizationsUsers.organization_id)
+            .join(Users, Users.user_id == Sets.user_id)
 
     @classmethod
     def get_set_info(cls, set_id: str) -> List[Tuple[...]]:
