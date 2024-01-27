@@ -11,9 +11,10 @@ from src.database.models.preferences import Preferences
 from src.database.models.reviews_flashcards import ReviewsFlashcards
 from src.database.models.reviews_sets import ReviewsSets
 from src.database.models.sets import Sets
+from src.database.models.subcategories import Subcategories
 from src.database.models.subscription_models import SubscriptionModels
 from src.database.models.users import Users
 
-__all__ = ["SubscriptionModels", "Organizations", "Users", "OrganizationsUsers", "Sets", "Categories",
+__all__ = ["SubscriptionModels", "Organizations", "Users", "OrganizationsUsers", "Sets", "Categories","Subcategories",
            "Comments", "Folders", "FoldersSets", "Preferences", "Flashcards", "LikedSets", "ReviewsSets",
            "LikedFlashcards", "ReviewsFlashcards"]
