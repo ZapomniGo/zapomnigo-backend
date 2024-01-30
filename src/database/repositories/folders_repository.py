@@ -76,7 +76,8 @@ class FoldersRepository:
             order_by_clause = desc(func.substring(Folders.folder_id, 1, 10)) if not ascending else asc(
                 func.substring(Folders.folder_id, 1, 10))
         else:
-            order_by_clause = asc(Folders.folder_title) if ascending else desc(Folders.folder_title)
+            order_by_clause = asc(func.concat(Folders.folder_title, Folders.folder_id)) if ascending else desc(
+                func.concat(Folders.folder_title, Folders.folder_id))
 
         pagination: Pagination = query.order_by(order_by_clause).paginate(page=page, per_page=size, error_out=True)
 
