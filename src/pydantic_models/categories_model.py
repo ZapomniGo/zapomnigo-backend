@@ -26,5 +26,4 @@ class UpdateSubcategoriesModel(BaseModel):
 
 
 class CategoriesWithSubcategoriesModel(BaseModel):
-    category_id: ID
     subcategories: List[ID]

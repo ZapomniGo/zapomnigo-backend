@@ -1,4 +1,4 @@
-from src.database.models import Categories, Subcategories
+from src.database.models import Categories, Subcategories, CategorySubcategories
 from src.database.models.base import db
 
 
@@ -28,3 +28,9 @@ class CategoriesRepository:
             return subcategory.subcategory_name
 
         return None
+
+    @classmethod
+    def get_subcategories_for_category(cls, category_id):
+        return db.session.query(Subcategories.subcategory_id, Subcategories.subcategory_name).join(
+            CategorySubcategories, CategorySubcategories.subcategory_id == Subcategories.subcategory_id).filter_by(
+            category_id=category_id).all()

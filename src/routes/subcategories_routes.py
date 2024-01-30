@@ -22,3 +22,13 @@ def edit_subcategory(subcategory_id: str):
 @admin_required
 def delete_category(subcategory_id: str):
     return c.delete_subcategory(subcategory_id)
+
+
+@subcategories_bp.post("/categories/<category_id>/subcategories")
+def create_subcategories_for_category(category_id: str):
+    return c.create_subcategories_for_category(category_id)
+
+
+@subcategories_bp.get("/categories/<category_id>/subcategories")
+def get_subcategories_for_category(category_id: str):
+    return c.get_subcategories_for_category(category_id)
