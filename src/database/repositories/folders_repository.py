@@ -2,9 +2,9 @@ from typing import List, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from sqlalchemy import delete, desc, func, asc
+from sqlalchemy import delete, desc, func, asc, and_
 
-from src.database.models import Folders, FoldersSets, Categories, Users
+from src.database.models import Folders, FoldersSets, Categories, Users, Subcategories
 from src.database.models.base import db
 
 
@@ -24,8 +24,9 @@ class FoldersRepository:
         """
         return db.session.query(
             Folders.folder_id, Folders.folder_title, Folders.folder_description, Folders.folder_modification_date,
-            Categories.category_name, Users.username
+            Categories.category_name, Subcategories.subcategory_name, Users.username
         ).outerjoin(Categories, Categories.category_id == Folders.category_id) \
+            .outerjoin(Subcategories, Subcategories.subcategory_id == Folders.subcategory_id) \
             .join(Users, Users.user_id == Folders.user_id)
 
     @classmethod
@@ -38,6 +39,7 @@ class FoldersRepository:
             page: int = 1,
             size: int = 20,
             category_id: str = "",
+            subcategory_id: str = "",
             user_id: str = "",
             sort_by_date: bool = True,
             ascending: bool = False,
@@ -49,6 +51,7 @@ class FoldersRepository:
             page (int): The page number to retrieve (default is 1).
             size (int): The number of folders per page (default is 20).
             category_id (str) If passed shows all folders with the given category
+            subcategory_id (str) If passed shows all folders with the given subcategory
             user_id (str): If provided, fetch folders associated with the specified user (default is an empty string).
             sort_by_date (bool): If True (default), the folders are ordered by creation date.
             ascending (bool): If True, the folders are ordered in ascending order, else in descending order.
@@ -61,6 +64,10 @@ class FoldersRepository:
 
         if category_id:
             query = query.filter(Categories.category_id == category_id)
+
+        if subcategory_id and category_id:
+            query = query.filter(
+                and_(Categories.category_id == category_id, Subcategories.subcategory_id == subcategory_id))
 
         if user_id:
             query = query.filter(Users.user_id == user_id)

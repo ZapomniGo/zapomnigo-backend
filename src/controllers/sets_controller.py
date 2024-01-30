@@ -48,9 +48,10 @@ class SetsController:
 
         page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
+        subcategory_id = request.args.get('subcategory_id', type=str)
 
         result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, category_id=category_id,
-                                             sort_by_date=sort_by_date,
+                                             subcategory_id=subcategory_id, sort_by_date=sort_by_date,
                                              ascending=ascending)
         sets_list = SetsFunctionality.display_sets_info(result)
 
