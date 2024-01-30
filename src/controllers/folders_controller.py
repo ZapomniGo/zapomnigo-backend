@@ -46,8 +46,10 @@ class FoldersController:
 
         page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
+        subcategory_id = request.args.get('subcategory_id', type=str)
 
         result = FoldersRepository.get_all_folders(page=page, size=size, user_id=user_id, category_id=category_id,
+                                                   subcategory_id=subcategory_id,
                                                    sort_by_date=sort_by_date,
                                                    ascending=ascending)
         folders_list = FoldersFunctionality.display_folders_info(result)
