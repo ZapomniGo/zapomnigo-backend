@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import String, ForeignKey, Integer
+from sqlalchemy import String, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
@@ -15,3 +15,5 @@ class ReviewsFlashcards(db.Model):
     # Creates a bidirectional relationship between tables
     users: Mapped["Users"] = relationship(back_populates="reviews_flashcards")
     flashcards: Mapped[List["Flashcards"]] = relationship(back_populates="reviews_flashcards")
+
+    __table_args__ = (UniqueConstraint("user_id", "flashcard_id", name="user_id_flashcard_id_unique"),)

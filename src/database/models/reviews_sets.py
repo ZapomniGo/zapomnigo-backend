@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database.models.base import db
@@ -13,3 +13,5 @@ class ReviewsSets(db.Model):
     # Creates a bidirectional relationship between tables
     users: Mapped["Users"] = relationship(back_populates="reviews_sets")
     sets: Mapped["Sets"] = relationship(back_populates="reviews_sets")
+
+    __table_args__ = (UniqueConstraint("user_id", "set_id", name="user_id_set_id_unique"),)
