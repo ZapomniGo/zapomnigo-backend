@@ -6,7 +6,7 @@ from ulid import ULID
 from src.database.models import Categories
 from src.database.repositories.categories_repository import CategoriesRepository
 from src.database.repositories.common_repository import CommonRepository
-from src.pydantic_models.categories_model import CategoriesModel
+from src.pydantic_models.categories_model import CategoriesModel, CategoriesWithSubcategoriesModel
 from src.utilities.parsers import validate_json_body
 from src.pydantic_models.categories_model import UpdateCategoriesModel
 
@@ -63,3 +63,13 @@ class CategoriesController:
             return {"message": "Category successfully deleted"}, 200
 
         return {"message": "Category with such id doesn't exist"}, 404
+    @classmethod
+    def create_folder_sets(cls, set_ids: List[str], folder_obj_id: str) -> List[FoldersSets]:
+        folder_sets_objects = []
+        for set_id in set_ids:
+            folder_sets_objects.append(FoldersSets(folder_set_id=str(ULID()), folder_id=folder_obj_id, set_id=set_id))
+
+        return folder_sets_objects
+    @classmethod
+    def create_subcategories_for_category(cls, category_id: str, json_data: CategoriesWithSubcategoriesModel):
+        return

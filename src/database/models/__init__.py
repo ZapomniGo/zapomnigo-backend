@@ -1,4 +1,5 @@
 from src.database.models.categories import Categories
+from src.database.models.category_subcategories import CategorySubcategories
 from src.database.models.comments import Comments
 from src.database.models.flashcards import Flashcards
 from src.database.models.folders import Folders
@@ -15,6 +16,7 @@ from src.database.models.subcategories import Subcategories
 from src.database.models.subscription_models import SubscriptionModels
 from src.database.models.users import Users
 
-__all__ = ["SubscriptionModels", "Organizations", "Users", "OrganizationsUsers", "Sets", "Categories","Subcategories",
+__all__ = ["SubscriptionModels", "Organizations", "Users", "OrganizationsUsers", "Sets", "Categories", "Subcategories",
+           "CategorySubcategories",
            "Comments", "Folders", "FoldersSets", "Preferences", "Flashcards", "LikedSets", "ReviewsSets",
            "LikedFlashcards", "ReviewsFlashcards"]

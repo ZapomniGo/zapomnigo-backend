@@ -11,7 +11,6 @@ class Categories(db.Model):
     # Creates a bidirectional relationship between tables
     sets: Mapped["Sets"] = relationship(back_populates="categories")
     folders: Mapped["Folders"] = relationship(back_populates="categories")
-    subcategories: Mapped["Subcategories"] = relationship(back_populates="categories")
 
     def to_json(self):
         return {"category_id": self.category_id,
