@@ -90,9 +90,10 @@ class SetsRepository:
             order_by_clause = desc(func.substring(Sets.set_id, 1, 10)) if not ascending else asc(
                 func.substring(Sets.set_id, 1, 10))
         else:
-            order_by_clause = asc(func.concat(Sets.set_name, Sets.set_id)) if ascending else desc(
-                func.concat(Sets.set_name, Sets.set_id))
+            if ascending:
+                order_by_clause = asc(Sets.set_name), asc(Sets.set_id)
+            else:
+                order_by_clause = desc(Sets.set_name), desc(Sets.set_id)
 
-        pagination: Pagination = query.order_by(order_by_clause).paginate(page=page, per_page=size, error_out=True)
-
+        pagination: Pagination = query.order_by(*order_by_clause).paginate(page=page, per_page=size, error_out=True)
         return pagination

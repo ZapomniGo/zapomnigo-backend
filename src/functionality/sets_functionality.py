@@ -16,6 +16,7 @@ class SetsFunctionality:
                     set_description=json_data.set_description,
                     set_modification_date=str(datetime.now()),
                     set_category=json_data.set_category,
+                    set_subcategory=json_data.set_subcategory,
                     user_id=user_id,
                     organization_id=json_data.organization_id)
 

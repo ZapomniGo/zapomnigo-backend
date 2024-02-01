@@ -61,7 +61,7 @@ class SetsController:
         last_page = result.pages if result.pages > 0 else 1
 
         return {'sets': sets_list, 'total_pages': result.pages, 'current_page': result.page,
-                'last_page': last_page}, 200
+                'last_page': last_page, "total_items": result.total}, 200
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
@@ -74,8 +74,7 @@ class SetsController:
             last_page = flashcards.pages if flashcards.pages > 0 else 1
 
             return {"set": SetsFunctionality.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
-                    'current_page': flashcards.page,
-                    'last_page': last_page}, 200
+                    'current_page': flashcards.page, 'total_items': flashcards.total, 'last_page': last_page}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
 
