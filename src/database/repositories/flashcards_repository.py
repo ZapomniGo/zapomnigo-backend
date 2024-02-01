@@ -26,7 +26,10 @@ class FlashcardsRepository:
                 order_by_clause = desc(func.substring(Flashcards.flashcard_id, 1, 10)) if not ascending else asc(
                     func.substring(Flashcards.flashcard_id, 1, 10))
             else:
-                order_by_clause = asc(Flashcards.term) if ascending else desc(Flashcards.term)
+                if ascending:
+                    order_by_clause = asc(Flashcards.term), asc(Flashcards.flashcard_id)
+                else:
+                    order_by_clause = desc(Flashcards.term), desc(Flashcards.flashcard_id)
 
             return db.session.query(Flashcards).filter_by(set_id=set_id).order_by(order_by_clause).paginate(page=page,
                                                                                                             per_page=size,
