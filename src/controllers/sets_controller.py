@@ -5,7 +5,7 @@ from flask import request
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
-from src.database.models import Flashcards
+from src.database.models import Flashcards, ReviewsSets
 from src.database.models.sets import Sets
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
@@ -166,3 +166,18 @@ class SetsController:
                                                                       sort_by_date=sort_by_date, ascending=ascending)
 
         return {"flashcards": SetsFunctionality.display_study_info(flashcards)}, 200
+
+    @classmethod
+    def create_studied_set(cls, set_id):
+        set_obj = SetsRepository.get_set_by_id(set_id)
+
+        if not set_obj:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+
+        studied_set = ReviewsSets(review_set_id=str(ULID()), user_id=user_id, set_id=set_id,
+                                  review_date=str(datetime.now()))
+        CommonRepository.add_object_to_db(studied_set)
+
+        return {"message": "studied set successfully created"}, 200
