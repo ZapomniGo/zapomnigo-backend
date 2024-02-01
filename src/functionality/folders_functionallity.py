@@ -16,6 +16,7 @@ class FoldersFunctionality:
                        folder_description=json_data.folder_description,
                        folder_modification_date=str(datetime.now()),
                        category_id=json_data.category_id,
+                       subcategory_id=json_data.subcategory_id,
                        user_id=user_id,
                        organization_id=json_data.organization_id)
 

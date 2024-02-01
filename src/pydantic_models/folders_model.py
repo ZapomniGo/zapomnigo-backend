@@ -10,6 +10,7 @@ class FoldersModel(BaseModel):
     folder_title: SET_OR_FOLDER_NAME
     folder_description: Optional[SET_OR_FOLDER_DESCRIPTION] = None
     category_id: Optional[ID] = None
+    subcategory_id: Optional[ID] = None
     sets: List[ID]
     organization_id: Optional[ID] = None
 
@@ -29,6 +30,7 @@ class UpdateFoldersModel(BaseModel):
     folder_title: Optional[SET_OR_FOLDER_NAME] = None
     folder_description: Optional[SET_OR_FOLDER_DESCRIPTION] = None
     category_id: Optional[ID] = None
+    subcategory_id: Optional[ID] = None
     sets: List[ID]
 
     @field_validator('folder_description', 'category_id', mode='before')
