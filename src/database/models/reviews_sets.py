@@ -14,4 +14,3 @@ class ReviewsSets(db.Model):
     users: Mapped["Users"] = relationship(back_populates="reviews_sets")
     sets: Mapped["Sets"] = relationship(back_populates="reviews_sets")
 
-    __table_args__ = (UniqueConstraint("user_id", "set_id", name="user_id_set_id_unique"),)

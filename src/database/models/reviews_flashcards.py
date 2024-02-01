@@ -16,4 +16,3 @@ class ReviewsFlashcards(db.Model):
     users: Mapped["Users"] = relationship(back_populates="reviews_flashcards")
     flashcards: Mapped[List["Flashcards"]] = relationship(back_populates="reviews_flashcards")
 
-    __table_args__ = (UniqueConstraint("user_id", "flashcard_id", name="user_id_flashcard_id_unique"),)
