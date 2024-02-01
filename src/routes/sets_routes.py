@@ -41,12 +41,20 @@ def update_set(set_id: str) -> Tuple[Dict[str, Any], int]:
 def get_sets_for_user(user_id: str):
     return c.get_sets_for_user(user_id)
 
+
 @sets_bp.post("/sets/<set_id>/copy")
 @jwt_required
 def copy_set(set_id: str):
     return c.copy_set(set_id)
 
+
 @sets_bp.get("/sets/<set_id>/study")
 @jwt_required
 def study_set(set_id: str):
     return c.study_set(set_id)
+
+
+@sets_bp.post("/sets/<set_id>/study")
+@jwt_required
+def create_studied_set(set_id: str):
+    return c.create_studied_set(set_id)
