@@ -13,6 +13,7 @@ class SetsModel(BaseModel):
     set_name: SET_OR_FOLDER_NAME
     set_description: Optional[SET_OR_FOLDER_DESCRIPTION] = None
     set_category: Optional[ID] = None
+    set_subcategory: Optional[ID] = None
     flashcards: List[FlashcardsModel]
     organization_id: Optional[ID] = None
 
@@ -33,6 +34,7 @@ class UpdateSetsModel(BaseModel):
     set_name: Optional[SET_OR_FOLDER_NAME] = None
     set_description: Optional[SET_OR_FOLDER_DESCRIPTION] = None
     set_category: Optional[ID] = None
+    set_subcategory: Optional[ID] = None
     flashcards: Optional[List[FlashcardsModel]] = None
 
     @field_validator('set_name', 'set_description', 'set_category', mode='before')
