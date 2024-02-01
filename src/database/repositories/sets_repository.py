@@ -87,8 +87,9 @@ class SetsRepository:
             query = cls._sets_in_folder_query(folder_id)
 
         if sort_by_date:
-            order_by_clause = desc(func.substring(Sets.set_id, 1, 10)) if not ascending else asc(
-                func.substring(Sets.set_id, 1, 10))
+            order_by_clause = (desc(func.substring(Sets.set_id, 1, 10)),) if not ascending else (
+                asc(func.substring(Sets.set_id, 1, 10)),)
+
         else:
             if ascending:
                 order_by_clause = asc(Sets.set_name), asc(Sets.set_id)

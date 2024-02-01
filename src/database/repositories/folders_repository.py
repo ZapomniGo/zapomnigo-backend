@@ -73,8 +73,8 @@ class FoldersRepository:
             query = query.filter(Users.user_id == user_id)
 
         if sort_by_date:
-            order_by_clause = desc(func.substring(Folders.folder_id, 1, 10)) if not ascending else asc(
-                func.substring(Folders.folder_id, 1, 10))
+            order_by_clause = (desc(func.substring(Folders.folder_id, 1, 10)),) if not ascending else (
+                asc(func.substring(Folders.folder_id, 1, 10)),)
         else:
             if ascending:
                 order_by_clause = asc(Folders.folder_title), asc(Folders.folder_id)
