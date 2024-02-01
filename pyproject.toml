@@ -24,6 +24,7 @@ flask-cors = "^4.0.0"
 hypercorn = "^0.15.0"
 asgiref = "^3.7.2"
 aiosmtplib = "^3.0.1"
+flask-limiter = "^3.5.0"
 
 [tool.poetry.scripts]
 start = "src.main:start"

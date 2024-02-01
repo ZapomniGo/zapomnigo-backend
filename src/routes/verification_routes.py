@@ -1,9 +1,10 @@
 from flask import Blueprint, request
+from flask_limiter.util import get_remote_address
 
-from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController as c
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.mailing_functionality import MailingFunctionality
+from src.limiter import limiter
 from src.pydantic_models.mail_sender_model import MailSenderModel
 from src.utilities.parsers import validate_json_body, eval_bool
 
@@ -17,8 +18,13 @@ def verify_user_route():
         return {"Invalid verification link"}, 400
     return c.verify_user(verification_token)
 
-
+@verification_bp.get("/test")
+@limiter.limit("5/hour")
+def test_route():
+    print(request.remote_addr)
+    return {"message": "test route"}, 200
 @verification_bp.post("/send-email")
+@limiter.limit("5/hour")
 async def send_email():
     is_verification = request.args.get("verification")
     if not is_verification:
