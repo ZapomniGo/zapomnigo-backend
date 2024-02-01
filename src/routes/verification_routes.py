@@ -18,13 +18,9 @@ def verify_user_route():
         return {"Invalid verification link"}, 400
     return c.verify_user(verification_token)
 
-@verification_bp.get("/test")
-@limiter.limit("5/hour")
-def test_route():
-    print(request.remote_addr)
-    return {"message": "test route"}, 200
+
 @verification_bp.post("/send-email")
-@limiter.limit("5/hour")
+# @limiter.limit("5/hour")
 async def send_email():
     is_verification = request.args.get("verification")
     if not is_verification:
