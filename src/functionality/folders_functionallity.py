@@ -38,6 +38,7 @@ class FoldersFunctionality:
                 'folder_description': row.folder_description,
                 'folder_modification_date': row.folder_modification_date,
                 'category_name': row.category_name,
+                "subcategory_name": row.subcategory_name,
                 'username': row.username,
             }
             folders_list.append(folder_dict)

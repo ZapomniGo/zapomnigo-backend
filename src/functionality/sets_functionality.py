@@ -40,6 +40,7 @@ class SetsFunctionality:
                 'set_description': row.set_description,
                 'set_modification_date': row.set_modification_date,
                 'category_name': row.category_name,
+                "subcategory_name": row.subcategory_name,
                 'username': row.username,
             }
             sets_list.append(set_dict)
