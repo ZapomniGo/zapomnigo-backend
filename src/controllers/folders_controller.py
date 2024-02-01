@@ -60,7 +60,7 @@ class FoldersController:
         last_page = result.pages if result.pages > 0 else 1
 
         return {'folders': folders_list, 'total_pages': result.pages, 'current_page': result.page,
-                'last_page': last_page}, 200
+                'total_items': result.total, 'last_page': last_page}, 200
 
     @classmethod
     def get_sets_in_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
