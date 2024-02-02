@@ -63,10 +63,11 @@ class SubcategoriesController:
             return {"validation errors": validation_errors}, 422
 
         category_subcategories = []
-        for subcategory_id in json_data["subcategories"]:
+        for subcategory_id, order in zip(json_data["subcategories"], json_data["order"]):
             category_subcategories.append(
                 CategorySubcategories(category_subcategories_id=str(ULID()), category_id=category_id,
-                                      subcategory_id=subcategory_id))
+                                      subcategory_id=subcategory_id, order=order))
+
         CommonRepository.add_many_objects_to_db(category_subcategories)
 
         return {"message": "Subcategories successfully added to category"}, 200

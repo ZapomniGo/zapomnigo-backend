@@ -27,3 +27,4 @@ class UpdateSubcategoriesModel(BaseModel):
 
 class CategoriesWithSubcategoriesModel(BaseModel):
     subcategories: List[ID]
+    order: List[int]
