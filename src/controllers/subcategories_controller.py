@@ -29,28 +29,6 @@ class SubcategoriesController:
         return {"message": "Subcategory added to db"}, 200
 
     @classmethod
-    def update_subcategory(cls, subcategory_id: str):
-        json_data = request.get_json()
-        subcategory = CategoriesRepository.get_subcategory_by_id(subcategory_id)
-
-        if not subcategory:
-            return {"message": "subcategory with such id doesn't exist"}, 404
-
-        if validation_errors := validate_json_body(json_data, UpdateCategoriesModel):
-            return {"validation errors": validation_errors}, 422
-
-        CommonRepository.edit_object(subcategory, CategoriesModel(**json_data))
-        return {"message": "subcategory successfully updated"}, 200
-
-    @classmethod
-    def delete_subcategory(cls, subcategory_id: str) -> Tuple[Dict[str, Any], int]:
-        if subcategory := CategoriesRepository.get_subcategory_by_id(subcategory_id):
-            CommonRepository.delete_object_from_db(subcategory)
-            return {"message": "subcategory successfully deleted"}, 200
-
-        return {"message": "subcategory with such id doesn't exist"}, 404
-
-    @classmethod
     def create_subcategories_for_category(cls, category_id: str):
         json_data = request.get_json()
 

@@ -12,18 +12,6 @@ def create_subcategory():
     return c.add_subcategory()
 
 
-@subcategories_bp.put("/subcategories/<subcategory_id>")
-@admin_required
-def edit_subcategory(subcategory_id: str):
-    return c.update_subcategory(subcategory_id)
-
-
-@subcategories_bp.delete("/subcategories/<subcategory_id>")
-@admin_required
-def delete_category(subcategory_id: str):
-    return c.delete_subcategory(subcategory_id)
-
-
 @subcategories_bp.post("/categories/<category_id>/subcategories")
 @admin_required
 def create_subcategories_for_category(category_id: str):

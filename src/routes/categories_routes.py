@@ -20,15 +20,3 @@ def get_category(category_id: str):
 @admin_required
 def create_category():
     return c.add_category()
-
-
-@categories_bp.put("/categories/<category_id>")
-@admin_required
-def edit_category(category_id: str):
-    return c.update_category(category_id)
-
-
-@categories_bp.delete("/categories/<category_id>")
-@admin_required
-def delete_category(category_id: str):
-    return c.delete_category(category_id)
