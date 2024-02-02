@@ -10,6 +10,10 @@ class CategoriesRepository:
         return db.session.query(Categories).filter_by(category_id=category_id).first()
 
     @classmethod
+    def get_all_categories(cls) -> list[Categories] | None:
+        return db.session.query(Categories).order_by(asc(Categories.order)).all()
+
+    @classmethod
     def get_all_subcategories_by_category_id(cls, category_id: str) -> list[Subcategories] | None:
         return db.session.query(Subcategories).filter_by(category_id=category_id).all()
 
