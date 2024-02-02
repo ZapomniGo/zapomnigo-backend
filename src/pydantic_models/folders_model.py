@@ -20,7 +20,7 @@ class FoldersModel(BaseModel):
             raise ValueError("Sets list cannot be empty")
         return values
 
-    @field_validator('folder_description', 'category_id', 'organization_id', mode='before')
+    @field_validator('folder_description', 'category_id', 'subcategory_id' 'organization_id', mode='before')
     def convert_empty_string_to_none(cls, value):
         return None if value == "" else value
 
@@ -33,7 +33,7 @@ class UpdateFoldersModel(BaseModel):
     subcategory_id: Optional[ID] = None
     sets: List[ID]
 
-    @field_validator('folder_description', 'category_id', mode='before')
+    @field_validator('folder_description', 'category_id', 'subcategory_id', mode='before')
     def convert_empty_string_to_none(cls, value):
         return None if value == "" else value
 

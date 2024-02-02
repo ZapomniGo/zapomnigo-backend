@@ -93,12 +93,9 @@ class FoldersRepository:
 
     @event.listens_for(FoldersSets, 'after_delete')
     def receive_after_delete(mapper, connection, target):
-        # Get the session from the target (deleted object)
         session: Session = Session.object_session(target)
 
-        # Check if there are any remaining FoldersSets with the same folder_id
         remaining = session.query(FoldersSets).filter_by(folder_id=target.folder_id).first()
 
-        # If there are none, delete the Folders with that folder_id
         if remaining is None:
             session.execute(delete(Folders).where(Folders.folder_id == target.folder_id))

@@ -17,7 +17,7 @@ class SetsModel(BaseModel):
     flashcards: List[FlashcardsModel]
     organization_id: Optional[ID] = None
 
-    @field_validator('set_description', 'set_category', 'organization_id', mode='before')
+    @field_validator('set_description', 'set_category', 'set_subcategory', 'organization_id', mode='before')
     def convert_empty_string_to_none(cls, value):
         return None if value == "" else value
 
@@ -37,6 +37,6 @@ class UpdateSetsModel(BaseModel):
     set_subcategory: Optional[ID] = None
     flashcards: Optional[List[FlashcardsModel]] = None
 
-    @field_validator('set_name', 'set_description', 'set_category', mode='before')
+    @field_validator('set_name', 'set_description', 'set_category', 'set_subcategory', mode='before')
     def convert_empty_string_to_none(cls, value):
         return None if value == "" else value
