@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Dict, Any, Tuple
 
+import bleach
 from flask_sqlalchemy.pagination import Pagination
 from ulid import ULID
 
@@ -24,9 +25,9 @@ class SetsFunctionality:
     def create_flashcards(cls, json_data: SetsModel, set_id: str):
         flashcards_objects = []
         for flashcard in json_data.flashcards:
-            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
-                                                 definition=flashcard.definition,
-                                                 notes=flashcard.notes,
+            flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=bleach.clean(flashcard.term),
+                                                 definition=bleach.clean(flashcard.definition),
+                                                 notes=bleach.clean(flashcard.notes),
                                                  set_id=set_id))
         return flashcards_objects
 
