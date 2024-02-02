@@ -7,7 +7,7 @@ subcategories_bp = Blueprint("subcategories", __name__)
 
 
 @subcategories_bp.post("/subcategories")
-# @admin_required
+@admin_required
 def create_subcategory():
     return c.add_subcategory()
 
@@ -25,6 +25,7 @@ def delete_category(subcategory_id: str):
 
 
 @subcategories_bp.post("/categories/<category_id>/subcategories")
+@admin_required
 def create_subcategories_for_category(category_id: str):
     return c.create_subcategories_for_category(category_id)
 
