@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 from src.database.models import Sets, Folders, Users
 from src.database.models.base import db
-from src.utilities.parsers import filter_none_values
 
 
 class CommonRepository:
