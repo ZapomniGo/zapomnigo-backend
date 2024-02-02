@@ -30,7 +30,7 @@ class CategoriesController:
 
     @classmethod
     def get_all_categories(cls) -> Tuple[Dict[str, Any], int]:
-        if result := CommonRepository.get_all_objects_from_db(Categories):
+        if result := CategoriesRepository.get_all_categories():
             return {"categories": [categories.to_json() for categories in result]}, 200
 
         return {"message": "No categories were found"}, 404

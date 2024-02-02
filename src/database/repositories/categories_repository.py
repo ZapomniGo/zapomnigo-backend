@@ -1,3 +1,5 @@
+from sqlalchemy import asc
+
 from src.database.models import Categories, Subcategories, CategorySubcategories
 from src.database.models.base import db
 
@@ -6,6 +8,10 @@ class CategoriesRepository:
     @classmethod
     def get_category_by_id(cls, category_id: str) -> Categories | None:
         return db.session.query(Categories).filter_by(category_id=category_id).first()
+
+    @classmethod
+    def get_all_categories(cls) -> list[Categories] | None:
+        return db.session.query(Categories).order_by(asc(Categories.order)).all()
 
     @classmethod
     def get_all_subcategories_by_category_id(cls, category_id: str) -> list[Subcategories] | None:
@@ -33,4 +39,4 @@ class CategoriesRepository:
     def get_subcategories_for_category(cls, category_id):
         return db.session.query(Subcategories.subcategory_id, Subcategories.subcategory_name).join(
             CategorySubcategories, CategorySubcategories.subcategory_id == Subcategories.subcategory_id).filter_by(
-            category_id=category_id).all()
+            category_id=category_id).order_by(asc(CategorySubcategories.order)).all()
