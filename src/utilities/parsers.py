@@ -31,7 +31,3 @@ def validate_json_body(json_data: Dict[str, Any], pydantic_model) -> List[Dict[s
 
 def arg_to_bool(value: str) -> bool:
     return value.lower() == 'true'
-
-
-def filter_none_values(json_data: BaseModel) -> Dict[str, Any]:
-    return {key: value for key, value in json_data.model_dump().items() if value is not None}
