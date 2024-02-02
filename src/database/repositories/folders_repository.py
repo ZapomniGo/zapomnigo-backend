@@ -2,7 +2,8 @@ from typing import List, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from sqlalchemy import delete, desc, func, asc, and_
+from flask_sqlalchemy.session import Session
+from sqlalchemy import delete, desc, func, asc, and_, event
 
 from src.database.models import Folders, FoldersSets, Categories, Users, Subcategories
 from src.database.models.base import db
@@ -89,3 +90,15 @@ class FoldersRepository:
     def delete_folders_sets_by_folder_id(cls, folder_id: str) -> None:
         db.session.execute(delete(FoldersSets).where(FoldersSets.folder_id == folder_id))
         db.session.commit()
+
+    @event.listens_for(FoldersSets, 'after_delete')
+    def receive_after_delete(mapper, connection, target):
+        # Get the session from the target (deleted object)
+        session: Session = Session.object_session(target)
+
+        # Check if there are any remaining FoldersSets with the same folder_id
+        remaining = session.query(FoldersSets).filter_by(folder_id=target.folder_id).first()
+
+        # If there are none, delete the Folders with that folder_id
+        if remaining is None:
+            session.execute(delete(Folders).where(Folders.folder_id == target.folder_id))
