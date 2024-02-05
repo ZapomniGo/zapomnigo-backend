@@ -26,8 +26,6 @@ class RegistrationModel(BaseModel):
             raise ValueError("Password must contain at least one lowercase letter")
         if not any(c.isdigit() for c in value):
             raise ValueError("Password must contain at least one digit")
-        if not any(c in string.punctuation for c in value):
-            raise ValueError("Password must contain at least one special character")
 
         return value
 
@@ -49,10 +47,9 @@ class ResetPasswordModel(BaseModel):
             raise ValueError("Password must contain at least one lowercase letter")
         if not any(c.isdigit() for c in value):
             raise ValueError("Password must contain at least one digit")
-        if not any(c in string.punctuation for c in value):
-            raise ValueError("Password must contain at least one special character")
 
         return value
+
     @field_validator("token", mode='before')
     def check_empty_token(cls, values):
         if not values or values == "":
