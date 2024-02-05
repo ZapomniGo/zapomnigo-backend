@@ -12,6 +12,7 @@ class Flashcards(db.Model):
     definition: Mapped[str] = mapped_column(String(524288), nullable=False)
     notes: Mapped[str] = mapped_column(String(524288), nullable=True)
     set_id: Mapped[str] = mapped_column(ForeignKey("sets.set_id"), nullable=False)
+    flashcard_creation_time: Mapped[str] = mapped_column(String(40), nullable=True)
 
     # Creates a bidirectional relationship between tables
     sets: Mapped["Sets"] = relationship(back_populates="flashcards")

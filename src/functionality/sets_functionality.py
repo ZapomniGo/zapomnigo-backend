@@ -27,7 +27,7 @@ class SetsFunctionality:
             flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
                                                  definition=flashcard.definition,
                                                  notes=flashcard.notes,
-                                                 set_id=set_id))
+                                                 set_id=set_id, flashcard_creation_time=str(datetime.now())))
         return flashcards_objects
 
     @classmethod
@@ -54,7 +54,8 @@ class SetsFunctionality:
                 'flashcard_id': flashcard.flashcard_id,
                 'term': flashcard.term,
                 'definition': flashcard.definition,
-                'notes': flashcard.notes
+                'notes': flashcard.notes,
+                "flashcard_creation_time": flashcard.flashcard_creation_time
             }
             flashcards_list.append(flashcard_dict)
 

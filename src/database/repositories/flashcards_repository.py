@@ -22,8 +22,8 @@ class FlashcardsRepository:
                                     sort_by_date: bool = True,
                                     ascending: bool = False) -> Pagination:
         if sort_by_date:
-            order_by_clause = (desc(func.substring(Flashcards.flashcard_id, 1, 10)),) if not ascending else asc((
-                func.substring(Flashcards.flashcard_id, 1, 10)), )
+            order_by_clause = (desc(Flashcards.flashcard_creation_time),) if not ascending else (
+            asc(Flashcards.flashcard_creation_time),)
         else:
             if ascending:
                 order_by_clause = asc(Flashcards.term), asc(Flashcards.flashcard_id)
