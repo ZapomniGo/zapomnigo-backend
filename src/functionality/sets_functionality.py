@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
+from lxml.html import clean
 from ulid import ULID
 
 from src.database.models import Flashcards, Sets
@@ -21,9 +22,16 @@ class SetsFunctionality:
                     organization_id=json_data.organization_id)
 
     @classmethod
+    def sanitize_html(cls, html):
+        cleaner = clean.Cleaner()
+        return cleaner.clean_html(html)
+
+    @classmethod
     def create_flashcards(cls, json_data: SetsModel, set_id: str):
         flashcards_objects = []
         for flashcard in json_data.flashcards:
+            flashcard.term = cls.sanitize_html(flashcard.term)
+            flashcard.definition = cls.sanitize_html(flashcard.definition)
             flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
                                                  definition=flashcard.definition,
                                                  notes=flashcard.notes,
