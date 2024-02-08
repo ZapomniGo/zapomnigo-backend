@@ -25,12 +25,12 @@ class SetsFunctionality:
     def sanitize_html(cls, html):
         cleaner = clean.Cleaner()
 
-        cleaner.allow_tags = ['p', 'span', 'math', 'semantics', 'mrow', 'mi', 'mo', 'msup', 'mn', 'annotation']
+        cleaner.allow_tags = ['p', 'span', 'math', 'semantics', 'mrow', 'mi', 'mo', 'msup', 'mn', 'annotation', 'img']
         cleaner.remove_unknown_tags = False
 
         # Don't remove these attributes:
         cleaner.safe_attrs = clean.defs.safe_attrs | {'class', 'data-value', 'contenteditable', 'aria-hidden', 'style',
-                                                      'xmlns', 'encoding'}
+                                                      'xmlns', 'encoding', 'src'}
         return cleaner.clean_html(html)
 
     @classmethod
