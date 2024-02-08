@@ -58,3 +58,9 @@ def study_set(set_id: str):
 @jwt_required
 def create_studied_set(set_id: str):
     return c.create_studied_set(set_id)
+
+
+@sets_bp.post("/sets/<set_id>/report")
+@jwt_required
+async def report_set(set_id: str):
+    return await c.report_set(set_id)

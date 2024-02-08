@@ -7,11 +7,17 @@ from src.services.mailer import send_email_background_task
 
 class MailingFunctionality:
     @classmethod
-    async def send_mail_logic(cls, email: str, username: str, is_verification=True):
+    async def send_mail_logic(cls, email: str, username: str, is_verification=True, is_report=False, report_body=None):
         token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
-        if is_verification:
+
+        if is_report:
+            body_html = report_body
+            subject = "Докладване на сет"
+
+        elif is_verification:
             body_html = cls.generate_email_body(username, token, True)
             subject = "Добре дошъл!"
+
         else:
             body_html = cls.generate_email_body(username, token, False)
             subject = "Забравена парола"

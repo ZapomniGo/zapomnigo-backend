@@ -4,6 +4,7 @@ from typing import Tuple, Dict, Any
 from flask import request
 from ulid import ULID
 
+from src.config import ADMIN_EMAIL
 from src.controllers.utility_controller import UtilityController
 from src.database.models import Flashcards, ReviewsSets
 from src.database.models.sets import Sets
@@ -13,7 +14,9 @@ from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
+from src.functionality.mailing_functionality import MailingFunctionality
 from src.functionality.sets_functionality import SetsFunctionality
+from src.pydantic_models.mail_sender_model import ReportSetModel
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
 from src.utilities.parsers import validate_json_body
 
@@ -181,3 +184,21 @@ class SetsController:
         CommonRepository.add_object_to_db(studied_set)
 
         return {"message": "studied set successfully created"}, 200
+
+    @classmethod
+    async def report_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+
+        if validation_errors := validate_json_body(json_data, ReportSetModel):
+            return {"validation errors": validation_errors}, 422
+
+        username = AuthFunctionality.get_session_username_or_user_id(request)
+        if not username:
+            return {"message": "No token provided"}, 499
+
+        report_body = f"User {username} has reported set with id {set_id} for the following reason: {json_data['reason']}"
+
+        await MailingFunctionality.send_mail_logic(ADMIN_EMAIL, username, is_verification=False, is_report=True,
+                                                   report_body=report_body)
+
+        return {"message": "Report sent successfully"}, 200
