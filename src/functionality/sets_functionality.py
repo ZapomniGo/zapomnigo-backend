@@ -26,14 +26,15 @@ class SetsFunctionality:
         cleaner = clean.Cleaner()
 
         cleaner.allow_tags = ['p', 'span', 'math', 'semantics', 'mrow', 'mi', 'mo', 'msup', 'mn', 'annotation', 'img',
-                              'iframe']
-        cleaner.remove_unknown_tags = False
+                              'iframe', 'br']
 
-        # Don't remove these attributes:
+        # Allow specific attributes
         cleaner.safe_attrs = clean.defs.safe_attrs | {
             'class', 'data-value', 'contenteditable', 'aria-hidden', 'style', 'xmlns', 'encoding', 'src', 'frameborder',
             'allowfullscreen'
         }
+
+        cleaner.remove_unknown_tags = False
 
         return cleaner.clean_html(html)
 
