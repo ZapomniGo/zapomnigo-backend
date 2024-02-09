@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Tuple, Dict, Any
 
 from flask import request
@@ -196,7 +196,9 @@ class SetsController:
         if not username:
             return {"message": "No token provided"}, 499
 
-        report_body = f"User {username} has reported set with id {set_id} for the following reason: {json_data['reason']}"
+        report_body = (f"Потребител  {username} докладва тесте с линк: https://zapomnigo.com/app/set/{set_id} на дата "
+                       f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
+                       f"причина:\n{json_data['reason']}")
 
         await MailingFunctionality.send_mail_logic(ADMIN_EMAIL, username, is_verification=False, is_report=True,
                                                    report_body=report_body)
