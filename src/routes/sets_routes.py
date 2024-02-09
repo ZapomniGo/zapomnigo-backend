@@ -61,6 +61,5 @@ def create_studied_set(set_id: str):
 
 
 @sets_bp.post("/sets/<set_id>/report")
-@jwt_required
-async def report_set(set_id: str):
+async def report_set(set_id: str) -> Tuple[Dict[str, Any], int]:
     return await c.report_set(set_id)
