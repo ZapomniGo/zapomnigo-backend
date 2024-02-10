@@ -3,7 +3,7 @@ from typing import List, Tuple
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
 from flask_sqlalchemy.session import Session
-from sqlalchemy import delete, desc, func, asc, and_, event
+from sqlalchemy import delete, desc, func, asc, and_, event, case
 
 from src.database.models import Folders, FoldersSets, Categories, Users, Subcategories
 from src.database.models.base import db
@@ -16,6 +16,11 @@ class FoldersRepository:
         return db.session.query(Folders).filter_by(folder_id=folder_id).first()
 
     @classmethod
+    def change_verified_status_folder(cls, folder: Folders, verified: bool) -> None:
+        folder.verified = verified
+        db.session.commit()
+
+    @classmethod
     def _base_query(cls) -> Query:
         """"
         SELECT f.folder_id, f.folder_title, f.folder_description, f.folder_modification_date, c.category_name, u.username
@@ -25,7 +30,7 @@ class FoldersRepository:
         """
         return db.session.query(
             Folders.folder_id, Folders.folder_title, Folders.folder_description, Folders.folder_modification_date,
-            Categories.category_name, Subcategories.subcategory_name, Users.username
+            Categories.category_name, Subcategories.subcategory_name, Users.username, Folders.verified
         ).outerjoin(Categories, Categories.category_id == Folders.category_id) \
             .outerjoin(Subcategories, Subcategories.subcategory_id == Folders.subcategory_id) \
             .join(Users, Users.user_id == Folders.user_id)
@@ -74,13 +79,25 @@ class FoldersRepository:
             query = query.filter(Users.user_id == user_id)
 
         if sort_by_date:
-            order_by_clause = (desc(func.substring(Folders.folder_id, 1, 10)),) if not ascending else (
-                asc(func.substring(Folders.folder_id, 1, 10)),)
+            order_by_clause = (
+                case((Folders.verified == True, 1), else_=0).desc(),
+                desc(func.substring(Folders.folder_id, 1, 10)) if not ascending else asc(func.substring(Folders.folder_id, 1, 10))
+            )
+
         else:
             if ascending:
-                order_by_clause = asc(Folders.folder_title), asc(Folders.folder_id)
+                order_by_clause = (
+                    case((Folders.verified == True, 1), else_=0).desc(),
+                    asc(Folders.folder_title),
+                    asc(Folders.folder_id)
+                )
+
             else:
-                order_by_clause = desc(Folders.folder_title), desc(Folders.folder_id)
+                order_by_clause = (
+                    case((Folders.verified == True, 1), else_=0).desc(),
+                    desc(Folders.folder_title),
+                    desc(Folders.folder_id)
+                )
 
         pagination: Pagination = query.order_by(*order_by_clause).paginate(page=page, per_page=size, error_out=True)
 

@@ -58,6 +58,7 @@ class SetsFunctionality:
                 'category_name': row.category_name,
                 "subcategory_name": row.subcategory_name,
                 'username': row.username,
+                'verified': row.verified,
             }
             sets_list.append(set_dict)
 

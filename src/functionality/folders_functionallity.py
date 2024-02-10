@@ -40,6 +40,7 @@ class FoldersFunctionality:
                 'category_name': row.category_name,
                 "subcategory_name": row.subcategory_name,
                 'username': row.username,
+                'verified': row.verified
             }
             folders_list.append(folder_dict)
 

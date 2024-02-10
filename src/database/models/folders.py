@@ -15,6 +15,7 @@ class Folders(db.Model):
     category_id: Mapped[str] = mapped_column(ForeignKey("categories.category_id"), nullable=True)
     subcategory_id: Mapped[str] = mapped_column(ForeignKey("subcategories.subcategory_id"), nullable=True)
     organization_id: Mapped[str] = mapped_column(ForeignKey("organizations.organization_id"), nullable=True)
+    verified: Mapped[bool] = mapped_column(db.Boolean, nullable=True, default=False)
 
     # Creates a bidirectional relationship between tables
     users: Mapped[List["Users"]] = relationship(back_populates="folders")

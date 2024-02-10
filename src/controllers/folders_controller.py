@@ -14,6 +14,7 @@ from src.functionality.common import CommonFunctionality
 from src.functionality.folders_functionallity import FoldersFunctionality
 from src.functionality.mailing_functionality import MailingFunctionality
 from src.functionality.sets_functionality import SetsFunctionality
+from src.pydantic_models.common import VerifySetFolderModel
 from src.pydantic_models.folders_model import FoldersModel, UpdateFoldersModel
 from src.pydantic_models.mail_sender_model import ReportFolderSetModel
 from src.utilities.parsers import validate_json_body
@@ -147,3 +148,18 @@ class FoldersController:
         await MailingFunctionality.send_mail_logic(ADMIN_EMAIL, username, is_verification=False, is_report=True,
                                                    report_body=report_body)
         return {"message": "Folder successfully reported"}, 200
+
+    @classmethod
+    def change_verified_status_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+
+        folder = FoldersRepository.get_folder_by_id(folder_id)
+        if not folder:
+            return {"message": "Folder with such id doesn't exist"}, 404
+
+        if validation_errors := validate_json_body(json_data, VerifySetFolderModel):
+            return {"validation errors": validation_errors}, 422
+
+        FoldersRepository.change_verified_status_folder(folder, json_data["verified"])
+
+        return {"message": "folder verified status changed successfully"}, 200
