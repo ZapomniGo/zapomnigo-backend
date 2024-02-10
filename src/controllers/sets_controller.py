@@ -16,7 +16,7 @@ from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
 from src.functionality.mailing_functionality import MailingFunctionality
 from src.functionality.sets_functionality import SetsFunctionality
-from src.pydantic_models.mail_sender_model import ReportSetModel
+from src.pydantic_models.mail_sender_model import  ReportFolderSetModel
 from src.pydantic_models.sets_model import SetsModel, UpdateSetsModel
 from src.utilities.parsers import validate_json_body
 
@@ -189,14 +189,18 @@ class SetsController:
     async def report_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
-        if validation_errors := validate_json_body(json_data, ReportSetModel):
+        if validation_errors := validate_json_body(json_data, ReportFolderSetModel):
             return {"validation errors": validation_errors}, 422
 
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
             return {"message": "No token provided"}, 499
 
-        report_body = (f"Потребител  {username} докладва тесте с линк: https://zapomnigo.com/app/set/{set_id} на дата "
+        set_obj = SetsRepository.get_set_by_id(set_id)
+        if not set_obj:
+            return {"message": "set with such id doesn't exist"}, 404
+
+        report_body = (f"Потребител  {username} докладва тесте {set_obj.set_name} с линк: https://zapomnigo.com/app/set/{set_id} на дата "
                        f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
                        f"причина:\n{json_data['reason']}")
 

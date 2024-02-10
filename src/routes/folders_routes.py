@@ -39,3 +39,8 @@ def get_sets_for_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
 @folders_bp.get("users/<user_id>/folders")
 def get_all_folders_for_user(user_id: str) -> Tuple[Dict[str, Any], int]:
     return c.get_all_folders(user_id)
+
+
+@folders_bp.post("/folders/<folder_id>/report")
+async def report_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
+    return await c.report_folder(folder_id)

@@ -12,7 +12,7 @@ class MailingFunctionality:
 
         if is_report:
             body_html = report_body
-            subject = "Докладване на сет"
+            subject = "Докладване на сет/папка"
 
         elif is_verification:
             body_html = cls.generate_email_body(username, token, True)

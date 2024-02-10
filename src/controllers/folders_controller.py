@@ -1,7 +1,9 @@
+from datetime import datetime, timezone, timedelta
 from typing import Tuple, Dict, Any
 
 from flask import request
 
+from src.config import ADMIN_EMAIL
 from src.controllers.utility_controller import UtilityController
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
@@ -10,8 +12,10 @@ from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
 from src.functionality.folders_functionallity import FoldersFunctionality
+from src.functionality.mailing_functionality import MailingFunctionality
 from src.functionality.sets_functionality import SetsFunctionality
 from src.pydantic_models.folders_model import FoldersModel, UpdateFoldersModel
+from src.pydantic_models.mail_sender_model import ReportFolderSetModel
 from src.utilities.parsers import validate_json_body
 
 
@@ -119,3 +123,27 @@ class FoldersController:
 
         CommonRepository.delete_object_from_db(folder_obj)
         return {"message": "Folder successfully deleted"}, 200
+
+    @classmethod
+    async def report_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+
+        if validation_errors := validate_json_body(json_data, ReportFolderSetModel):
+            return {"validation errors": validation_errors}, 422
+
+        username = AuthFunctionality.get_session_username_or_user_id(request)
+        if not username:
+            return {"message": "No token provided"}, 499
+
+        folder_obj = FoldersRepository.get_folder_by_id(folder_id)
+        if not folder_obj:
+            return {"message": "Folder with such id doesn't exist"}, 404
+
+        report_body = (
+            f"Потребител  {username} докладва папка {folder_obj.folder_title} с линк: https://zapomnigo.com/app/folder/{folder_id} на дата "
+            f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
+            f"причина:\n{json_data['reason']}")
+
+        await MailingFunctionality.send_mail_logic(ADMIN_EMAIL, username, is_verification=False, is_report=True,
+                                                   report_body=report_body)
+        return {"message": "Folder successfully reported"}, 200
