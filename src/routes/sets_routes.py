@@ -4,6 +4,7 @@ from flask import Blueprint
 
 from src.controllers.sets_controller import SetsController as c
 from src.functionality.auth.jwt_decorators import jwt_required, admin_required
+from src.limiter import limiter
 
 sets_bp = Blueprint("sets", __name__)
 
@@ -61,6 +62,7 @@ def create_studied_set(set_id: str):
 
 
 @sets_bp.post("/sets/<set_id>/report")
+@limiter.limit("60/hour")
 async def report_set(set_id: str) -> Tuple[Dict[str, Any], int]:
     return await c.report_set(set_id)
 

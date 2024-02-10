@@ -3,7 +3,8 @@ from typing import Tuple, Any, Dict
 from flask import Blueprint
 
 from src.controllers.folders_controller import FoldersController as c
-from src.functionality.auth.jwt_decorators import jwt_required
+from src.functionality.auth.jwt_decorators import jwt_required, admin_required
+from src.limiter import limiter
 
 folders_bp = Blueprint("folders", __name__)
 
@@ -42,5 +43,12 @@ def get_all_folders_for_user(user_id: str) -> Tuple[Dict[str, Any], int]:
 
 
 @folders_bp.post("/folders/<folder_id>/report")
+@limiter.limit("60/hour")
 async def report_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
     return await c.report_folder(folder_id)
+
+
+@folders_bp.post("/folders/<folder_id>/verify")
+@admin_required
+def change_verified_status_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.change_verified_status_folder(folder_id)
