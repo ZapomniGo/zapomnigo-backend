@@ -4,5 +4,5 @@ from pydantic import BaseModel, EmailStr
 class MailSenderModel(BaseModel):
     email: EmailStr
 
-class ReportSetModel(BaseModel):
+class ReportFolderSetModel(BaseModel):
     reason: str

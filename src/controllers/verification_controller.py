@@ -3,7 +3,6 @@ from typing import Tuple, Dict
 import jwt
 
 from src.config import SECRET_KEY
-from src.controllers.utility_controller import UtilityController
 from src.database.repositories.users_repository import UsersRepository
 
 

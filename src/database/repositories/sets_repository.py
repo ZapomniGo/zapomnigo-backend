@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from sqlalchemy import desc, asc, func, and_
+from sqlalchemy import desc, asc, func, and_, case
 
 from src.database.models import Categories, Users, FoldersSets, Subcategories
 from src.database.models.base import db
@@ -20,6 +20,11 @@ class SetsRepository:
         return db.session.query(Sets).filter_by(set_id=set_id).first()
 
     @classmethod
+    def change_verified_status_set(cls, set_obj: Sets, verified: bool) -> None:
+        set_obj.verified = verified
+        db.session.commit()
+
+    @classmethod
     def _base_query(cls) -> Query:
         """"
             SELECT s.set_id, s.set_name, s.set_description, c.category_name FROM sets as s
@@ -28,7 +33,7 @@ class SetsRepository:
         """
         return db.session.query(
             Sets.set_id, Sets.set_name, Sets.set_description, Sets.set_modification_date,
-            Categories.category_name, Subcategories.subcategory_name, Users.username
+            Categories.category_name, Subcategories.subcategory_name, Users.username, Sets.verified
         ).outerjoin(Categories, Categories.category_id == Sets.set_category) \
             .outerjoin(Subcategories, Subcategories.subcategory_id == Sets.set_subcategory) \
             .join(Users, Users.user_id == Sets.user_id)
@@ -87,14 +92,25 @@ class SetsRepository:
             query = cls._sets_in_folder_query(folder_id)
 
         if sort_by_date:
-            order_by_clause = (desc(func.substring(Sets.set_id, 1, 10)),) if not ascending else (
-                asc(func.substring(Sets.set_id, 1, 10)),)
+            order_by_clause = (
+                case((Sets.verified == True, 1), else_=0).desc(),
+                desc(func.substring(Sets.set_id, 1, 10)) if not ascending else asc(func.substring(Sets.set_id, 1, 10))
+            )
 
         else:
             if ascending:
-                order_by_clause = asc(Sets.set_name), asc(Sets.set_id)
+                order_by_clause = (
+                    case((Sets.verified == True, 1), else_=0).desc(),
+                    asc(Sets.set_name),
+                    asc(Sets.set_id)
+                )
+
             else:
-                order_by_clause = desc(Sets.set_name), desc(Sets.set_id)
+                order_by_clause = (
+                    case((Sets.verified == True, 1), else_=0).desc(),
+                    desc(Sets.set_name),
+                    desc(Sets.set_id)
+                )
 
         pagination: Pagination = query.order_by(*order_by_clause).paginate(page=page, per_page=size, error_out=True)
         return pagination

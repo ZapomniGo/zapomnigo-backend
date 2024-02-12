@@ -26,16 +26,12 @@ class SetsFunctionality:
         cleaner = clean.Cleaner()
 
         cleaner.allow_tags = ['p', 'span', 'math', 'semantics', 'mrow', 'mi', 'mo', 'msup', 'mn', 'annotation', 'img',
-                              'iframe', 'br']
-
-        # Allow specific attributes
-        cleaner.safe_attrs = clean.defs.safe_attrs | {
-            'class', 'data-value', 'contenteditable', 'aria-hidden', 'style', 'xmlns', 'encoding', 'src', 'frameborder',
-            'allowfullscreen'
-        }
-
+                              'br']
         cleaner.remove_unknown_tags = False
 
+        # Don't remove these attributes:
+        cleaner.safe_attrs = clean.defs.safe_attrs | {'class', 'data-value', 'contenteditable', 'aria-hidden', 'style',
+                                                      'xmlns', 'encoding', 'src'}
         return cleaner.clean_html(html)
 
     @classmethod
@@ -62,6 +58,7 @@ class SetsFunctionality:
                 'category_name': row.category_name,
                 "subcategory_name": row.subcategory_name,
                 'username': row.username,
+                'verified': row.verified,
             }
             sets_list.append(set_dict)
 

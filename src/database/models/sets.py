@@ -15,6 +15,7 @@ class Sets(db.Model):
     set_subcategory: Mapped[str] = mapped_column(ForeignKey("subcategories.subcategory_id"), nullable=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False)
     organization_id: Mapped[str] = mapped_column(ForeignKey("organizations.organization_id"), nullable=True)
+    verified: Mapped[bool] = mapped_column(db.Boolean, nullable=True, default=False)
 
     # Creates a bidirectional relationship between tables
     users: Mapped[List["Users"]] = relationship(back_populates="sets")
