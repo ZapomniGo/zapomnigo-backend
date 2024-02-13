@@ -76,9 +76,8 @@ class UtilityController:
 
         results = query.order_by(desc('rank_sets'), desc('rank_folders'), desc('rank_flashcards')).all()
 
-        formatted_results = {"sets": [], "folders": [], "flashcards": []}
-        unique_set_ids = set()  # To track unique set_ids
-        unique_folder_ids = set()  # To track unique folder_ids
+        formatted_results = {"sets": [], "folders": []}
+        unique_entities = {"sets": set(), "folders": set()}  # To track unique set_ids and folder_ids
 
         for result in results:
             sets_instance, folders_instance, flashcards_instance, rank_sets, rank_folders, rank_flashcards = result
@@ -94,7 +93,7 @@ class UtilityController:
                 'username': sets_instance.users.username if sets_instance.users else None,
                 'verified': sets_instance.verified,
                 'rank': rank_sets
-            } if sets_instance and sets_instance.set_id not in unique_set_ids else None
+            } if sets_instance and sets_instance.set_id not in unique_entities["sets"] else None
 
             formatted_folders = {
                 'folder_id': folders_instance.folder_id,
@@ -106,14 +105,14 @@ class UtilityController:
                 'username': folders_instance.users.username if folders_instance.users else None,
                 'verified': folders_instance.verified,
                 'rank': rank_folders
-            } if folders_instance and folders_instance.folder_id not in unique_folder_ids else None
+            } if folders_instance and folders_instance.folder_id not in unique_entities["folders"] else None
 
             if formatted_sets:
                 formatted_results["sets"].append(formatted_sets)
-                unique_set_ids.add(sets_instance.set_id)
+                unique_entities["sets"].add(sets_instance.set_id)
 
             if formatted_folders:
                 formatted_results["folders"].append(formatted_folders)
-                unique_folder_ids.add(folders_instance.folder_id)
+                unique_entities["folders"].add(folders_instance.folder_id)
 
         return {"results": formatted_results}, 200
