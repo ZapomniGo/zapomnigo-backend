@@ -4,6 +4,7 @@ from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
 from flask_sqlalchemy.session import Session
 from sqlalchemy import delete, desc, func, asc, and_, event, case
+from sqlalchemy.orm import joinedload
 
 from src.database.models import Folders, FoldersSets, Categories, Users, Subcategories
 from src.database.models.base import db
@@ -81,7 +82,8 @@ class FoldersRepository:
         if sort_by_date:
             order_by_clause = (
                 case((Folders.verified == True, 1), else_=0).desc(),
-                desc(func.substring(Folders.folder_id, 1, 10)) if not ascending else asc(func.substring(Folders.folder_id, 1, 10))
+                desc(func.substring(Folders.folder_id, 1, 10)) if not ascending else asc(
+                    func.substring(Folders.folder_id, 1, 10))
             )
 
         else:
@@ -116,3 +118,26 @@ class FoldersRepository:
 
         if remaining is None:
             session.execute(delete(Folders).where(Folders.folder_id == target.folder_id))
+
+    @classmethod
+    def search_folders(cls, search_terms: str, page: int = 1, size: int = 20) -> Pagination:
+        folders_query = db.session.query(Folders)
+        folders_query = folders_query.options(
+            joinedload(Folders.categories),
+            joinedload(Folders.subcategories),
+            joinedload(Folders.users)
+        )
+        folders_query = folders_query.add_columns(
+            func.ts_rank(
+                func.to_tsvector('simple', Folders.folder_title + ' ' + Folders.folder_description),
+                func.plainto_tsquery('simple', search_terms)
+            ).label('rank_folders')
+        )
+        folders_query = folders_query.filter(
+            func.to_tsvector('simple', Folders.folder_title + ' ' + Folders.folder_description).match(search_terms)
+        )
+
+        folders_results: Pagination = folders_query.order_by(desc('rank_folders')).paginate(page=page,
+                                                                                            per_page=size)
+
+        return folders_results
