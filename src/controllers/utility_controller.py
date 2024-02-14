@@ -1,9 +1,17 @@
 from typing import Tuple, Dict, Any
 
 from flask import request
+from flask_sqlalchemy.pagination import Pagination
+from sqlalchemy import func, or_, desc, and_
+from sqlalchemy.orm import joinedload
 
 from src.config import ADMIN_USERNAME
+from src.database.models import Sets, Folders, Flashcards, FoldersSets, Categories, Subcategories, Users
+from src.database.models.base import db
+from src.database.repositories.folders_repository import FoldersRepository
+from src.database.repositories.sets_repository import SetsRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
+from src.functionality.common import CommonFunctionality
 
 
 class UtilityController:
@@ -23,3 +31,18 @@ class UtilityController:
             return None
 
         return {"message": "Admin privileges required."}, 403
+
+    @classmethod
+    def search(cls) -> Tuple[Dict[str, Any], int]:
+        search_terms = request.args.get("q")
+        if not search_terms:
+            return {"message": "No search query provided"}, 400
+
+        page, size, _, _ = CommonFunctionality.get_pagination_params(request)
+
+        sets_results = SetsRepository.search_sets_flashcards(search_terms, page, size)
+        folders_results = FoldersRepository.search_folders(search_terms, page, size)
+
+        formatted_results = CommonFunctionality.search_format_results(folders_results, sets_results)
+
+        return {"results": formatted_results}, 200

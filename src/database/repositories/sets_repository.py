@@ -2,9 +2,10 @@ from typing import List, Tuple
 
 from flask_sqlalchemy.pagination import Pagination
 from flask_sqlalchemy.query import Query
-from sqlalchemy import desc, asc, func, and_, case
+from sqlalchemy import desc, asc, func, and_, case, or_
+from sqlalchemy.orm import joinedload
 
-from src.database.models import Categories, Users, FoldersSets, Subcategories
+from src.database.models import Categories, Users, FoldersSets, Subcategories, Flashcards
 from src.database.models.base import db
 from src.database.models.sets import Sets
 
@@ -114,3 +115,34 @@ class SetsRepository:
 
         pagination: Pagination = query.order_by(*order_by_clause).paginate(page=page, per_page=size, error_out=True)
         return pagination
+
+    @classmethod
+    def search_sets_flashcards(cls, search_terms: str, page: int = 1, size: int = 20) -> Pagination:
+        sets_query = db.session.query(Sets, Flashcards)
+        sets_query = sets_query.outerjoin(Flashcards, Sets.set_id == Flashcards.set_id)
+        sets_query = sets_query.options(
+            joinedload(Sets.categories),
+            joinedload(Sets.subcategories),
+            joinedload(Sets.users),
+        )
+        sets_query = sets_query.add_columns(
+            func.ts_rank(
+                func.to_tsvector('simple', Sets.set_name + ' ' + Sets.set_description),
+                func.plainto_tsquery('simple', search_terms)
+            ).label('rank_sets'),
+            func.ts_rank(
+                func.to_tsvector('simple', Flashcards.term + ' ' + Flashcards.definition),
+                func.plainto_tsquery('simple', search_terms)
+            ).label('rank_flashcards')
+        )
+        sets_query = sets_query.filter(
+            or_(
+                func.to_tsvector('simple', Sets.set_name + ' ' + Sets.set_description).match(search_terms),
+                func.to_tsvector('simple', Flashcards.term + ' ' + Flashcards.definition).match(search_terms)
+            )
+        )
+
+        sets_results: Pagination = sets_query.order_by(desc('rank_sets'), desc('rank_flashcards')).paginate(page=page,
+                                                                                                            per_page=size)
+
+        return sets_results
