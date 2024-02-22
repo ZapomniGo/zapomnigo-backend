@@ -1,13 +1,8 @@
 from typing import Tuple, Dict, Any
 
 from flask import request
-from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import func, or_, desc, and_
-from sqlalchemy.orm import joinedload
 
 from src.config import ADMIN_USERNAME
-from src.database.models import Sets, Folders, Flashcards, FoldersSets, Categories, Subcategories, Users
-from src.database.models.base import db
 from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
