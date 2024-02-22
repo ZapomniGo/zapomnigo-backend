@@ -14,6 +14,7 @@ from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
+from src.functionality.folders_functionallity import FoldersFunctionality
 from src.functionality.mailing_functionality import MailingFunctionality
 from src.functionality.sets_functionality import SetsFunctionality
 from src.pydantic_models.common import VerifySetFolderModel
@@ -25,7 +26,7 @@ from src.utilities.parsers import validate_json_body
 class SetsController:
 
     @classmethod
-    def add_set(cls):
+    def add_set(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
@@ -43,6 +44,16 @@ class SetsController:
             return {"message": "Cannot create more than 2000 flashcards per set"}, 400
 
         CommonRepository.add_many_objects_to_db(flashcards)
+
+        folder_id = request.args.get('folder_id', type=str)
+        if folder_id:
+            _,username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,get_set=False)
+
+            if result := UtilityController.check_user_access(username):
+                return result
+
+            folder_set = FoldersFunctionality.create_folder_sets([set_obj.set_id], folder_id)
+            CommonRepository.add_many_objects_to_db(folder_set)
 
         return {"set_id": set_obj.set_id}, 200
 
@@ -90,7 +101,7 @@ class SetsController:
         return cls.get_all_sets(user_id)
 
     @classmethod
-    def update_set(cls, set_id: str):
+    def update_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
         set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
 
@@ -111,6 +122,16 @@ class SetsController:
             return {"message": "Cannot create more than 2000 flashcards per set"}, 400
 
         CommonRepository.add_many_objects_to_db(flashcards)
+
+        folder_id = request.args.get('folder_id', type=str)
+        if folder_id:
+            _,username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,get_set=False)
+
+            if result := UtilityController.check_user_access(username):
+                return result
+
+            folder_set = FoldersFunctionality.create_folder_sets([set_obj.set_id], folder_id)
+            CommonRepository.add_many_objects_to_db(folder_set)
 
         return {"message": "set successfully updated"}, 200
 
