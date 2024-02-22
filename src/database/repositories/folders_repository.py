@@ -137,7 +137,9 @@ class FoldersRepository:
             func.to_tsvector('simple', Folders.folder_title + ' ' + Folders.folder_description).match(search_terms)
         )
 
-        folders_results: Pagination = folders_query.order_by(desc('rank_folders')).paginate(page=page,
-                                                                                            per_page=size)
+        folders_results: Pagination = folders_query.distinct(Folders.folder_id).order_by(Folders.folder_id,
+                                                                                         desc('rank_folders')).paginate(
+            page=page,
+            per_page=size)
 
         return folders_results

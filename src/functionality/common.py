@@ -1,7 +1,7 @@
 from typing import List, Tuple, Dict, Any
 
 from flask import Request
-from flask_sqlalchemy.pagination import Pagination
+from flask_sqlalchemy.pagination import Pagination, QueryPagination
 
 from src.utilities.parsers import arg_to_bool
 
@@ -22,7 +22,6 @@ class CommonFunctionality:
                               sets_results: Pagination | List[Tuple[...]]) -> Dict[str, List[Dict[str, Any]]]:
 
         formatted_results = {"sets": [], "folders": []}
-        unique_entities = {"sets": set(), "folders": set()}
         for result in sets_results:
             sets_instance, flashcards_instance, rank_sets, rank_flashcards = result
             formatted_sets = {
@@ -35,11 +34,16 @@ class CommonFunctionality:
                 'username': sets_instance.users.username if sets_instance.users else None,
                 'verified': sets_instance.verified,
                 'rank': rank_sets
-            } if sets_instance and sets_instance.set_id not in unique_entities["sets"] else None
+            }
 
-            if formatted_sets:
-                formatted_results["sets"].append(formatted_sets)
-                unique_entities["sets"].add(sets_instance.set_id)
+            formatted_results["sets"].append(formatted_sets)
+
+        formatted_results["sets_pagination"] = {
+            'total_pages': sets_results.pages,
+            'current_page': sets_results.page,
+            'last_page': sets_results.pages if sets_results.pages > 0 else 1,
+            'total_items': sets_results.total
+        }
 
         for result in folders_results:
             folders_instance, rank_folders = result
@@ -53,10 +57,15 @@ class CommonFunctionality:
                 'username': folders_instance.users.username if folders_instance.users else None,
                 'verified': folders_instance.verified,
                 'rank': rank_folders
-            } if folders_instance and folders_instance.folder_id not in unique_entities["folders"] else None
+            }
 
-            if formatted_folders:
-                formatted_results["folders"].append(formatted_folders)
-                unique_entities["folders"].add(folders_instance.folder_id)
+            formatted_results["folders"].append(formatted_folders)
+
+        formatted_results["folders_pagination"] = {
+            'total_pages': folders_results.pages,
+            'current_page': folders_results.page,
+            'last_page': folders_results.pages if folders_results.pages > 0 else 1,
+            'total_items': folders_results.total
+        }
 
         return formatted_results
