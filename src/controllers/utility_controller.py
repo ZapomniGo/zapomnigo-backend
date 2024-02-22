@@ -39,9 +39,11 @@ class UtilityController:
             return {"message": "No search query provided"}, 400
 
         page, size, _, _ = CommonFunctionality.get_pagination_params(request)
+        category_id = request.args.get('category_id', type=str)
+        subcategory_id = request.args.get('subcategory_id', type=str)
 
-        sets_results = SetsRepository.search_sets_flashcards(search_terms, page, size)
-        folders_results = FoldersRepository.search_folders(search_terms, page, size)
+        sets_results = SetsRepository.search_sets_flashcards(search_terms, page, size,category_id,subcategory_id)
+        folders_results = FoldersRepository.search_folders(search_terms, page, size,category_id,subcategory_id)
 
         formatted_results = CommonFunctionality.search_format_results(folders_results, sets_results)
 

@@ -120,8 +120,17 @@ class FoldersRepository:
             session.execute(delete(Folders).where(Folders.folder_id == target.folder_id))
 
     @classmethod
-    def search_folders(cls, search_terms: str, page: int = 1, size: int = 20) -> Pagination:
+    def search_folders(cls, search_terms: str, page: int = 1, size: int = 20, category_id: str | None = None,
+                       subcategory_id: str | None = None) -> Pagination:
         folders_query = db.session.query(Folders)
+
+        if category_id:
+            folders_query = folders_query.filter(Folders.category_id == category_id)
+
+        if category_id and subcategory_id:
+            folders_query = folders_query.filter(
+                and_(Folders.category_id == category_id, Folders.subcategory_id == subcategory_id))
+
         folders_query = folders_query.options(
             joinedload(Folders.categories),
             joinedload(Folders.subcategories),

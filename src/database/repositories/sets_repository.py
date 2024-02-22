@@ -117,8 +117,17 @@ class SetsRepository:
         return pagination
 
     @classmethod
-    def search_sets_flashcards(cls, search_terms: str, page: int = 1, size: int = 20) -> Pagination:
-        sets_query = db.session.query(Sets, Flashcards)
+    def search_sets_flashcards(cls, search_terms: str, page: int = 1, size: int = 20, category_id: str | None = None,
+                               subcategory_id: str | None = None) -> Pagination:
+        sets_query = db.session.query(Sets)
+
+        if category_id:
+            sets_query = sets_query.filter(Sets.set_category == category_id)
+
+        if category_id and subcategory_id:
+            sets_query = sets_query.filter(
+                and_(Sets.set_category == category_id, Sets.set_subcategory == subcategory_id))
+
         sets_query = sets_query.outerjoin(Flashcards, Sets.set_id == Flashcards.set_id)
         sets_query = sets_query.options(
             joinedload(Sets.categories),
@@ -126,6 +135,7 @@ class SetsRepository:
             joinedload(Sets.users),
         )
         sets_query = sets_query.add_columns(
+            Flashcards,
             func.ts_rank(
                 func.to_tsvector('simple', Sets.set_name + ' ' + Sets.set_description),
                 func.plainto_tsquery('simple', search_terms)
