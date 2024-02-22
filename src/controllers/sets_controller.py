@@ -123,16 +123,6 @@ class SetsController:
 
         CommonRepository.add_many_objects_to_db(flashcards)
 
-        folder_id = request.args.get('folder_id', type=str)
-        if folder_id:
-            _,username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,get_set=False)
-
-            if result := UtilityController.check_user_access(username):
-                return result
-
-            folder_set = FoldersFunctionality.create_folder_sets([set_obj.set_id], folder_id)
-            CommonRepository.add_many_objects_to_db(folder_set)
-
         return {"message": "set successfully updated"}, 200
 
     @classmethod
@@ -247,3 +237,23 @@ class SetsController:
         SetsRepository.change_verified_status_set(set_obj, json_data["verified"])
 
         return {"message": "set verified status changed successfully"}, 200
+
+    @classmethod
+    def add_set_to_folder(cls, set_id: str, folder_id: str) -> Tuple[Dict[str, Any], int]:
+        # set_obj = SetsRepository.get_set_by_id(set_id)
+        # if not set_obj:
+        #     return {"message": "set with such id doesn't exist"}, 404
+        #
+        # folder_obj = FoldersRepository.get_folder_by_id(folder_id)
+        # if not folder_obj:
+        #     return {"message": "folder with such id doesn't exist"}, 404
+
+        _, username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id, get_set=False)
+
+        if result := UtilityController.check_user_access(username):
+            return result
+
+        folder_set = FoldersFunctionality.create_folder_sets([set_id], folder_id)
+        CommonRepository.add_many_objects_to_db(folder_set)
+
+        return {"message": "set successfully added to folder"}, 200
