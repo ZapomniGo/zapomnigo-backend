@@ -132,3 +132,14 @@ class UsersController:
             return user
 
         return None
+
+    @classmethod
+    def edit_uer(cls, user_id: str, json_data: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
+        json_data = request.get_json()
+
+        user = UsersRepository.get_user_by_ulid(user_id)
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        UsersRepository.edit_user(user, json_data)
+        return {"message": "user updated"}, 200
