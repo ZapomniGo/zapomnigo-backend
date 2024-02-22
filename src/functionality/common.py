@@ -38,12 +38,13 @@ class CommonFunctionality:
 
             formatted_results["sets"].append(formatted_sets)
 
-        formatted_results["sets_pagination"] = {
-            'total_pages': sets_results.pages,
-            'current_page': sets_results.page,
-            'last_page': sets_results.pages if sets_results.pages > 0 else 1,
-            'total_items': sets_results.total
-        }
+        if formatted_results["sets"]:
+            formatted_results["sets_pagination"] = {
+                'total_pages': sets_results.pages,
+                'current_page': sets_results.page,
+                'last_page': sets_results.pages if sets_results.pages > 0 else 1,
+                'total_items': sets_results.total
+            }
 
         for result in folders_results:
             folders_instance, rank_folders = result
@@ -61,11 +62,12 @@ class CommonFunctionality:
 
             formatted_results["folders"].append(formatted_folders)
 
-        formatted_results["folders_pagination"] = {
-            'total_pages': folders_results.pages,
-            'current_page': folders_results.page,
-            'last_page': folders_results.pages if folders_results.pages > 0 else 1,
-            'total_items': folders_results.total
-        }
+        if formatted_results["folders"]:
+            formatted_results["folders_pagination"] = {
+                'total_pages': folders_results.pages,
+                'current_page': folders_results.page,
+                'last_page': folders_results.pages if folders_results.pages > 0 else 1,
+                'total_items': folders_results.total
+            }
 
         return formatted_results
