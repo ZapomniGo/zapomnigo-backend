@@ -103,7 +103,7 @@ class FoldersController:
         if validation_errors := validate_json_body(json_data, UpdateFoldersModel):
             return {"validation errors": validation_errors}, 422
 
-        CommonRepository.edit_object(folder_obj, UpdateFoldersModel(**json_data), field_to_drop="sets")
+        CommonRepository.edit_object(folder_obj, UpdateFoldersModel(**json_data), fields_to_drop=["sets"])
         FoldersRepository.delete_folders_sets_by_folder_id(folder_id)
 
         folder_sets = FoldersFunctionality.create_folder_sets(json_data["sets"], folder_obj.folder_id)

@@ -12,7 +12,7 @@ from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.mailing_functionality import MailingFunctionality
-from src.pydantic_models.users_models import ResetPasswordModel, RegistrationModel, LoginModel
+from src.pydantic_models.users_models import ResetPasswordModel, RegistrationModel, LoginModel, UpdateUser
 from src.utilities.parsers import validate_json_body
 
 
@@ -134,12 +134,38 @@ class UsersController:
         return None
 
     @classmethod
-    def edit_uer(cls, user_id: str, json_data: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
+    def edit_uer(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
+
+        if validation_errors := validate_json_body(json_data, UpdateUser):
+            return {"validation errors": validation_errors}, 422
 
         user = UsersRepository.get_user_by_ulid(user_id)
         if not user:
             return {"message": "user doesn't exist"}, 404
 
-        UsersRepository.edit_user(user, json_data)
+        user_update_fields = UpdateUser(**json_data)
+
+        if user_update_fields.new_password and user_update_fields.password:
+            if not check_password_hash(user.password, user_update_fields.password):
+                return {"message": "invalid password"}, 401
+
+            hashed_password = generate_password_hash(user_update_fields.new_password).decode("utf-8")
+            user_update_fields.password = hashed_password
+            # await MailingFunctionality.send_mail_logic(user_update_fields.email, user.username, is_verification=False)
+
+        if user_update_fields.email:
+            if user_update_fields.email != user.email:
+                user_update_fields.verified = False
+                # await MailingFunctionality.send_mail_logic(user_update_fields.email, user.username)
+
+        # As the fields which are not passed in the body are None,
+        # we should drop them from the update
+        fields_to_drop = []
+        for key, value in user_update_fields.model_dump().items():
+            if value is None:
+                fields_to_drop.append(key)
+
+        CommonRepository.edit_object(user, user_update_fields, fields_to_drop=fields_to_drop)
+
         return {"message": "user updated"}, 200

@@ -1,7 +1,6 @@
-from dataclasses import Field
 from typing import Annotated
 
-from pydantic import StringConstraints, BaseModel
+from pydantic import StringConstraints, BaseModel, Field
 
 NAME = Annotated[str, StringConstraints(min_length=2, max_length=40)]
 ID = Annotated[str, StringConstraints(max_length=26)]

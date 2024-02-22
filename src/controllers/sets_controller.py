@@ -115,7 +115,7 @@ class SetsController:
         if validation_errors := validate_json_body(json_data, UpdateSetsModel):
             return {"validation errors": validation_errors}, 422
 
-        CommonRepository.edit_object(set_obj, UpdateSetsModel(**json_data), field_to_drop="flashcards")
+        CommonRepository.edit_object(set_obj, UpdateSetsModel(**json_data), fields_to_drop=["flashcards"])
         FlashcardsRepository.delete_flashcards_by_set_id(set_id)
 
         flashcards = SetsFunctionality.create_flashcards(SetsModel(**json_data), set_id)

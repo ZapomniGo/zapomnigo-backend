@@ -28,12 +28,11 @@ class CommonRepository:
         db.session.commit()
 
     @classmethod
-    def edit_object(cls, obj, json_data: BaseModel, field_to_drop: str | None = None) -> None:
+    def edit_object(cls, obj, json_data: BaseModel, fields_to_drop: List[str] | None = None) -> None:
         fields_to_be_updated = json_data.model_dump()
-
         # This filed is dropped from the req body as it is not part of the original SQLAlchemy obj
-        if field_to_drop:
-            fields_to_be_updated.pop(field_to_drop, None)
+        for field in fields_to_drop:
+            fields_to_be_updated.pop(field, None)
 
         for field_name, value in fields_to_be_updated.items():
             setattr(obj, field_name, value)

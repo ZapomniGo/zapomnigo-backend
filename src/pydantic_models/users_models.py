@@ -37,7 +37,7 @@ class UpdateUser(BaseModel):
     password: Optional[PASSWORD] = None
     new_password: Optional[PASSWORD] = None
     age: Optional[AGE] = None
-    gender: Literal["M", "F", "O"]
+    gender: Optional[Literal["M", "F", "O"]] = None
     organization: Optional[ID] = None
     privacy_policy: Optional[bool] = None
     terms_and_conditions: Optional[bool] = None

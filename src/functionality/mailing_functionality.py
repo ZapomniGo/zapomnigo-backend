@@ -5,41 +5,61 @@ from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.services.mailer import send_email_background_task
 
 
+class EmailTemplates:
+    templates = {
+        "report": {
+            "subject": "Докладване на сет/папка",
+            "template_path": 'resources/email_templates/BG_Report.html'
+        },
+        "verification": {
+            "subject": "Добре дошъл!",
+            "template_path": 'resources/email_templates/BG_VerifyEmail.html'
+        },
+        "reset_password": {
+            "subject": "Забравена парола",
+            "template_path": 'resources/email_templates/BG_ResetPassword.html'
+        },
+        "change_email": {
+            "subject": "Промяна на имейл",
+            "template_path": 'resources/email_templates/BG_ChangeEmail.html'
+        },
+        "change_password": {
+            "subject": "Промяна на парола",
+            "template_path": 'resources/email_templates/BG_ChangePassword.html'
+        }
+    }
+
+    @classmethod
+    def get_template(cls, template_name):
+        return cls.templates.get(template_name)
+
+
 class MailingFunctionality:
     @classmethod
-    async def send_mail_logic(cls, email: str, username: str, is_verification=True, is_report=False, report_body=None):
-        token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
-
-        if is_report:
-            body_html = report_body
-            subject = "Докладване на сет/папка"
-
-        elif is_verification:
-            body_html = cls.generate_email_body(username, token, True)
-            subject = "Добре дошъл!"
-
-        else:
-            body_html = cls.generate_email_body(username, token, False)
-            subject = "Забравена парола"
-
-        asyncio.create_task(send_email_background_task(email, subject, body_html))
+    def get_base_url(cls):
+        if IS_OFFLINE:
+            return "http://localhost:5173"
+        if IS_DEV:
+            return "https://dev-client-zapomnigo-192299046f7f.herokuapp.com"
+        elif IS_PROD:
+            return "https://zapomnigo.com"
 
     @classmethod
-    def generate_email_body(cls, username, token, is_verification):
-        base_url = ""
-        if IS_OFFLINE:
-            base_url = "http://localhost:5173"
-        if IS_DEV:
-            base_url = "https://dev-client-zapomnigo-192299046f7f.herokuapp.com"
-        elif IS_PROD:
-            base_url = "https://zapomnigo.com"
+    async def send_mail_logic(cls, email: str, username: str, template_name: str, report_body=None):
+        token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
+        template = EmailTemplates.get_template(template_name)
 
-        if is_verification:
-            template_path = 'resources/email_templates/BG_VerifyEmail.html'
-            url = f'{base_url}/app/verify?token={token}'
+        if template_name == "report":
+            body_html = report_body
         else:
-            template_path = 'resources/email_templates/BG_ResetPassword.html'
-            url = f'{base_url}/app/forgot-password?token={token}'
+            body_html = cls.generate_email_body(username, token, template["template_path"])
+
+        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
+
+    @classmethod
+    def generate_email_body(cls, username, token, template_path):
+        base_url = cls.get_base_url()
+        url = f'{base_url}/app/{template_path.split("/")[-1].split(".")[0]}?token={token}'
 
         html_content = cls.read_html_template(template_path)
         html_content = html_content.replace("{username}", username)
@@ -47,6 +67,24 @@ class MailingFunctionality:
         html_content = html_content.replace("{base_url}", base_url)
 
         return html_content
+
+    @classmethod
+    async def send_change_email_logic(cls, email: str, username: str):
+        token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
+        template = EmailTemplates.get_template("change_email")
+
+        body_html = cls.generate_email_body(username, token, template["template_path"])
+
+        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
+
+    @classmethod
+    async def send_change_password_logic(cls, email: str, username: str):
+        token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
+        template = EmailTemplates.get_template("change_password")
+
+        body_html = cls.generate_email_body(username, token, template["template_path"])
+
+        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
 
     @classmethod
     def read_html_template(cls, template_path):
