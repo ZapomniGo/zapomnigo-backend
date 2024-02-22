@@ -71,3 +71,9 @@ async def report_set(set_id: str) -> Tuple[Dict[str, Any], int]:
 @admin_required
 def change_verified_status_set(set_id: str) -> Tuple[Dict[str, Any], int]:
     return c.change_verified_status_set(set_id)
+
+
+@sets_bp.post("/sets/<set_id>/folders/<folder_id>")
+@jwt_required
+def add_set_to_folder(set_id: str, folder_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.add_set_to_folder(set_id, folder_id)
