@@ -7,6 +7,7 @@ from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
+from src.utilities.parsers import arg_to_bool
 
 
 class UtilityController:
@@ -36,9 +37,18 @@ class UtilityController:
         page, size, _, _ = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
         subcategory_id = request.args.get('subcategory_id', type=str)
+        is_set = request.args.get('is_set', type=str, default="")
+        is_set = arg_to_bool(is_set)
 
-        sets_results = SetsRepository.search_sets_flashcards(search_terms, page, size,category_id,subcategory_id)
-        folders_results = FoldersRepository.search_folders(search_terms, page, size,category_id,subcategory_id)
+        sets_results = []
+        folders_results = []
+        if is_set is True:
+            sets_results = SetsRepository.search_sets_flashcards(search_terms, page, size, category_id, subcategory_id)
+        elif is_set is False:
+            folders_results = FoldersRepository.search_folders(search_terms, page, size, category_id, subcategory_id)
+        else:
+            sets_results = SetsRepository.search_sets_flashcards(search_terms, page, size, category_id, subcategory_id)
+            folders_results = FoldersRepository.search_folders(search_terms, page, size, category_id, subcategory_id)
 
         formatted_results = CommonFunctionality.search_format_results(folders_results, sets_results)
 
