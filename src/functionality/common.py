@@ -21,7 +21,11 @@ class CommonFunctionality:
     def search_format_results(cls, folders_results: Pagination | List[Tuple[...]],
                               sets_results: Pagination | List[Tuple[...]]) -> Dict[str, List[Dict[str, Any]]]:
 
-        formatted_results = {"sets": [], "folders": []}
+        formatted_results = {"sets": [],
+                             "sets_pagination": {'total_pages': 0, 'current_page': 0, 'last_page': 0, 'total_items': 0},
+                             "folders": [], "folders_pagination": {'total_pages': 0, 'current_page': 0, 'last_page': 0,
+                                                                   'total_items': 0}}
+
         for result in sets_results:
             sets_instance, flashcards_instance, rank_sets, rank_flashcards = result
             formatted_sets = {
