@@ -156,8 +156,7 @@ class SetsRepository:
             )
         )
 
-        sets_results: Pagination = sets_query.distinct(Sets.set_id).order_by(Sets.set_id, desc(Sets.verified),
-                                                                             desc('rank_sets'),
+        sets_results: Pagination = sets_query.distinct(Sets.set_id).order_by(Sets.set_id, desc('rank_sets'),
                                                                              desc('rank_flashcards')).paginate(
             page=page, per_page=size)
 
