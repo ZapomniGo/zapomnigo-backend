@@ -1,7 +1,7 @@
 from typing import List
 
 from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import delete, desc, func, asc
+from sqlalchemy import delete, desc, asc
 
 from src.database.models import Flashcards, ReviewsFlashcards
 from src.database.models.base import db

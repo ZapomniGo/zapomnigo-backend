@@ -7,7 +7,6 @@ from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
-from src.utilities.parsers import arg_to_bool
 
 
 class UtilityController:

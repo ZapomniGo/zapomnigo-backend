@@ -1,7 +1,7 @@
 from typing import List, Tuple, Dict, Any
 
 from flask import Request
-from flask_sqlalchemy.pagination import Pagination, QueryPagination
+from flask_sqlalchemy.pagination import Pagination
 
 from src.utilities.parsers import arg_to_bool
 
