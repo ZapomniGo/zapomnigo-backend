@@ -19,9 +19,17 @@ class CommonFunctionality:
 
     @classmethod
     def search_format_results(cls, folders_results: Pagination | List[Tuple[...]],
-                              sets_results: Pagination | List[Tuple[...]]) -> Dict[str, List[Dict[str, Any]]]:
+                              sets_results: Pagination | List[Tuple[...]], main_page_search: bool = False) -> Dict[
+        str, Any]:
 
-        formatted_results = {"sets": [], "folders": []}
+        formatted_results = {"sets": [], "folders": [],
+                             'total_pages': 0, 'current_page': 0, 'total_items': 0}
+        if main_page_search:
+            formatted_results = {"sets": [],
+                                 "sets_pagination": {'total_pages': 0, 'current_page': 0, 'total_items': 0},
+                                 "folders": [],
+                                 "folders_pagination": {'total_pages': 0, 'current_page': 0, 'total_items': 0}}
+
         for result in sets_results:
             sets_instance, flashcards_instance, rank_sets, rank_flashcards = result
             formatted_sets = {
@@ -38,12 +46,17 @@ class CommonFunctionality:
 
             formatted_results["sets"].append(formatted_sets)
 
-        formatted_results["sets_pagination"] = {
-            'total_pages': sets_results.pages,
-            'current_page': sets_results.page,
-            'last_page': sets_results.pages if sets_results.pages > 0 else 1,
-            'total_items': sets_results.total
-        }
+        if formatted_results["sets"] and main_page_search:
+            formatted_results["sets_pagination"] = {
+                'total_pages': sets_results.pages,
+                'current_page': sets_results.page,
+                'total_items': sets_results.total
+            }
+
+        elif formatted_results["sets"]:
+            formatted_results["total_pages"] = sets_results.pages
+            formatted_results['current_page'] = sets_results.page
+            formatted_results['total_items'] = sets_results.total
 
         for result in folders_results:
             folders_instance, rank_folders = result
@@ -61,11 +74,16 @@ class CommonFunctionality:
 
             formatted_results["folders"].append(formatted_folders)
 
-        formatted_results["folders_pagination"] = {
-            'total_pages': folders_results.pages,
-            'current_page': folders_results.page,
-            'last_page': folders_results.pages if folders_results.pages > 0 else 1,
-            'total_items': folders_results.total
-        }
+        if formatted_results["folders"] and main_page_search:
+            formatted_results["folders_pagination"] = {
+                'total_pages': folders_results.pages,
+                'current_page': folders_results.page,
+                'total_items': folders_results.total
+            }
+
+        elif formatted_results["folders"]:
+            formatted_results["total_pages"] = folders_results.pages
+            formatted_results['current_page'] = folders_results.page
+            formatted_results['total_items'] = folders_results.total
 
         return formatted_results

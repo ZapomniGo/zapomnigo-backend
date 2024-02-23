@@ -48,7 +48,7 @@ class SetsController:
 
         folder_id = request.args.get('folder_id', type=str)
         if folder_id:
-            _,username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,get_set=False)
+            _, username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id, get_set=False)
 
             if result := UtilityController.check_user_access(username):
                 return result
@@ -65,19 +65,21 @@ class SetsController:
         page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
         subcategory_id = request.args.get('subcategory_id', type=str)
+        search_terms = request.args.get("search", type=str)
 
         result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, category_id=category_id,
                                              subcategory_id=subcategory_id, sort_by_date=sort_by_date,
-                                             ascending=ascending)
+                                             ascending=ascending, search_terms=search_terms)
+        if search_terms:
+            return CommonFunctionality.search_format_results([], result), 200
+
         sets_list = SetsFunctionality.display_sets_info(result)
 
         if not sets_list:
             return {"message": "No sets were found"}, 404
 
-        last_page = result.pages if result.pages > 0 else 1
-
         return {'sets': sets_list, 'total_pages': result.pages, 'current_page': result.page,
-                'last_page': last_page, "total_items": result.total}, 200
+                "total_items": result.total}, 200
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
@@ -87,10 +89,9 @@ class SetsController:
             flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
                                                                           sort_by_date=sort_by_date,
                                                                           ascending=ascending)
-            last_page = flashcards.pages if flashcards.pages > 0 else 1
 
             return {"set": SetsFunctionality.display_sets_info(result, flashcards)[0], 'total_pages': flashcards.pages,
-                    'current_page': flashcards.page, 'total_items': flashcards.total, 'last_page': last_page}, 200
+                    'current_page': flashcards.page, 'total_items': flashcards.total}, 200
 
         return {"message": "set with such id doesn't exist"}, 404
 
@@ -126,7 +127,7 @@ class SetsController:
 
         folder_id = request.args.get('folder_id', type=str)
         if folder_id:
-            _,username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,get_set=False)
+            _, username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id, get_set=False)
 
             if result := UtilityController.check_user_access(username):
                 return result
