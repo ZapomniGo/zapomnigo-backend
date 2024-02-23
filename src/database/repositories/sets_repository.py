@@ -59,6 +59,7 @@ class SetsRepository:
             folder_id: str = "",
             sort_by_date: bool = True,
             ascending: bool = False,
+            search_terms: str | None = None,
     ) -> Pagination:
         """
         Retrieve a paginated list of sets from the database based on passed params for filtering and sorting
@@ -113,6 +114,9 @@ class SetsRepository:
                     desc(Sets.set_id)
                 )
 
+        if search_terms:
+            return cls.search_sets_flashcards(search_terms, page, size, category_id, subcategory_id)
+
         pagination: Pagination = query.order_by(*order_by_clause).paginate(page=page, per_page=size, error_out=True)
         return pagination
 
@@ -152,7 +156,8 @@ class SetsRepository:
             )
         )
 
-        sets_results: Pagination = sets_query.distinct(Sets.set_id).order_by(Sets.set_id, desc('rank_sets'),
+        sets_results: Pagination = sets_query.distinct(Sets.set_id).order_by(Sets.set_id, desc(Sets.verified),
+                                                                             desc('rank_sets'),
                                                                              desc('rank_flashcards')).paginate(
             page=page, per_page=size)
 

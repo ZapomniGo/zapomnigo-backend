@@ -52,20 +52,22 @@ class FoldersController:
         page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
         subcategory_id = request.args.get('subcategory_id', type=str)
+        search_terms = request.args.get("search", type=str)
 
         result = FoldersRepository.get_all_folders(page=page, size=size, user_id=user_id, category_id=category_id,
                                                    subcategory_id=subcategory_id,
                                                    sort_by_date=sort_by_date,
-                                                   ascending=ascending)
+                                                   ascending=ascending, search_terms=search_terms)
+        if search_terms:
+            return CommonFunctionality.search_format_results(result, []), 200
+
         folders_list = FoldersFunctionality.display_folders_info(result)
 
         if not folders_list:
             return {"message": "No Folders were found"}, 404
 
-        last_page = result.pages if result.pages > 0 else 1
-
         return {'folders': folders_list, 'total_pages': result.pages, 'current_page': result.page,
-                'total_items': result.total, 'last_page': last_page}, 200
+                'total_items': result.total}, 200
 
     @classmethod
     def get_sets_in_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
@@ -82,10 +84,7 @@ class FoldersController:
         if not sets_list:
             return {"message": "No sets were found"}, 404
 
-        last_page = sets.pages if sets.pages > 0 else 1
-
-        return {"folder": folder_info, 'sets': sets_list, 'total_pages': sets.pages, 'current_page': sets.page,
-                'last_page': last_page}, 200
+        return {"folder": folder_info, 'sets': sets_list, 'total_pages': sets.pages, 'current_page': sets.page}, 200
 
     @classmethod
     def edit_folder(cls, folder_id: str):

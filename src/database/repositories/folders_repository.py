@@ -50,6 +50,7 @@ class FoldersRepository:
             user_id: str = "",
             sort_by_date: bool = True,
             ascending: bool = False,
+            search_terms: str | None = None
     ) -> Pagination:
         """
         Retrieve a paginated list of folders from the database based on passed params for filtering and sorting
@@ -100,6 +101,9 @@ class FoldersRepository:
                     desc(Folders.folder_title),
                     desc(Folders.folder_id)
                 )
+
+        if search_terms:
+            return cls.search_folders(search_terms, page, size, category_id, subcategory_id)
 
         pagination: Pagination = query.order_by(*order_by_clause).paginate(page=page, per_page=size, error_out=True)
 
