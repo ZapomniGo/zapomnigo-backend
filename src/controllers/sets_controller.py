@@ -116,6 +116,8 @@ class SetsController:
         if validation_errors := validate_json_body(json_data, UpdateSetsModel):
             return {"validation errors": validation_errors}, 422
 
+        # As we are passing the flashcards in the update body, we have to drop the field because it is not part of
+        # the original Sets SQLAlchemy object
         CommonRepository.edit_object(set_obj, UpdateSetsModel(**json_data), fields_to_drop=["flashcards"])
         FlashcardsRepository.delete_flashcards_by_set_id(set_id)
 
@@ -229,8 +231,7 @@ class SetsController:
             f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
             f"причина:\n{json_data['reason']}")
 
-        await MailingFunctionality.send_mail_logic(ADMIN_EMAIL, username, is_verification=False, is_report=True,
-                                                   report_body=report_body)
+        await MailingFunctionality.send_report_email(ADMIN_EMAIL, report_body)
 
         return {"message": "Report sent successfully"}, 200
 

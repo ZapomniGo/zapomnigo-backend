@@ -39,8 +39,10 @@ class VerificationController:
 
     @classmethod
     def verify_token(cls, token, is_verification=True) -> Tuple[Dict[str, str], int]:
-        response, status_code = cls.decode_query_param_token(token,
-                                                             is_verification)
+        """This method is used to verify the validity and integrity of the jwt_token used in the urls for verifying
+        emails and changing passwords."""
+
+        response, status_code = cls.decode_query_param_token(token, is_verification)
         if status_code != 200:
             return response, status_code
 

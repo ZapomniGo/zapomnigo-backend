@@ -60,7 +60,11 @@ class AuthFunctionality:
 
     @classmethod
     def create_jwt_token(cls, username: str, is_refresh: bool = True) -> str:
+        """If is_refresh is true, the token will expire in 30 days. (refresh_token)
+        If is_refresh is false, the token will expire in 24 hours. (transaction emails)"""
+
         exp = datetime.utcnow() + timedelta(days=30)
+
         if not is_refresh:
             # This is for transactional emails
             exp = datetime.utcnow() + timedelta(hours=24)

@@ -22,6 +22,7 @@ class UsersRepository:
     def change_verified_status(cls, user: Users) -> None:
         user.verified = True
         db.session.commit()
+
     @classmethod
     def reset_password(cls, user: Users, new_password: str) -> None:
         hashed_password = generate_password_hash(new_password).decode(

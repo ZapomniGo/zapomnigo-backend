@@ -102,6 +102,8 @@ class FoldersController:
         if validation_errors := validate_json_body(json_data, UpdateFoldersModel):
             return {"validation errors": validation_errors}, 422
 
+        # As we are passing the sets in the update body, we have to drop the field because it is not part of
+        # the original Folders SQLAlchemy object
         CommonRepository.edit_object(folder_obj, UpdateFoldersModel(**json_data), fields_to_drop=["sets"])
         FoldersRepository.delete_folders_sets_by_folder_id(folder_id)
 
@@ -144,8 +146,7 @@ class FoldersController:
             f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
             f"причина:\n{json_data['reason']}")
 
-        await MailingFunctionality.send_mail_logic(ADMIN_EMAIL, username, is_verification=False, is_report=True,
-                                                   report_body=report_body)
+        await MailingFunctionality.send_report_email(ADMIN_EMAIL, report_body)
         return {"message": "Folder successfully reported"}, 200
 
     @classmethod
