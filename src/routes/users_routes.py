@@ -36,3 +36,8 @@ def reset_password_route():
 @users_bp.put("/users/<user_id>")
 async def edit_user(user_id: str):
     return await c.edit_user(user_id)
+
+
+@users_bp.delete("/users/<user_id>")
+async def delete_user(user_id: str):
+    return await c.delete_user(user_id)

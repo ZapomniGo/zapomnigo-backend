@@ -11,6 +11,7 @@ class TemplateNames(Enum):
     RESET_PASSWORD = "reset_password"
     CHANGE_EMAIL = "change_email"
     CHANGE_PASSWORD = "change_password"
+    DELETE_USER = "delete-user"
 
 
 class MailingFunctionality:
@@ -30,6 +31,10 @@ class MailingFunctionality:
         "change_password": {
             "subject": "Промяна на парола",
             "template_path": 'resources/email_templates/BG_ChangedPassword.html'
+        },
+        "delete-user": {
+            "subject": "Изтриване на акаунт",
+            "template_path": 'resources/email_templates/BG_DeletedAccount.html'
         }
     }
 
@@ -98,6 +103,13 @@ class MailingFunctionality:
             template = cls.get_template(TemplateNames.CHANGE_PASSWORD.value)
 
         body_html = cls.generate_email_body(template["template_path"], username, token, is_verification_email=False)
+
+        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
+
+    @classmethod
+    async def send_delete_user_email(cls, email: str, username: str):
+        template = cls.get_template(TemplateNames.DELETE_USER.value)
+        body_html = cls.generate_email_body(template["template_path"], username)
 
         asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
 

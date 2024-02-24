@@ -5,6 +5,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
 
 from src.config import SECRET_KEY
+from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController
 from src.database.database_transaction_handlers import handle_database_session_transaction_async, \
     handle_database_session_transaction
@@ -115,6 +116,9 @@ class UsersController:
         if not username:
             return {"message": "No auth token provided"}, 499
 
+        if result := UtilityController.check_user_access(username):
+            return result
+
         user = UsersRepository.get_user_by_ulid(user_id)
         if not user:
             return {"message": "user doesn't exist"}, 404
@@ -143,3 +147,26 @@ class UsersController:
         await UsersFunctionality.send_emails(user, user_update_fields)
 
         return {"message": "user updated"}, 200
+
+    @classmethod
+    @handle_database_session_transaction_async
+    async def delete_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
+        """This method deletes a user from the database along with all the sets, folders and flashcards they have
+        created."""
+
+        # As this is an async func we cannot use the jwt_required decorator
+        username = AuthFunctionality.get_session_username_or_user_id(request)
+        if not username:
+            return {"message": "No auth token provided"}, 499
+
+        if result := UtilityController.check_user_access(username):
+            return result
+
+        user = UsersRepository.get_user_by_ulid(user_id)
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        CommonRepository.delete_object_from_db(user)
+        await MailingFunctionality.send_delete_user_email(user.email, user.username)
+
+        return {"message": "user deleted"}, 200
