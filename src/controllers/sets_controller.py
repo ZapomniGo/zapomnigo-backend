@@ -6,6 +6,7 @@ from ulid import ULID
 
 from src.config import ADMIN_EMAIL
 from src.controllers.utility_controller import UtilityController
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.models import Flashcards, ReviewsSets
 from src.database.models.sets import Sets
 from src.database.repositories.common_repository import CommonRepository
@@ -27,12 +28,11 @@ from src.utilities.parsers import validate_json_body
 class SetsController:
 
     @classmethod
+    @handle_database_session_transaction
     def add_set(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
-        if not user_id:
-            return {"message": "No token provided"}, 499
 
         if validation_errors := validate_json_body(json_data, SetsModel):
             return {"validation errors": validation_errors}, 422
@@ -103,6 +103,7 @@ class SetsController:
         return cls.get_all_sets(user_id)
 
     @classmethod
+    @handle_database_session_transaction
     def update_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
         set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
@@ -140,6 +141,7 @@ class SetsController:
         return {"message": "set successfully updated"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def delete_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         set_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(set_id)
 
@@ -154,6 +156,7 @@ class SetsController:
         return {"message": "Set successfully deleted"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def copy_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         set_obj = SetsRepository.get_set_by_id(set_id)
 
@@ -197,6 +200,7 @@ class SetsController:
         return {"flashcards": SetsFunctionality.display_study_info(flashcards)}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def create_studied_set(cls, set_id):
         set_obj = SetsRepository.get_set_by_id(set_id)
 
@@ -213,14 +217,15 @@ class SetsController:
 
     @classmethod
     async def report_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
+        # As this is an async func we cannot use the jwt_required decorator
+        username = AuthFunctionality.get_session_username_or_user_id(request)
+        if not username:
+            return {"message": "No auth token provided"}, 499
+
         json_data = request.get_json()
 
         if validation_errors := validate_json_body(json_data, ReportFolderSetModel):
             return {"validation errors": validation_errors}, 422
-
-        username = AuthFunctionality.get_session_username_or_user_id(request)
-        if not username:
-            return {"message": "No token provided"}, 499
 
         set_obj = SetsRepository.get_set_by_id(set_id)
         if not set_obj:
@@ -236,6 +241,7 @@ class SetsController:
         return {"message": "Report sent successfully"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def change_verified_status_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
@@ -252,6 +258,7 @@ class SetsController:
         return {"message": "set verified status changed successfully"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def add_set_to_folder(cls, set_id: str, folder_id: str) -> Tuple[Dict[str, Any], int]:
         set_obj = SetsRepository.get_set_by_id(set_id)
         if not set_obj:

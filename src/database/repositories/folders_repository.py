@@ -19,7 +19,6 @@ class FoldersRepository:
     @classmethod
     def change_verified_status_folder(cls, folder: Folders, verified: bool) -> None:
         folder.verified = verified
-        db.session.commit()
 
     @classmethod
     def _base_query(cls) -> Query:
@@ -112,7 +111,6 @@ class FoldersRepository:
     @classmethod
     def delete_folders_sets_by_folder_id(cls, folder_id: str) -> None:
         db.session.execute(delete(FoldersSets).where(FoldersSets.folder_id == folder_id))
-        db.session.commit()
 
     @event.listens_for(FoldersSets, 'after_delete')
     def receive_after_delete(mapper, connection, target):

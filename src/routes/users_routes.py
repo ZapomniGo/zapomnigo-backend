@@ -32,7 +32,7 @@ def refresh():
 def reset_password_route():
     return c.reset_password()
 
+
 @users_bp.put("/users/<user_id>")
-@jwt_required
-def edit_user(user_id: str):
-    return c.edit_uer(user_id)
+async def edit_user(user_id: str):
+    return await c.edit_user(user_id)

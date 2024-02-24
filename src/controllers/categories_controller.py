@@ -3,6 +3,7 @@ from typing import Tuple, Any, Dict
 from flask import request
 from ulid import ULID
 
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.models import Categories
 from src.database.repositories.categories_repository import CategoriesRepository
 from src.database.repositories.common_repository import CommonRepository
@@ -17,6 +18,7 @@ class CategoriesController:
         return Categories(category_id=str(ULID()), category_name=json_data.category_name.strip())
 
     @classmethod
+    @handle_database_session_transaction
     def add_category(cls):
         json_data = request.get_json()
 

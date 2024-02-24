@@ -3,49 +3,34 @@ from typing import Tuple, Dict, Any
 from flask import request, make_response, Response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
-from ulid import ULID
 
 from src.config import SECRET_KEY
 from src.controllers.verification_controller import VerificationController
-from src.database.models import Users, OrganizationsUsers
+from src.database.database_transaction_handlers import handle_database_session_transaction_async, \
+    handle_database_session_transaction
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.mailing_functionality import MailingFunctionality
+from src.functionality.users_functionallity import UsersFunctionality
 from src.pydantic_models.users_models import ResetPasswordModel, RegistrationModel, LoginModel, UpdateUser
 from src.utilities.parsers import validate_json_body
 
 
 class UsersController:
 
-    @staticmethod
-    def create_user(json_data: RegistrationModel) -> Users:
-        hashed_password = generate_password_hash(json_data.password).decode("utf-8")
-
-        return Users(user_id=str(ULID()), username=json_data.username,
-                     name=json_data.name, email=json_data.email,
-                     password=hashed_password, age=json_data.age,
-                     gender=json_data.gender,
-                     privacy_policy=json_data.privacy_policy,
-                     terms_and_conditions=json_data.terms_and_conditions,
-                     marketing_consent=json_data.marketing_consent)
-
     @classmethod
+    @handle_database_session_transaction_async
     async def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         if validation_errors := validate_json_body(json_data, RegistrationModel):
             return {"validation errors": validation_errors}, 422
 
-        user = cls.create_user(RegistrationModel(**json_data))
+        user = UsersFunctionality.create_user(RegistrationModel(**json_data))
         CommonRepository.add_object_to_db(user)
 
-        # if organization_id := json_data.get("organization", None):
-        #     obj = OrganizationsUsers(organization_user_id=str(ULID()),
-        #                              user_id=user.user_id, organization_id=str(organization_id))
-        #     CommonRepository.add_object_to_db(obj)
-
-        await MailingFunctionality.send_mail_logic(user.email, user.username)
+        await MailingFunctionality.send_verification_email(user.email, user.username)
         return {"message": "user added to db"}, 200
 
     @classmethod
@@ -55,7 +40,7 @@ class UsersController:
         if validation_errors := validate_json_body(json_data, LoginModel):
             return {"validation errors": validation_errors}, 422
 
-        user = cls.check_if_user_exists(json_data)
+        user = UsersFunctionality.check_if_user_exists(json_data)
         if not user:
             return {"message": "user doesn't exist"}, 404
 
@@ -103,6 +88,7 @@ class UsersController:
         return response
 
     @classmethod
+    @handle_database_session_transaction
     def reset_password(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
@@ -122,57 +108,38 @@ class UsersController:
         return {"message": "Your password has been changed"}, 200
 
     @classmethod
-    def check_if_user_exists(cls, json_data) -> Users | None:
-        email_or_username = json_data["email_or_username"]
-
-        if user := UsersRepository.get_user_by_username(email_or_username):
-            return user
-
-        elif user := UsersRepository.get_user_by_email(email_or_username):
-            return user
-
-        return None
-
-    @classmethod
-    async def edit_uer(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
-        json_data = request.get_json()
-
-        if validation_errors := validate_json_body(json_data, UpdateUser):
-            return {"validation errors": validation_errors}, 422
+    @handle_database_session_transaction_async
+    async def edit_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
+        # As this is an async func we cannot use the jwt_required decorator
+        username = AuthFunctionality.get_session_username_or_user_id(request)
+        if not username:
+            return {"message": "No auth token provided"}, 499
 
         user = UsersRepository.get_user_by_ulid(user_id)
         if not user:
             return {"message": "user doesn't exist"}, 404
 
+        json_data = request.get_json()
+        if validation_errors := validate_json_body(json_data, UpdateUser):
+            return {"validation errors": validation_errors}, 422
+
         user_update_fields = UpdateUser(**json_data)
 
         if user_update_fields.new_password and user_update_fields.password:
-            error_message, status_code = await cls.update_password(user, user_update_fields)
-            if error_message:
-                return error_message, status_code
+            if not check_password_hash(user.password, user_update_fields.password):
+                return {"message": "invalid password"}, 401
+
+            user_update_fields.password = generate_password_hash(user_update_fields.new_password).decode("utf-8")
 
         else:
             # Remove the password field if order to prevent updating the password without
             # passing the new_password as well
             user_update_fields.password = None
 
-        if user_update_fields.email:
-            if user_update_fields.email != user.email:
-                user_update_fields.verified = False
-                await MailingFunctionality.send_verification_email(user_update_fields.email, user.username,
-                                                                   verify_on_register=False)
+        if user_update_fields.email is not None and user_update_fields.email != user.email:
+            UsersRepository.change_verified_status(user, False)
 
         CommonRepository.edit_object(user, user_update_fields)
+        await UsersFunctionality.send_emails(user, user_update_fields)
 
         return {"message": "user updated"}, 200
-
-    @classmethod
-    async def update_password(cls, user, user_update_fields):
-        if not check_password_hash(user.password, user_update_fields.password):
-            return {"message": "invalid password"}, 401
-
-        hashed_password = generate_password_hash(user_update_fields.new_password).decode("utf-8")
-        user_update_fields.password = hashed_password
-        await MailingFunctionality.send_reset_password_email(user.email, user.username, is_change_password=True)
-
-        return None, None

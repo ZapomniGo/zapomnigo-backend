@@ -3,12 +3,14 @@ from typing import Tuple, Dict
 import jwt
 
 from src.config import SECRET_KEY
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.repositories.users_repository import UsersRepository
 
 
 class VerificationController:
 
     @classmethod
+    @handle_database_session_transaction
     def verify_user(cls, token) -> Tuple[Dict[str, str], int]:
         response, status_code = cls.verify_token(token)
         if status_code != 200:
@@ -18,7 +20,7 @@ class VerificationController:
         if not user:
             return {"message": "user doesn't exist"}, 404
 
-        UsersRepository.change_verified_status(user)
+        UsersRepository.change_verified_status(user, True)
         return {"message": "Your account has been verified"}, 200
 
     @classmethod

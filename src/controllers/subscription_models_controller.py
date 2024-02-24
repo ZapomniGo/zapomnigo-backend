@@ -3,6 +3,7 @@ from typing import Tuple, Dict, Any
 from flask import request
 from ulid import ULID
 
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.models import SubscriptionModels
 from src.database.repositories.common_repository import CommonRepository
 from src.pydantic_models.subscription_model import SubscriptionModel
@@ -17,6 +18,7 @@ class SubscriptionModelsController:
                                   subscription_model=json_data["subscription_model"])
 
     @classmethod
+    @handle_database_session_transaction
     def add_subscription_model(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 

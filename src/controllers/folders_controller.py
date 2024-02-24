@@ -5,6 +5,7 @@ from flask import request
 
 from src.config import ADMIN_EMAIL
 from src.controllers.utility_controller import UtilityController
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.sets_repository import SetsRepository
@@ -23,12 +24,11 @@ from src.utilities.parsers import validate_json_body
 class FoldersController:
 
     @classmethod
+    @handle_database_session_transaction
     def add_folder(cls):
         json_data = request.get_json()
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
-        if not user_id:
-            return {"message": "No token provided"}, 499
 
         if validation_errors := validate_json_body(json_data, FoldersModel):
             return {"validation errors": validation_errors}, 422
@@ -87,6 +87,7 @@ class FoldersController:
         return {"folder": folder_info, 'sets': sets_list, 'total_pages': sets.pages, 'current_page': sets.page}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def edit_folder(cls, folder_id: str):
         json_data = request.get_json()
 
@@ -113,6 +114,7 @@ class FoldersController:
         return {"message": "Folder successfully updated"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def delete_folder(cls, folder_id: str):
         folder_obj, creator_username = CommonRepository.get_set_or_folder_by_id_with_creator_username(folder_id,
                                                                                                       get_set=False)
@@ -133,9 +135,10 @@ class FoldersController:
         if validation_errors := validate_json_body(json_data, ReportFolderSetModel):
             return {"validation errors": validation_errors}, 422
 
+        # As this is an async func we cannot use the jwt_required decorator
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No token provided"}, 499
+            return {"message": "No auth token provided"}, 499
 
         folder_obj = FoldersRepository.get_folder_by_id(folder_id)
         if not folder_obj:
@@ -150,6 +153,7 @@ class FoldersController:
         return {"message": "Folder successfully reported"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def change_verified_status_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 

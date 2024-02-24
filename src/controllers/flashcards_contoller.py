@@ -4,11 +4,11 @@ from flask import request
 from ulid import ULID
 
 from src.controllers.utility_controller import UtilityController
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.models import ReviewsFlashcards
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.flashcards_repository import FlashcardsRepository
 from src.database.repositories.reviews_flashcards_repository import ReviewsFlashcardsRepository
-from src.database.repositories.sets_repository import SetsRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.pydantic_models.flashcards_model import UpdateFlashcardsModel, StudyFlashcardsModel
 from src.utilities.parsers import validate_json_body
@@ -33,6 +33,7 @@ class FlashcardsController:
             return result
 
     @classmethod
+    @handle_database_session_transaction
     def update_flashcard(cls, flashcard_id: str):
         json_data = request.get_json()
         flashcard = FlashcardsRepository.get_flashcard_by_id(flashcard_id)
@@ -50,6 +51,7 @@ class FlashcardsController:
         return {"message": "Flashcard successfully updated"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def delete_flashcard(cls, flashcard_id: str) -> Tuple[Dict[str, Any], int]:
         flashcard = FlashcardsRepository.get_flashcard_by_id(flashcard_id)
 
@@ -63,6 +65,7 @@ class FlashcardsController:
         return {"message": "Flashcard successfully deleted"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def study_flashcard(cls, flashcard_id):
         json_data = request.get_json()
         flashcard = FlashcardsRepository.get_flashcard_by_id(flashcard_id)

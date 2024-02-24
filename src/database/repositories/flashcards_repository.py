@@ -23,7 +23,7 @@ class FlashcardsRepository:
                                     ascending: bool = False) -> Pagination:
         if sort_by_date:
             order_by_clause = (desc(Flashcards.flashcard_creation_time),) if not ascending else (
-            asc(Flashcards.flashcard_creation_time),)
+                asc(Flashcards.flashcard_creation_time),)
         else:
             if ascending:
                 order_by_clause = asc(Flashcards.term), asc(Flashcards.flashcard_id)
@@ -60,5 +60,3 @@ class FlashcardsRepository:
 
         db.session.execute(
             delete(Flashcards).where(Flashcards.set_id == set_id))
-
-        db.session.commit()
