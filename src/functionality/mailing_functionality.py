@@ -1,12 +1,21 @@
 import asyncio
+from enum import Enum
 
 from src.config import IS_OFFLINE, IS_DEV, IS_PROD
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.services.mailer import send_email_background_task
 
 
-class EmailTemplates:
-    templates = {
+class TemplateNames(Enum):
+    REPORT = "report"
+    VERIFICATION = "verification"
+    RESET_PASSWORD = "reset_password"
+    CHANGE_EMAIL = "change_email"
+    CHANGE_PASSWORD = "change_password"
+
+
+class MailingFunctionality:
+    TEMPLATES = {
         "report": {
             "subject": "Докладване на сет/папка",
             "template_path": 'resources/email_templates/BG_Report.html'
@@ -31,10 +40,8 @@ class EmailTemplates:
 
     @classmethod
     def get_template(cls, template_name):
-        return cls.templates.get(template_name)
+        return cls.TEMPLATES.get(template_name)
 
-
-class MailingFunctionality:
     @classmethod
     def get_base_url(cls):
         if IS_OFFLINE:
@@ -45,21 +52,17 @@ class MailingFunctionality:
             return "https://zapomnigo.com"
 
     @classmethod
-    async def send_mail_logic(cls, email: str, username: str, template_name: str, report_body=None):
-        token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
-        template = EmailTemplates.get_template(template_name)
+    def generate_email_body(cls, template_path, username: str | None = None, token: str | None = None,
+                            is_verification_email: bool = True):
+        """If is_verification_email is true, the url in the email is for verifying the email.
+        If is_verification_email is false, the url in the email is for resetting the password."""
 
-        if template_name == "report":
-            body_html = report_body
-        else:
-            body_html = cls.generate_email_body(username, token, template["template_path"])
-
-        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
-
-    @classmethod
-    def generate_email_body(cls, username, token, template_path):
         base_url = cls.get_base_url()
-        url = f'{base_url}/app/{template_path.split("/")[-1].split(".")[0]}?token={token}'
+
+        if is_verification_email:
+            url = f"{base_url}/app/verify-email?token={token}"
+        else:
+            url = f"{base_url}/app/forgot-password?token={token}"
 
         html_content = cls.read_html_template(template_path)
         html_content = html_content.replace("{username}", username)
@@ -68,21 +71,40 @@ class MailingFunctionality:
 
         return html_content
 
+    # The asyncio.create_task is not awaited because the func is awaited in the controller
     @classmethod
-    async def send_change_email_logic(cls, email: str, username: str):
+    async def send_report_email(cls, email: str, report_body: str):
+        template = cls.get_template(TemplateNames.REPORT)
+
+        asyncio.create_task(send_email_background_task(email, template["subject"], report_body))
+
+    @classmethod
+    async def send_verification_email(cls, email: str, username: str, verify_on_register: bool = True):
+        """If verify_on_register is true, the email will be sent when the user registers or requests a
+        new verification email.
+        If verify_on_register is false, the email will be sent when the user changes their email."""
+
         token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
-        template = EmailTemplates.get_template("change_email")
+
+        if verify_on_register:
+            template = cls.get_template(TemplateNames.VERIFICATION)
+        else:
+            template = cls.get_template(TemplateNames.CHANGE_EMAIL)
 
         body_html = cls.generate_email_body(username, token, template["template_path"])
 
         asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
 
     @classmethod
-    async def send_change_password_logic(cls, email: str, username: str):
+    async def send_reset_password_email(cls, email: str, username: str, is_change_password: bool = False):
         token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
-        template = EmailTemplates.get_template("change_password")
 
-        body_html = cls.generate_email_body(username, token, template["template_path"])
+        if not is_change_password:
+            template = cls.get_template(TemplateNames.RESET_PASSWORD)
+        else:
+            template = cls.get_template(TemplateNames.CHANGE_PASSWORD)
+
+        body_html = cls.generate_email_body(template["template_path"], username, token, is_verification_email=False)
 
         asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
 
