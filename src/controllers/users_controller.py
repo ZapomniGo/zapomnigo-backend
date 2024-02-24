@@ -134,7 +134,7 @@ class UsersController:
         return None
 
     @classmethod
-    def edit_uer(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
+    async def edit_uer(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         if validation_errors := validate_json_body(json_data, UpdateUser):
@@ -147,25 +147,32 @@ class UsersController:
         user_update_fields = UpdateUser(**json_data)
 
         if user_update_fields.new_password and user_update_fields.password:
-            if not check_password_hash(user.password, user_update_fields.password):
-                return {"message": "invalid password"}, 401
+            error_message, status_code = await cls.update_password(user, user_update_fields)
+            if error_message:
+                return error_message, status_code
 
-            hashed_password = generate_password_hash(user_update_fields.new_password).decode("utf-8")
-            user_update_fields.password = hashed_password
-            # await MailingFunctionality.send_mail_logic(user_update_fields.email, user.username, is_verification=False)
+        else:
+            # Remove the password field if order to prevent updating the password without
+            # passing the new_password as well
+            user_update_fields.password = None
 
         if user_update_fields.email:
             if user_update_fields.email != user.email:
                 user_update_fields.verified = False
-                # await MailingFunctionality.send_mail_logic(user_update_fields.email, user.username)
+                await MailingFunctionality.send_verification_email(user_update_fields.email, user.username,
+                                                                   verify_on_register=False)
 
-        # As the fields which are not passed in the body are None,
-        # we should drop them from the update
-        fields_to_drop = []
-        for key, value in user_update_fields.model_dump().items():
-            if value is None:
-                fields_to_drop.append(key)
-
-        CommonRepository.edit_object(user, user_update_fields, fields_to_drop=fields_to_drop)
+        CommonRepository.edit_object(user, user_update_fields)
 
         return {"message": "user updated"}, 200
+
+    @classmethod
+    async def update_password(cls, user, user_update_fields):
+        if not check_password_hash(user.password, user_update_fields.password):
+            return {"message": "invalid password"}, 401
+
+        hashed_password = generate_password_hash(user_update_fields.new_password).decode("utf-8")
+        user_update_fields.password = hashed_password
+        await MailingFunctionality.send_reset_password_email(user.email, user.username, is_change_password=True)
+
+        return None, None
