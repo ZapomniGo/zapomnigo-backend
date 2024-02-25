@@ -170,3 +170,15 @@ class UsersController:
         await MailingFunctionality.send_delete_user_email(user.email, user.username)
 
         return {"message": "user deleted"}, 200
+
+    @classmethod
+    def export_user_data(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
+        user = UsersRepository.get_user_by_ulid(user_id)
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        if result := UtilityController.check_user_access(user.username):
+            return result
+
+        return {"user_info": UsersFunctionality.export_user_data(user)}, 200
+        # user_data = UsersFunctionality.export_user_data(user)

@@ -1,7 +1,13 @@
+from typing import Dict, Any
+
 from flask_bcrypt import generate_password_hash
+from sqlalchemy import select, Result
+from sqlalchemy.orm import joinedload, aliased
 from ulid import ULID
 
-from src.database.models import Users
+from src.database.models import Users, Sets, Flashcards, FoldersSets, Folders, Categories, Subcategories
+from src.database.models.base import db
+from src.database.repositories.sets_repository import SetsRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.mailing_functionality import MailingFunctionality
 from src.pydantic_models.users_models import UpdateUser, RegistrationModel
@@ -42,3 +48,42 @@ class UsersFunctionality:
             return user
 
         return None
+
+    @classmethod
+    def export_user_data(cls, user: Users) -> Dict[str, Any]:
+        user_sets: Result = db.session.execute(
+            select(
+                Sets, Flashcards
+            )
+            .join(Flashcards, Flashcards.set_id == Sets.set_id)
+            .join(Categories, Categories.category_id == Sets.set_category, isouter=True)
+            .join(Subcategories, Subcategories.subcategory_id == Sets.set_subcategory, isouter=True)
+            .where(Sets.user_id == user.user_id))
+        # sets_data = []
+        # for row_sets in user_sets:
+        #     sets_data.append({})
+
+        # # Query for user's folders and related sets
+        user_folders = db.session.execute(
+            select(Folders, Sets).join(FoldersSets, FoldersSets.folder_id == Folders.folder_id).join(Sets,
+                                                                                               FoldersSets.set_id == Sets.set_id).where(
+                Folders.user_id == user.user_id))
+
+        for row_folders in user_folders:
+            print(f"{row_folders.Folders.folder_id}, {row_folders.Sets.set_name}")
+
+        # Return the user's information, sets, and folders
+        return {
+            "user_info": {
+                "username": user.username,
+                "name": user.name,
+                "email": user.email,
+                "gender": user.gender,
+                "age": user.age,
+                "privacy_policy": user.privacy_policy,
+                "terms_and_conditions": user.terms_and_conditions,
+                "marketing_consent": user.marketing_consent
+            },
+            # "user_sets": sets_data,
+            # "user_folders": folders_data
+        }

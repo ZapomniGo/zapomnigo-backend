@@ -41,3 +41,9 @@ async def edit_user(user_id: str):
 @users_bp.delete("/users/<user_id>")
 async def delete_user(user_id: str):
     return await c.delete_user(user_id)
+
+
+# @users_bp.get("/users/<user_id>")
+# @jwt_required
+# def export_user_data(user_id: str):
+#     return c.export_user_data(user_id)
