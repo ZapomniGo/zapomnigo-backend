@@ -1,14 +1,12 @@
-from typing import Tuple, Any, Dict
-
 from flask import request
 from ulid import ULID
 
-from src.database.models import Categories, Subcategories, CategorySubcategories
+from src.database.database_transaction_handlers import handle_database_session_transaction
+from src.database.models import Subcategories, CategorySubcategories
 from src.database.repositories.categories_repository import CategoriesRepository
 from src.database.repositories.common_repository import CommonRepository
-from src.pydantic_models.categories_model import CategoriesModel, SubcategoriesModel, CategoriesWithSubcategoriesModel
+from src.pydantic_models.categories_model import SubcategoriesModel, CategoriesWithSubcategoriesModel
 from src.utilities.parsers import validate_json_body
-from src.pydantic_models.categories_model import UpdateCategoriesModel
 
 
 class SubcategoriesController:
@@ -18,6 +16,7 @@ class SubcategoriesController:
         return Subcategories(subcategory_id=str(ULID()), subcategory_name=json_data.subcategory_name.strip())
 
     @classmethod
+    @handle_database_session_transaction
     def add_subcategory(cls):
         json_data = request.get_json()
 
@@ -29,6 +28,7 @@ class SubcategoriesController:
         return {"message": "Subcategory added to db"}, 200
 
     @classmethod
+    @handle_database_session_transaction
     def create_subcategories_for_category(cls, category_id: str):
         json_data = request.get_json()
 

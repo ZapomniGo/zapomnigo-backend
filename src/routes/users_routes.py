@@ -3,6 +3,7 @@ from typing import Tuple, Dict, Any
 from flask import Blueprint, Response
 
 from src.controllers.users_controller import UsersController as c
+from src.functionality.auth.jwt_decorators import jwt_required
 
 users_bp = Blueprint("users", __name__)
 
@@ -30,3 +31,19 @@ def refresh():
 @users_bp.post("/forgot-password")
 def reset_password_route():
     return c.reset_password()
+
+
+@users_bp.put("/users/<user_id>")
+async def edit_user(user_id: str):
+    return await c.edit_user(user_id)
+
+
+@users_bp.delete("/users/<user_id>")
+async def delete_user(user_id: str):
+    return await c.delete_user(user_id)
+
+
+# @users_bp.get("/users/<user_id>")
+# @jwt_required
+# def export_user_data(user_id: str):
+#     return c.export_user_data(user_id)

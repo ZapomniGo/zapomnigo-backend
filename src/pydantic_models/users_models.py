@@ -1,9 +1,9 @@
 import string
-from typing import Literal, Optional
+from typing import Literal, Optional, Annotated
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
-from src.pydantic_models.common import NAME, PASSWORD, ID
+from src.pydantic_models.common import NAME, PASSWORD, ID, AGE
 
 
 class RegistrationModel(BaseModel):
@@ -11,7 +11,7 @@ class RegistrationModel(BaseModel):
     username: NAME
     email: EmailStr
     password: PASSWORD
-    age: int = Field(..., gt=5, le=99)
+    age: AGE
     gender: Literal["M", "F", "O"]
     organization: Optional[ID] = None
     privacy_policy: bool
@@ -20,6 +20,33 @@ class RegistrationModel(BaseModel):
 
     @field_validator("password")
     def validate_password(cls, value):
+        if not any(c.isupper() for c in value):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not any(c.islower() for c in value):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not any(c.isdigit() for c in value):
+            raise ValueError("Password must contain at least one digit")
+
+        return value
+
+
+class UpdateUser(BaseModel):
+    name: Optional[NAME] = None
+    username: Optional[NAME] = None
+    email: Optional[EmailStr] = None
+    password: Optional[PASSWORD] = None
+    new_password: Optional[PASSWORD] = None
+    age: Optional[AGE] = None
+    gender: Optional[Literal["M", "F", "O"]] = None
+    organization: Optional[ID] = None
+    privacy_policy: Optional[bool] = None
+    terms_and_conditions: Optional[bool] = None
+    marketing_consent: Optional[bool] = None
+
+    @field_validator("password")
+    def validate_password(cls, value):
+        if not value:
+            return None
         if not any(c.isupper() for c in value):
             raise ValueError("Password must contain at least one uppercase letter")
         if not any(c.islower() for c in value):

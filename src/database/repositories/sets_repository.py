@@ -23,7 +23,6 @@ class SetsRepository:
     @classmethod
     def change_verified_status_set(cls, set_obj: Sets, verified: bool) -> None:
         set_obj.verified = verified
-        db.session.commit()
 
     @classmethod
     def _base_query(cls) -> Query:

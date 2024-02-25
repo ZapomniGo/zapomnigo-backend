@@ -7,7 +7,6 @@ from src.database.repositories.folders_repository import FoldersRepository
 from src.database.repositories.sets_repository import SetsRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
 from src.functionality.common import CommonFunctionality
-from src.utilities.parsers import arg_to_bool
 
 
 class UtilityController:
@@ -21,7 +20,7 @@ class UtilityController:
         """Returns a JSON Response if there is an error or the user doesn't have access"""
         logged_in_username = AuthFunctionality.get_session_username_or_user_id(request)
         if not logged_in_username:
-            return {"message": "No username provided"}, 400
+            return {"message": "No auth token provided"}, 400
 
         if logged_in_username == ADMIN_USERNAME or logged_in_username == username:
             return None

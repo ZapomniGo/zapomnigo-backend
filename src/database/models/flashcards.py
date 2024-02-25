@@ -15,7 +15,7 @@ class Flashcards(db.Model):
     flashcard_creation_time: Mapped[str] = mapped_column(String(40), nullable=True)
 
     # Creates a bidirectional relationship between tables
-    sets: Mapped["Sets"] = relationship(back_populates="flashcards")
+    sets: Mapped[List["Sets"]] = relationship(back_populates="flashcards")
     liked_flashcards: Mapped[List["LikedFlashcards"]] = relationship(back_populates="flashcards", cascade="all")
     reviews_flashcards: Mapped[List["ReviewsFlashcards"]] = relationship(back_populates="flashcards", cascade="all")
 

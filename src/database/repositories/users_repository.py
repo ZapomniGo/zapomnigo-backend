@@ -19,12 +19,10 @@ class UsersRepository:
         return db.session.query(Users).filter_by(email=email).first()
 
     @classmethod
-    def change_verified_status(cls, user: Users) -> None:
-        user.verified = True
-        db.session.commit()
+    def change_verified_status(cls, user: Users, verified: bool) -> None:
+        user.verified = verified
+
     @classmethod
     def reset_password(cls, user: Users, new_password: str) -> None:
-        hashed_password = generate_password_hash(new_password).decode(
-            "utf-8")
+        hashed_password = generate_password_hash(new_password).decode("utf-8")
         user.password = hashed_password
-        db.session.commit()

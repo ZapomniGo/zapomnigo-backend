@@ -21,5 +21,3 @@ class ReviewsFlashcardsRepository:
             set_obj.confidence -= 1
         else:
             set_obj.confidence += 1
-
-        db.session.commit()
