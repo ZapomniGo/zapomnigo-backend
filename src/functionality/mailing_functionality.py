@@ -60,7 +60,7 @@ class MailingFunctionality:
         base_url = cls.get_base_url()
 
         if is_verification_email:
-            url = f"{base_url}/app/verify-email?token={token}"
+            url = f"{base_url}/app/verify?token={token}"
         else:
             url = f"{base_url}/app/forgot-password?token={token}"
 
