@@ -1,13 +1,10 @@
-from typing import Dict, Any
+from collections import defaultdict
+from typing import Dict, Any, List
 
 from flask_bcrypt import generate_password_hash
-from sqlalchemy import select, Result
-from sqlalchemy.orm import joinedload, aliased
 from ulid import ULID
 
-from src.database.models import Users, Sets, Flashcards, FoldersSets, Folders, Categories, Subcategories
-from src.database.models.base import db
-from src.database.repositories.sets_repository import SetsRepository
+from src.database.models import Users
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.mailing_functionality import MailingFunctionality
 from src.pydantic_models.users_models import UpdateUser, RegistrationModel
@@ -51,28 +48,12 @@ class UsersFunctionality:
 
     @classmethod
     def export_user_data(cls, user: Users) -> Dict[str, Any]:
-        user_sets: Result = db.session.execute(
-            select(
-                Sets, Flashcards
-            )
-            .join(Flashcards, Flashcards.set_id == Sets.set_id)
-            .join(Categories, Categories.category_id == Sets.set_category, isouter=True)
-            .join(Subcategories, Subcategories.subcategory_id == Sets.set_subcategory, isouter=True)
-            .where(Sets.user_id == user.user_id))
-        # sets_data = []
-        # for row_sets in user_sets:
-        #     sets_data.append({})
+        user_sets = UsersRepository.get_user_sets(user.user_id)
+        user_folders = UsersRepository.get_user_folders(user.user_id)
 
-        # # Query for user's folders and related sets
-        user_folders = db.session.execute(
-            select(Folders, Sets).join(FoldersSets, FoldersSets.folder_id == Folders.folder_id).join(Sets,
-                                                                                               FoldersSets.set_id == Sets.set_id).where(
-                Folders.user_id == user.user_id))
+        sets_data = cls.display_user_sets(user_sets)
+        folders_data = cls.display_user_folders(user_folders)
 
-        for row_folders in user_folders:
-            print(f"{row_folders.Folders.folder_id}, {row_folders.Sets.set_name}")
-
-        # Return the user's information, sets, and folders
         return {
             "user_info": {
                 "username": user.username,
@@ -84,6 +65,45 @@ class UsersFunctionality:
                 "terms_and_conditions": user.terms_and_conditions,
                 "marketing_consent": user.marketing_consent
             },
-            # "user_sets": sets_data,
-            # "user_folders": folders_data
+            "user_sets": sets_data,
+            "user_folders": list(folders_data.values())
         }
+
+    @classmethod
+    def display_user_folders(cls, user_folders):
+        folders_data = defaultdict(lambda: defaultdict(list))
+        for row_folders in user_folders:
+            folder_id = row_folders.Folders.folder_id
+            folders_data[folder_id]["folder_id"] = folder_id
+            folders_data[folder_id]["folder_title"] = row_folders.Folders.folder_title
+            folders_data[folder_id]["folder_description"] = row_folders.Folders.folder_description
+            folders_data[folder_id][
+                "category"] = row_folders.Categories.category_name if row_folders.Categories else None
+            folders_data[folder_id][
+                "subcategory"] = row_folders.Subcategories.subcategory_name if row_folders.Subcategories else None
+            folders_data[folder_id]["sets"].append({
+                "set_id": row_folders.Sets.set_id,
+                "set_name": row_folders.Sets.set_name,
+                "set_description": row_folders.Sets.set_description
+            })
+
+        # Convert defaultdict to regular dict for JSON serialization
+        folders_data = {k: dict(v) for k, v in folders_data.items()}
+        return folders_data
+
+    @classmethod
+    def display_user_sets(cls, user_sets) -> List[Dict[str, Any]]:
+        sets_data = []
+        for row_sets in user_sets:
+            sets_data.append({"set_id": row_sets.Sets.set_id,
+                              "set_name": row_sets.Sets.set_name,
+                              "set_description": row_sets.Sets.set_description,
+                              "category": row_sets.Categories.category_name if row_sets.Categories else None,
+                              "subcategory": row_sets.Subcategories.subcategory_name if row_sets.Subcategories else None,
+                              "flashcards": [{"flashcard_id": row_flashcards.flashcard_id,
+                                              "term": row_flashcards.term,
+                                              "definition": row_flashcards.definition,
+                                              "notes": row_flashcards.notes} for row_flashcards in
+                                             row_sets.Sets.flashcards]})
+
+        return sets_data
