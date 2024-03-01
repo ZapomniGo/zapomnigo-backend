@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import String, Boolean, Integer
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
@@ -24,11 +26,11 @@ class Users(db.Model):
     # Creates a bidirectional relationship between tables
     # subscription_models: Mapped["SubscriptionModels"] = relationship(back_populates="users", cascade="all")
     organizations_users: Mapped["OrganizationsUsers"] = relationship(back_populates="users", cascade="all")
-    sets: Mapped["Sets"] = relationship(back_populates="users", cascade="all")
+    sets: Mapped[List["Sets"]] = relationship(back_populates="users", cascade="all")
     comments: Mapped["Comments"] = relationship(back_populates="users", cascade="all")
-    folders: Mapped["Folders"] = relationship(back_populates="users", cascade="all")
+    folders: Mapped[List["Folders"]] = relationship(back_populates="users", cascade="all")
     preferences: Mapped["Preferences"] = relationship(back_populates="users", cascade="all")
     liked_sets: Mapped["LikedSets"] = relationship(back_populates="users", cascade="all")
-    reviews_sets: Mapped["ReviewsSets"] = relationship(back_populates="users", cascade="all")
+    reviews_sets: Mapped[List["ReviewsSets"]] = relationship(back_populates="users", cascade='all')
     liked_flashcards: Mapped["LikedFlashcards"] = relationship(back_populates="users", cascade="all")
-    reviews_flashcards: Mapped["ReviewsFlashcards"] = relationship(back_populates="users", cascade="all")
+    reviews_flashcards: Mapped[List["ReviewsFlashcards"]] = relationship(back_populates="users", cascade="all")
