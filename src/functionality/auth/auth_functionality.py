@@ -5,7 +5,7 @@ from flask import Request
 from flask_bcrypt import check_password_hash
 from jwt import decode, encode
 
-from src.config import ADMIN_EMAIL, ADMIN_PASSWORD, DevConfig, IS_OFFLINE, \
+from src.config import ADMIN_EMAIL, DevConfig, IS_OFFLINE, \
     ProdConfig, SECRET_KEY, ADMIN_USERNAME
 from src.database.models import Users
 from src.database.repositories.organizations_users_repository import \

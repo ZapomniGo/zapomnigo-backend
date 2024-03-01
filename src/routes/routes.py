@@ -3,7 +3,7 @@ from typing import List
 from flask import Blueprint, Flask
 
 from src.routes.categories_routes import categories_bp
-from src.routes.flashcards import flashcards_bp
+from src.routes.flashcards_routes import flashcards_bp
 from src.routes.folders_routes import folders_bp
 from src.routes.organizations_routes import organizations_bp
 from src.routes.sets_routes import sets_bp

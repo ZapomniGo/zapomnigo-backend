@@ -72,6 +72,7 @@ class SetsRepository:
             folder_id (str): If provided, fetch sets in the given folder (default is an empty string).
             sort_by_date (bool): If True (default), the sets are ordered by creation date.
             ascending (bool): If True, the sets are ordered in ascending order, else in descending order.
+            search_terms (str): If provided, fetch sets that match the search terms (default is None).
 
         Returns:
             Pagination: A paginated result containing sets based on the specified parameters.

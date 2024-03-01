@@ -197,7 +197,9 @@ class SetsController:
                                                                       user_id=user_id, is_study=True,
                                                                       sort_by_date=sort_by_date, ascending=ascending)
 
-        return {"flashcards": SetsFunctionality.display_study_info(flashcards)}, 200
+        return {"flashcards": SetsFunctionality.display_study_info(flashcards), 'total_pages': flashcards.pages,
+                'current_page': flashcards.page,
+                "total_items": flashcards.total}, 200
 
     @classmethod
     @handle_database_session_transaction
