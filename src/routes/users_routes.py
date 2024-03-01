@@ -4,6 +4,7 @@ from flask import Blueprint, Response
 
 from src.controllers.users_controller import UsersController as c
 from src.functionality.auth.jwt_decorators import jwt_required
+from src.limiter import limiter
 
 users_bp = Blueprint("users", __name__)
 
@@ -43,7 +44,8 @@ async def delete_user(user_id: str):
     return await c.delete_user(user_id)
 
 
-# @users_bp.get("/users/<user_id>")
-# @jwt_required
-# def export_user_data(user_id: str):
-#     return c.export_user_data(user_id)
+@users_bp.get("/users/<user_id>")
+@jwt_required
+@limiter.limit("1/week")
+def export_user_data(user_id: str):
+    return c.export_user_data(user_id)
