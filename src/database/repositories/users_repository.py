@@ -44,12 +44,11 @@ class UsersRepository:
     @classmethod
     def get_user_folders(cls, user_id: str) -> Result:
         user_folders: Result = db.session.execute(
-            select(FoldersSets, Folders, Categories, Subcategories, Sets).distinct().join(Folders,
-                                                                                          Folders.folder_id == FoldersSets.folder_id).join(
-                Sets, (Sets.set_id == FoldersSets.set_id) & (Sets.user_id == Folders.user_id)).join(Categories,
-                                                                                                    Categories.category_id == Folders.category_id,
-                                                                                                    isouter=True).join(
-                Subcategories, Subcategories.subcategory_id == Folders.subcategory_id, isouter=True).where(
-                Folders.user_id == user_id))
+            select(FoldersSets, Folders, Categories, Subcategories, Sets).distinct()
+            .join(Folders, Folders.folder_id == FoldersSets.folder_id)
+            .join(Sets, (Sets.set_id == FoldersSets.set_id) & (Sets.user_id == Folders.user_id))
+            .join(Categories, Categories.category_id == Folders.category_id, isouter=True)
+            .join(Subcategories, Subcategories.subcategory_id == Folders.subcategory_id, isouter=True)
+            .where(Folders.user_id == user_id))
 
         return user_folders

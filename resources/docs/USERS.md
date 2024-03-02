@@ -20,7 +20,6 @@
     - 200: `{"message": "user added to db"}`
     - 422: `{"validation errors": {...}}`
     - 409: `{"error": "unique constraint violation message"}`
-    - 499: `{"message": "Invalid or missing auth token."}`
 
 2. `POST /login`
 
@@ -37,9 +36,8 @@
     - 200: `{"message": "user logged in", "access_token": "access_token", "refresh_token": "refresh_token"}`
     - 401: `{"message": "invalid password"}`
     - 404: `{"message": "user doesn't exist"}`
-    - 498: `{"message": "Auth token expired."}`
-    - 401: `{"message": "Invalid token signature."}`
-    - 499: `{"message": "Invalid or missing auth token."}`
+    - 401: `{"message": "invalid password"}`
+    - 418: `{"user_info": {"email": user.email,"user_id": user.user_id,"username": user.username}}` - if user is not verified
 
 3. `POST /logout`
 
@@ -47,7 +45,6 @@
 
    Responses:
     - 200: `{"message": "user logged out"}`
-    - 499: `{"message": "Invalid or missing auth token."}`
 
 4. `POST /refresh`
 
@@ -73,7 +70,9 @@
    Responses:
     - 200: `{"message": "Your password has been changed"}`
     - 422: `{"validation errors": {...}}`
-    - 409: `{"error": "unique constraint violation message"}`
+    - 404: `{"message": "user doesn't exist"}`
+    - 498: `{"message": "Auth token expired."}`
+    - 401: `{"message": "Invalid token signature."}`
     - 499: `{"message": "Invalid or missing auth token."}`
 
 6. `PUT /users/<user_id>`
@@ -100,7 +99,11 @@
     - 200: `{"message": "user updated"}`
     - 422: `{"validation errors": {...}}`
     - 409: `{"error": "unique constraint violation message"}`
+    - 498: `{"message": "Auth token expired."}`
+    - 404: `{"message": "user doesn't exist"}`
+    - 401: `{"message": "Invalid token signature."}`
     - 499: `{"message": "Invalid or missing auth token."}`
+    - 403: `{"message": "Admin privileges required."}`
 
 7. `DELETE /users/<user_id>`
 
@@ -109,8 +112,10 @@
    Responses:
     - 200: `{"message": "user deleted"}`
     - 404: `{"message": "user doesn't exist"}`
-    - 409: `{"error": "unique constraint violation message"}`
+    - 401: `{"message": "Invalid token signature."}`
     - 499: `{"message": "Invalid or missing auth token."}`
+    - 403: `{"message": "Admin privileges required."}`
+
 
 8. `GET /users/<user_id>`
 
@@ -119,6 +124,7 @@
    Responses:
     - 200: `{"user_info": {...}}`
     - 404: `{"message": "user doesn't exist"}`
-    - 409: `{"error": "unique constraint violation message"}`
+    - 401: `{"message": "Invalid token signature."}`
     - 499: `{"message": "Invalid or missing auth token."}`
+    - 403: `{"message": "Admin privileges required."}`
 
