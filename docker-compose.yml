@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  py-api:
+    build: 
+      context: ./zapomnigo-backend
+      target: final
+    container_name: py-api  
+    env_file: ".env"
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./zapomnigo-backend/data/certs:/app/data/certs
+    networks:
+      - zapomnigo-network
+
+  react-app:
+    build: ./zapomnigo-client
+    container_name: react-app
+    env_file:
+      - ".env"
+    expose:
+      - "443"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./zapomnigo-client/data/certs:/etc/nginx/certs
+    networks:
+      - zapomnigo-network
+
+networks:
+  zapomnigo-network:
+    driver: bridge
