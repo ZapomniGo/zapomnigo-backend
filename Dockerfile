@@ -14,4 +14,4 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 EXPOSE 8000
 
-CMD ["hypercorn", "src.main:asgi_app", "--bind","0.0.0.0:8000", "--workers", "4"]
+CMD ["hypercorn", "src.main:asgi_app", "--bind","0.0.0.0:8000", "--certfile", "data/certs/zapomnigo.crt", "--keyfile", "data/certs/zapomnigo.key", "--workers", "4"]

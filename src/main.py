@@ -1,3 +1,5 @@
+import ssl
+
 from asgiref.wsgi import WsgiToAsgi
 from flask import Flask
 from flask_cors import CORS
@@ -46,7 +48,9 @@ asgi_app = WsgiToAsgi(create_app())
 
 
 def start() -> None:
-    create_app().run(host="0.0.0.0", port=3884)
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_context.load_cert_chain(certfile='data/certs/zapomnigo.crt', keyfile='data/certs/zapomnigo.key')
+    create_app().run(host="0.0.0.0", port=3884, ssl_context=ssl_context)
 
 
 if __name__ == '__main__':
