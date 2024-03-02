@@ -63,4 +63,22 @@ Responses:
   }
 }
 ```
-* 400: {"message": "No search query provided"}
+* 400: `{"message": "No search query provided"}`
+
+### `POST /send-email?verification=true` - sends an email to a registered user
+If verification=false a forgot-password email will be send
+Example body:
+```json
+{"email": "test@test.com"}
+```
+Responses:
+* 200
+```json
+{
+    "message": "Email send to test@test.com"
+}
+```
+- 422: `{"validation errors": {...}}`
+* 404 
+`{"message": "invalid argument provided"}` or `{"message": "user doesn't exist"}`
+- 429: `{"message": "Rate limit exceeded."}`

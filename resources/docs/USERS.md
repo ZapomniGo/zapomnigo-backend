@@ -37,7 +37,8 @@
     - 401: `{"message": "invalid password"}`
     - 404: `{"message": "user doesn't exist"}`
     - 401: `{"message": "invalid password"}`
-    - 418: `{"user_info": {"email": user.email,"user_id": user.user_id,"username": user.username}}` - if user is not verified
+    - 418: `{"user_info": {"email": user.email,"user_id": user.user_id,"username": user.username}}` - if user is not
+      verified
 
 3. `POST /logout`
 
@@ -127,4 +128,4 @@
     - 401: `{"message": "Invalid token signature."}`
     - 499: `{"message": "Invalid or missing auth token."}`
     - 403: `{"message": "Admin privileges required."}`
-
+    - 429: `{"message": "Rate limit exceeded."}`
