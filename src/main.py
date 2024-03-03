@@ -48,12 +48,16 @@ def create_app() -> Flask:
     return app
 
 
+app = create_app()
+
+
 def start() -> None:
     # This is when you do poetry run start
     ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     ssl_context.load_cert_chain(certfile='data/certs/zapomnigo.crt', keyfile='data/certs/zapomnigo.key')
     # Start Celery worker and beat services
-    subprocess.Popen(["celery", "-A", "src.celery_task_queue.make_celery", "worker", "--autoscale=8,1", "--loglevel", "INFO"])
+    subprocess.Popen(
+        ["celery", "-A", "src.celery_task_queue.make_celery", "worker", "--autoscale=8,1", "--loglevel", "INFO"])
     subprocess.Popen(["celery", "-A", "src.celery_task_queue.make_celery", "beat", "--loglevel", "INFO"])
     create_app().run(host="0.0.0.0", port=3884, ssl_context=ssl_context)
 
