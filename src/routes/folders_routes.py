@@ -43,9 +43,10 @@ def get_all_folders_for_user(user_id: str) -> Tuple[Dict[str, Any], int]:
 
 
 @folders_bp.post("/folders/<folder_id>/report")
+@jwt_required
 @limiter.limit("60/hour")
-async def report_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
-    return await c.report_folder(folder_id)
+def report_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.report_folder(folder_id)
 
 
 @folders_bp.post("/folders/<folder_id>/verify")

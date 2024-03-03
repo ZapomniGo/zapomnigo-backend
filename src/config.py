@@ -12,6 +12,8 @@ IS_DEV = eval_bool(getenv("IS_DEV", False))
 ADMIN_EMAIL = getenv("ADMIN_EMAIL")
 ADMIN_USERNAME = getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = getenv("ADMIN_PASSWORD")
+CELERY_BROKER_URL = getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = getenv("CELERY_RESULT_BACKEND")
 
 if IS_OFFLINE:
     SECRET_KEY = getenv("DEV_SECRET_KEY")
@@ -26,12 +28,16 @@ class DevConfig:
         SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
     else:
         SQLALCHEMY_DATABASE_URI = getenv("DEV_DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
+    CELERY_BROKER_URL = CELERY_BROKER_URL
+    CELERY_RESULT_BACKEND = CELERY_RESULT_BACKEND
 
 
 class LocalConfig:
     SECRET_KEY = SECRET_KEY
     SQLALCHEMY_DATABASE_URI = getenv("LOCAL_DATABASE_URI")
     DEBUG = True
+    CELERY_BROKER_URL = CELERY_BROKER_URL
+    CELERY_RESULT_BACKEND = CELERY_RESULT_BACKEND
 
 
 class ProdConfig:
@@ -40,3 +46,5 @@ class ProdConfig:
         SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
     else:
         SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
+    CELERY_BROKER_URL = CELERY_BROKER_URL
+    CELERY_RESULT_BACKEND = CELERY_RESULT_BACKEND

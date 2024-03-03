@@ -13,6 +13,7 @@ class UtilityController:
 
     @staticmethod
     def get_health() -> Tuple[Dict[str, str], int]:
+        raise Exception("test")
         return {"status": "healthy"}, 200
 
     @classmethod
@@ -20,7 +21,7 @@ class UtilityController:
         """Returns a JSON Response if there is an error or the user doesn't have access"""
         logged_in_username = AuthFunctionality.get_session_username_or_user_id(request)
         if not logged_in_username:
-            return {"message": "No auth token provided"}, 400
+            return {"message": "Username is not provided in the auth token"}, 400
 
         if logged_in_username == ADMIN_USERNAME or logged_in_username == username:
             return None

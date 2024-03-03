@@ -26,6 +26,8 @@ asgiref = "^3.7.2"
 aiosmtplib = "^3.0.1"
 flask-limiter = "^3.5.0"
 lxml = "^5.1.0"
+celery = "^5.3.6"
+redis = "^5.0.2"
 
 [tool.poetry.scripts]
 start = "src.main:start"

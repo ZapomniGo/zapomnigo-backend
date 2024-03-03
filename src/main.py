@@ -5,6 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 
+from src.celery_tasks.initializer import celery_init_app
 from src.config import DevConfig, ProdConfig, IS_OFFLINE, LocalConfig, IS_PROD, IS_DEV
 from src.database.models.base import db
 from src.limiter import limiter
@@ -17,10 +18,12 @@ migrate = Migrate(directory="database/migrations")
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     CORS(app, resources={r"/api/v1/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173",
-                                                "https://dev-client-zapomnigo-192299046f7f.herokuapp.com",
-                                                "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com",
-                                                "https://www.zapomnigo.com",
-                                                "https://zapomnigo.com"]}}
+                                                    "https://dev-client-zapomnigo-192299046f7f.herokuapp.com",
+                                                    "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com",
+                                                    "https://www.zapomnigo.com",
+                                                    "https://zapomnigo.com",
+                                                    "https://dev.zapomnigo.com",
+                                                    "https://localhost"]}}
          , supports_credentials=True)
 
     if IS_OFFLINE and not IS_PROD and not IS_DEV:
@@ -36,6 +39,7 @@ def create_app() -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     limiter.init_app(app)
+    celery_init_app(app)
 
     # Creates tables in the database based on the models if they don't exist
     with app.app_context():
@@ -44,10 +48,8 @@ def create_app() -> Flask:
     return app
 
 
-asgi_app = WsgiToAsgi(create_app())
-
-
 def start() -> None:
+    # This is when you do poetry run start
     ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     ssl_context.load_cert_chain(certfile='data/certs/zapomnigo.crt', keyfile='data/certs/zapomnigo.key')
     create_app().run(host="0.0.0.0", port=3884, ssl_context=ssl_context)

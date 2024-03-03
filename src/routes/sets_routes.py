@@ -62,9 +62,10 @@ def create_studied_set(set_id: str):
 
 
 @sets_bp.post("/sets/<set_id>/report")
+@jwt_required
 @limiter.limit("60/hour")
-async def report_set(set_id: str) -> Tuple[Dict[str, Any], int]:
-    return await c.report_set(set_id)
+def report_set(set_id: str) -> Tuple[Dict[str, Any], int]:
+    return c.report_set(set_id)
 
 
 @sets_bp.post("/sets/<set_id>/verify")

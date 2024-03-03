@@ -7,8 +7,7 @@ from jwt import decode
 from src.config import SECRET_KEY
 from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController
-from src.database.database_transaction_handlers import handle_database_session_transaction_async, \
-    handle_database_session_transaction
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
@@ -21,8 +20,8 @@ from src.utilities.parsers import validate_json_body
 class UsersController:
 
     @classmethod
-    @handle_database_session_transaction_async
-    async def register_user(cls) -> Tuple[Dict[str, Any], int]:
+    @handle_database_session_transaction
+    def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         if validation_errors := validate_json_body(json_data, RegistrationModel):
@@ -31,7 +30,7 @@ class UsersController:
         user = UsersFunctionality.create_user(RegistrationModel(**json_data))
         CommonRepository.add_object_to_db(user)
 
-        await MailingFunctionality.send_verification_email(user.email, user.username)
+        MailingFunctionality.send_verification_email(user.email, user.username)
         return {"message": "user added to db"}, 200
 
     @classmethod
@@ -109,12 +108,11 @@ class UsersController:
         return {"message": "Your password has been changed"}, 200
 
     @classmethod
-    @handle_database_session_transaction_async
-    async def edit_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
-        # As this is an async func we cannot use the jwt_required decorator
+    @handle_database_session_transaction
+    def edit_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No auth token provided"}, 499
+            return {"message": "Username is not provided in the auth token"}, 499
 
         if result := UtilityController.check_user_access(username):
             return result
@@ -144,20 +142,19 @@ class UsersController:
             UsersRepository.change_verified_status(user, False)
 
         CommonRepository.edit_object(user, user_update_fields)
-        await UsersFunctionality.send_emails(user, user_update_fields)
+        UsersFunctionality.send_emails(user, user_update_fields)
 
         return {"message": "user updated"}, 200
 
     @classmethod
-    @handle_database_session_transaction_async
-    async def delete_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
+    @handle_database_session_transaction
+    def delete_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
         """This method deletes a user from the database along with all the sets, folders and flashcards they have
         created."""
 
-        # As this is an async func we cannot use the jwt_required decorator
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No auth token provided"}, 499
+            return {"message": "Username is not provided in the auth token"}, 499
 
         if result := UtilityController.check_user_access(username):
             return result
@@ -167,7 +164,7 @@ class UsersController:
             return {"message": "user doesn't exist"}, 404
 
         CommonRepository.delete_object_from_db(user)
-        await MailingFunctionality.send_delete_user_email(user.email, user.username)
+        MailingFunctionality.send_delete_user_email(user.email, user.username)
 
         return {"message": "user deleted"}, 200
 

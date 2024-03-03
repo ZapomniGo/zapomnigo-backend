@@ -3,7 +3,7 @@ from enum import Enum
 
 from src.config import IS_OFFLINE, IS_DEV, IS_PROD
 from src.functionality.auth.auth_functionality import AuthFunctionality
-from src.services.mailer import send_email_background_task
+from src.celery_tasks.tasks.mailer import send_email_background_task
 
 
 class TemplateNames(Enum):
@@ -73,11 +73,11 @@ class MailingFunctionality:
 
     # The asyncio.create_task is not awaited because the func is awaited in the controller
     @classmethod
-    async def send_report_email(cls, email: str, report_body: str):
-        asyncio.create_task(send_email_background_task(email, "Докладване на сет/папка", report_body))
+    def send_report_email(cls, email: str, report_body: str):
+        send_email_background_task.delay(email, "Докладване на сет/папка", report_body)
 
     @classmethod
-    async def send_verification_email(cls, email: str, username: str, verify_on_register: bool = True):
+    def send_verification_email(cls, email: str, username: str, verify_on_register: bool = True):
         """If verify_on_register is true, the email will be sent when the user registers or requests a
         new verification email.
         If verify_on_register is false, the email will be sent when the user changes their email."""
@@ -91,10 +91,10 @@ class MailingFunctionality:
 
         body_html = cls.generate_email_body(template["template_path"], username, token)
 
-        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
+        send_email_background_task.delay(email, template["subject"], body_html)
 
     @classmethod
-    async def send_reset_password_email(cls, email: str, username: str, is_change_password: bool = False):
+    def send_reset_password_email(cls, email: str, username: str, is_change_password: bool = False):
         token = AuthFunctionality.create_jwt_token(username, is_refresh=False)
 
         if not is_change_password:
@@ -104,14 +104,14 @@ class MailingFunctionality:
 
         body_html = cls.generate_email_body(template["template_path"], username, token, is_verification_email=False)
 
-        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
+        send_email_background_task.delay(email, template["subject"], body_html)
 
     @classmethod
-    async def send_delete_user_email(cls, email: str, username: str):
+    def send_delete_user_email(cls, email: str, username: str):
         template = cls.get_template(TemplateNames.DELETE_USER.value)
         body_html = cls.generate_email_body(template["template_path"], username)
 
-        asyncio.create_task(send_email_background_task(email, template["subject"], body_html))
+        send_email_background_task.delay(email, template["subject"], body_html)
 
     @classmethod
     def read_html_template(cls, template_path):
