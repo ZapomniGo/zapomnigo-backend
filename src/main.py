@@ -5,7 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-from src.celery_tasks.initializer import celery_init_app
+from src.celery_task_queue.initializer import celery_init_app
 from src.config import DevConfig, ProdConfig, IS_OFFLINE, LocalConfig, IS_PROD, IS_DEV
 from src.database.models.base import db
 from src.limiter import limiter

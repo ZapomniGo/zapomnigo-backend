@@ -1,9 +1,8 @@
-import asyncio
 from enum import Enum
 
+from src.celery_task_queue.tasks.mailer import send_email_background_task
 from src.config import IS_OFFLINE, IS_DEV, IS_PROD
 from src.functionality.auth.auth_functionality import AuthFunctionality
-from src.celery_tasks.tasks.mailer import send_email_background_task
 
 
 class TemplateNames(Enum):
