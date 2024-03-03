@@ -76,6 +76,6 @@ The Celery Beat service is a scheduler that sends tasks to the worker at regular
 In order fo Celery to execute tasks both immediately and on a schedule, both services should be running concurrently.
 
 ```bash
-celery -A "src.celery_tasks.make_celery" worker --autoscale=8,1 --loglevel INFO
-celery -A "src.celery_tasks.make_celery" beat --loglevel INFO
+celery -A "src.celery_task_queue.make_celery" worker --autoscale=8,1 --loglevel INFO
+celery -A "src.celery_task_queue.make_celery" beat --loglevel INFO
 ```
