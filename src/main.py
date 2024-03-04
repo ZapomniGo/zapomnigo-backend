@@ -26,6 +26,7 @@ def create_app() -> Flask:
                                                     "https://localhost"]}}
          , supports_credentials=True)
 
+    # This is like this so that I can connect to the dev or prod db using poetry run start
     if IS_OFFLINE and not IS_PROD and not IS_DEV:
         app.config.from_object(LocalConfig)
     elif IS_PROD:

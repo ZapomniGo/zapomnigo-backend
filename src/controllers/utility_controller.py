@@ -13,7 +13,6 @@ class UtilityController:
 
     @staticmethod
     def get_health() -> Tuple[Dict[str, str], int]:
-        raise Exception("test")
         return {"status": "healthy"}, 200
 
     @classmethod

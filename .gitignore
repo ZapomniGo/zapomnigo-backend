@@ -26,3 +26,5 @@ htmlcov/
 .coverage.*
 *,cover
 *.log
+
+celerybeat-schedule

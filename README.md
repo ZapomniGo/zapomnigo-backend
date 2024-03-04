@@ -30,6 +30,12 @@ pyenv install 3.11.4
 ```bash
 poetry add package-name
 ```
+## Redis
+
+To run redis locally do:
+```bash
+docker run -d --name local-redis -p 6379:6379 redis:latest
+```
 
 ## How to start development server:
 
