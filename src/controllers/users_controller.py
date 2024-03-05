@@ -1,9 +1,11 @@
 from typing import Tuple, Dict, Any
 
+from celery import shared_task
 from flask import request, make_response, Response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
 
+from src.celery_task_queue.tasks.data_exporter import export_user_data_task
 from src.config import SECRET_KEY
 from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController
@@ -177,5 +179,8 @@ class UsersController:
         if result := UtilityController.check_user_access(user.username):
             return result
 
-        return {"user_info": UsersFunctionality.export_user_data(user)}, 200
-        # user_data = UsersFunctionality.export_user_data(user)
+        # The arguments passed need to be JSON serializable so we can't pass the user object directly.
+        # This is because the celery worker might be on a different machine and the args need to be serialized
+        # in order to be sent over the network.
+        task = export_user_data_task.delay(user_id)
+        return {"message": "Export user data task started", "task_id": str(task.id)}, 202
