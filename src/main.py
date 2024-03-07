@@ -64,6 +64,7 @@ def start() -> None:
 
     try:
         create_app().run(host="0.0.0.0", port=3884, ssl_context=ssl_context)
+
     except Exception as e:
         worker_process.terminate()
         beat_process.terminate()
