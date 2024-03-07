@@ -21,7 +21,7 @@ class SetsFunctionality:
                     user_id=user_id,
                     organization_id=json_data.organization_id)
 
-    @classmethod
+    # @classmethod
     # def sanitize_html(cls, html):
     #     cleaner = clean.Cleaner()
     #
