@@ -50,7 +50,7 @@ def delete_user(user_id: str):
 
 
 @users_bp.get("/users/<user_id>")
-@limiter.limit("1/week")
+@limiter.limit("1/7 days")
 @jwt_required
 def export_user_data(user_id: str):
     return c.export_user_data(user_id)
