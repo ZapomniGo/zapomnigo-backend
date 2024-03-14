@@ -76,3 +76,6 @@ class ExceptionHandlers:
         app.register_error_handler(DecodeError, cls.handle_decode_error)
         app.register_error_handler(404, cls.not_found_error)
         app.register_error_handler(500, cls.internal_server_error)
+        app.register_error_handler(405, cls.method_not_allowed)
+        app.register_error_handler(400, cls.bad_request)
+        app.register_error_handler(429, cls.too_many_requests)
