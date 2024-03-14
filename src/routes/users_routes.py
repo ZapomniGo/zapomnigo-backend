@@ -54,34 +54,3 @@ def delete_user(user_id: str):
 @jwt_required
 def export_user_data(user_id: str):
     return c.export_user_data(user_id)
-
-
-# https://flask.palletsprojects.com/en/2.3.x/patterns/celery/#getting-results
-@users_bp.get("/users/<user_id>/tasks/<task_id>")
-@jwt_required
-def get_task_status(user_id: str, task_id: str):
-    user = UsersRepository.get_user_by_ulid(user_id)
-    if not user:
-        return {"message": "user doesn't exist"}, 404
-
-    if result := UtilityController.check_user_access(user.username):
-        return result
-
-    task = AsyncResult(task_id)
-    if task.state == 'PENDING':
-        response = {
-            'state': task.state,
-            'status': 'Task is pending...'
-        }
-    elif task.state != 'FAILURE':
-        response = {
-            'state': task.state,
-            'result': task.result,
-        }
-    else:
-        response = {
-            'state': task.state,
-            'status': str(task.info)
-        }
-
-    return jsonify(response)

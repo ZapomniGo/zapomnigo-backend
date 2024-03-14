@@ -73,7 +73,7 @@ class MailingFunctionality:
     # The asyncio.create_task is not awaited because the func is awaited in the controller
     @classmethod
     def send_report_email(cls, email: str, report_body: str):
-        send_email_background_task.delay(email, "Докладване на сет/папка", report_body)
+        send_email_background_task.apply_async(args=[email, "Докладване на сет/папка", report_body], expires=1800)
 
     @classmethod
     def send_verification_email(cls, email: str, username: str, verify_on_register: bool = True):
@@ -90,7 +90,7 @@ class MailingFunctionality:
 
         body_html = cls.generate_email_body(template["template_path"], username, token)
 
-        send_email_background_task.delay(email, template["subject"], body_html)
+        send_email_background_task.apply_async(args=[email, template["subject"], body_html], expires=1800)
 
     @classmethod
     def send_reset_password_email(cls, email: str, username: str, is_change_password: bool = False):
@@ -103,14 +103,14 @@ class MailingFunctionality:
 
         body_html = cls.generate_email_body(template["template_path"], username, token, is_verification_email=False)
 
-        send_email_background_task.delay(email, template["subject"], body_html)
+        send_email_background_task.apply_async(args=[email, template["subject"], body_html], expires=1800)
 
     @classmethod
     def send_delete_user_email(cls, email: str, username: str):
         template = cls.get_template(TemplateNames.DELETE_USER.value)
         body_html = cls.generate_email_body(template["template_path"], username)
 
-        send_email_background_task.delay(email, template["subject"], body_html)
+        send_email_background_task.apply_async(args=[email, template["subject"], body_html], expires=1800)
 
     @classmethod
     def read_html_template(cls, template_path):

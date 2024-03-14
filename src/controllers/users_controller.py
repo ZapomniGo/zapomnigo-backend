@@ -1,7 +1,5 @@
 from typing import Tuple, Dict, Any
 
-from celery import shared_task
-from celery.result import AsyncResult
 from flask import request, make_response, Response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
@@ -180,9 +178,9 @@ class UsersController:
         if result := UtilityController.check_user_access(user.username):
             return result
 
-        # The arguments passed need to be JSON serializable so we can't pass the user object directly.
+        # The arguments passed need to be JSON serializable, so we can't pass the user object directly.
         # This is because the celery worker might be on a different machine and the args need to be serialized
         # in order to be sent over the network.
-        export_user_data_task.delay(user_id)
+        export_user_data_task.apply_async(args=[user_id], expires=86400)
         return {"message": "Export user data task has started. "
                            "The user will receive an email with their data on task success!"}, 202
