@@ -21,24 +21,24 @@ class SetsFunctionality:
                     user_id=user_id,
                     organization_id=json_data.organization_id)
 
-    @classmethod
-    def sanitize_html(cls, html):
-        cleaner = clean.Cleaner()
-
-        cleaner.allow_tags = ['p', 'u', 'em', 'strong', 'span', 'math', 'semantics', 'mrow', 'mi', 'mo', 'msup', 'mn', 'annotation', 'img',
-                              'br', 'a']
-        cleaner.remove_unknown_tags = False
-
-        cleaner.safe_attrs = clean.defs.safe_attrs | {'class', 'data-value', 'contenteditable', 'aria-hidden', 'style',
-                                                      'xmlns', 'encoding', 'src', 'href', 'rel', 'target'}
-        return cleaner.clean_html(html)
+    # @classmethod
+    # def sanitize_html(cls, html):
+    #     cleaner = clean.Cleaner()
+    #
+    #     cleaner.allow_tags = ['p', 'u', 'em', 'strong', 'span', 'math', 'semantics', 'mrow', 'mi', 'mo', 'msup', 'mn', 'annotation', 'img',
+    #                           'br', 'a']
+    #     cleaner.remove_unknown_tags = False
+    #
+    #     cleaner.safe_attrs = clean.defs.safe_attrs | {'class', 'data-value', 'contenteditable', 'aria-hidden', 'style',
+    #                                                   'xmlns', 'encoding', 'src', 'href', 'rel', 'target'}
+    #     return cleaner.clean_html(html)
 
     @classmethod
     def create_flashcards(cls, json_data: SetsModel, set_id: str):
         flashcards_objects = []
         for flashcard in json_data.flashcards:
-            flashcard.term = cls.sanitize_html(flashcard.term)
-            flashcard.definition = cls.sanitize_html(flashcard.definition)
+            flashcard.term = flashcard.term
+            flashcard.definition = flashcard.definition
             flashcards_objects.append(Flashcards(flashcard_id=str(ULID()), term=flashcard.term,
                                                  definition=flashcard.definition,
                                                  notes=flashcard.notes,
