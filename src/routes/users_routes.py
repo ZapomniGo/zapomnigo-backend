@@ -1,13 +1,9 @@
 from typing import Tuple, Dict, Any
 
-from celery.result import AsyncResult
-from flask import Blueprint, Response, jsonify
+from flask import Blueprint, Response
 
 from src.controllers.users_controller import UsersController as c
-from src.controllers.utility_controller import UtilityController
-from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.jwt_decorators import jwt_required
-from src.limiter import limiter
 
 users_bp = Blueprint("users", __name__)
 
@@ -50,7 +46,13 @@ def delete_user(user_id: str):
 
 
 @users_bp.get("/users/<user_id>")
-@limiter.limit("1/7 days")
+# @limiter.limit("1/7 days")
 @jwt_required
 def export_user_data(user_id: str):
     return c.export_user_data(user_id)
+
+
+@users_bp.get("/users/<user_id>/data/<task_id>")
+@jwt_required
+def get_export_user_data_task_status(user_id: str, task_id: str):
+    return c.get_export_user_data_task_status(user_id, task_id)

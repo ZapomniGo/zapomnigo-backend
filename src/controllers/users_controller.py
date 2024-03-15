@@ -1,6 +1,10 @@
+import json
+import os
+from tempfile import gettempdir
 from typing import Tuple, Dict, Any
 
-from flask import request, make_response, Response
+from celery.result import AsyncResult
+from flask import request, make_response, Response, send_file
 from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
 
@@ -184,3 +188,33 @@ class UsersController:
         export_user_data_task.apply_async(args=[user_id], expires=86400)
         return {"message": "Export user data task has started. "
                            "The user will receive an email with their data on task success!"}, 202
+
+    @classmethod
+    def get_export_user_data_task_status(cls, user_id: str, task_id: str) -> Tuple[Dict[str, Any], int] | Response:
+        user = UsersRepository.get_user_by_ulid(user_id)
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        if result := UtilityController.check_user_access(user.username):
+            return result
+
+        task = AsyncResult(task_id)
+        if task.state == "SUCCESS":
+            temp_dir = gettempdir()
+            user_data_dir = os.path.join(temp_dir, 'users_data_exports', user_id)
+            os.makedirs(user_data_dir, exist_ok=True)
+
+            user_data_file = os.path.join(user_data_dir, f'{user.username}.json')
+            with open(user_data_file, 'w') as f:
+                json.dump(task.result, f)
+
+            return send_file(user_data_file, mimetype='application/json', as_attachment=True)
+
+        elif task.state == "FAILURE":
+            return {"message": "User export data task failed"}, 500
+
+        elif task.state == "PENDING" and task.result is None:
+            return {"message": "Such task does not exist"}, 404
+
+        else:
+            return {"message": "Task is still processing"}, 202

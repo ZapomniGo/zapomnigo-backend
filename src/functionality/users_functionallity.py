@@ -56,6 +56,7 @@ class UsersFunctionality:
 
         return {
             "user_info": {
+                "user_id": user.user_id,
                 "username": user.username,
                 "name": user.name,
                 "email": user.email,
