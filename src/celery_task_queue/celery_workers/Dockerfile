@@ -25,7 +25,7 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 WORKDIR /app
 
 COPY src ./src
-COPY .env ./
+COPY ../../../.env ./
 
 
 CMD ["celery", "-A", "src.celery_task_queue.make_celery", "worker", "--autoscale=8,1", "--loglevel", "INFO"]
