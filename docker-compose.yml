@@ -27,6 +27,9 @@ services:
       - py-api
     networks:
       - zapomnigo-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 1m
 
   celery-workers:
     build:
