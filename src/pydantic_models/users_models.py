@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from src.pydantic_models.common import NAME, PASSWORD, ID, AGE
 
-USER_ROLES = Literal["Ученик", "Родител", "Учител"]
+USER_ROLES = Literal["Student", "Parent", "Teacher"]
 
 class RegistrationModel(BaseModel):
     name: NAME
