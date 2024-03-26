@@ -53,12 +53,12 @@ class LocalConfig:
 class ProdConfig:
     SECRET_KEY = SECRET_KEY
     if not IS_OFFLINE:
-        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
+        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgresql:", "postgresql+psycopg2:")
         CELERY_BROKER_URL = getenv("PROD_CELERY_BROKER_URL")
         CELERY_RESULT_BACKEND = getenv("PROD_CELERY_RESULT_BACKEND")
         RATELIMIT_STORAGE_URI = getenv("PROD_RATELIMIT_STORAGE_URI")
     else:
-        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
+        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgresql:", "postgresql+psycopg2:")
         CELERY_BROKER_URL = getenv("LOCAL_CELERY_BROKER_URL")
         CELERY_RESULT_BACKEND = getenv("LOCAL_CELERY_RESULT_BACKEND")
         RATELIMIT_STORAGE_URI = getenv("LOCAL_RATELIMIT_STORAGE_URI")
