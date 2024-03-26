@@ -15,6 +15,7 @@ class Users(db.Model):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
+    role: Mapped[str] = mapped_column(String(40), nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     # subscription_date: Mapped[str] = mapped_column(String(40), nullable=True)
     privacy_policy: Mapped[bool] = mapped_column(Boolean, nullable=False)
