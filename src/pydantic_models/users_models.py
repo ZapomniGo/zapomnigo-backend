@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from src.pydantic_models.common import NAME, PASSWORD, ID, AGE
 
+USER_ROLES = Literal["Ученик", "Родител", "Учител"]
 
 class RegistrationModel(BaseModel):
     name: NAME
@@ -13,6 +14,7 @@ class RegistrationModel(BaseModel):
     password: PASSWORD
     age: AGE
     gender: Literal["M", "F", "O"]
+    role: USER_ROLES
     organization: Optional[ID] = None
     privacy_policy: bool
     terms_and_conditions: bool
@@ -37,6 +39,7 @@ class UpdateUser(BaseModel):
     password: Optional[PASSWORD] = None
     new_password: Optional[PASSWORD] = None
     age: Optional[AGE] = None
+    role: Optional[USER_ROLES] = None
     gender: Optional[Literal["M", "F", "O"]] = None
     organization: Optional[ID] = None
     privacy_policy: Optional[bool] = None

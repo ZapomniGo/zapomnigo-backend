@@ -191,24 +191,25 @@ class SetsController:
 
     @classmethod
     def study_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        set_obj = SetsRepository.get_set_by_id(set_id)
+        if result := SetsRepository.get_set_info(set_id):
+            page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
 
-        if not set_obj:
-            return {"message": "set with such id doesn't exist"}, 404
+            user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+            if not user_id:
+                return {"message": "user_id is not provided in the auth token"}, 499
 
-        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+            flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
+                                                                          user_id=user_id, is_study=True,
+                                                                          sort_by_date=sort_by_date,
+                                                                          ascending=ascending)
 
-        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
-        if not user_id:
-            return {"message": "user_id is not provided in the auth token"}, 499
+            return {"flashcards": SetsFunctionality.display_study_info(flashcards), 'total_pages': flashcards.pages,
+                    'current_page': flashcards.page,
+                    "total_items": flashcards.total,
+                    "category_name": SetsFunctionality.display_sets_info(result)[0]["category_name"],
+                    "subcategory_name": SetsFunctionality.display_sets_info(result)[0]["subcategory_name"]}, 200
 
-        flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
-                                                                      user_id=user_id, is_study=True,
-                                                                      sort_by_date=sort_by_date, ascending=ascending)
-
-        return {"flashcards": SetsFunctionality.display_study_info(flashcards), 'total_pages': flashcards.pages,
-                'current_page': flashcards.page,
-                "total_items": flashcards.total}, 200
+        return {"message": "set with such id doesn't exist"}, 404
 
     @classmethod
     @handle_database_session_transaction

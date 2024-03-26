@@ -20,6 +20,7 @@ class UsersFunctionality:
                      name=json_data.name, email=json_data.email,
                      password=hashed_password, age=json_data.age,
                      gender=json_data.gender,
+                     role=json_data.role,
                      privacy_policy=json_data.privacy_policy,
                      terms_and_conditions=json_data.terms_and_conditions,
                      marketing_consent=json_data.marketing_consent)
@@ -62,6 +63,7 @@ class UsersFunctionality:
                 "email": user.email,
                 "gender": user.gender,
                 "age": user.age,
+                "role": user.role,
                 "privacy_policy": user.privacy_policy,
                 "terms_and_conditions": user.terms_and_conditions,
                 "marketing_consent": user.marketing_consent
