@@ -21,4 +21,4 @@ class Routes:
     @classmethod
     def register_blueprints(cls, app: Flask) -> None:
         for blueprint in cls._blueprints:
-            app.register_blueprint(blueprint, url_prefix="/v1")
+            app.register_blueprint(blueprint, url_prefix="/api/v1")

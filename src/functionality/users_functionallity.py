@@ -26,14 +26,14 @@ class UsersFunctionality:
                      marketing_consent=json_data.marketing_consent)
 
     @classmethod
-    async def send_emails(cls, user: Users, user_update_fields: UpdateUser):
+    def send_emails(cls, user: Users, user_update_fields: UpdateUser):
         """Send transactional email if the user has changed their email or password"""
         if not user.verified and user_update_fields.email:
-            await MailingFunctionality.send_verification_email(user_update_fields.email, user.username,
+            MailingFunctionality.send_verification_email(user_update_fields.email, user.username,
                                                                verify_on_register=False)
 
         if user_update_fields.new_password and user_update_fields.password:
-            await MailingFunctionality.send_reset_password_email(user.email, user.username, is_change_password=True)
+            MailingFunctionality.send_reset_password_email(user.email, user.username, is_change_password=True)
 
     @classmethod
     def check_if_user_exists(cls, json_data) -> Users | None:
@@ -57,6 +57,7 @@ class UsersFunctionality:
 
         return {
             "user_info": {
+                "user_id": user.user_id,
                 "username": user.username,
                 "name": user.name,
                 "email": user.email,

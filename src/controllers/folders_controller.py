@@ -29,6 +29,8 @@ class FoldersController:
         json_data = request.get_json()
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+        if not user_id:
+            return {"message": "user_id is not provided in the auth token"}, 499
 
         if validation_errors := validate_json_body(json_data, FoldersModel):
             return {"validation errors": validation_errors}, 422
@@ -129,16 +131,15 @@ class FoldersController:
         return {"message": "Folder successfully deleted"}, 200
 
     @classmethod
-    async def report_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
+    def report_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         if validation_errors := validate_json_body(json_data, ReportFolderSetModel):
             return {"validation errors": validation_errors}, 422
 
-        # As this is an async func we cannot use the jwt_required decorator
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No auth token provided"}, 499
+            return {"message": "Username is not provided in the auth token"}, 499
 
         folder_obj = FoldersRepository.get_folder_by_id(folder_id)
         if not folder_obj:
@@ -149,7 +150,7 @@ class FoldersController:
             f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
             f"причина:\n{json_data['reason']}")
 
-        await MailingFunctionality.send_report_email(ADMIN_EMAIL, report_body)
+        MailingFunctionality.send_report_email(ADMIN_EMAIL, report_body)
         return {"message": "Folder successfully reported"}, 200
 
     @classmethod

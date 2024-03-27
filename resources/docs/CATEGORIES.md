@@ -21,8 +21,7 @@
    Example request body:
    ```json
    {
-       "name": "New Category",
-       "description": "Description of the new category"
+       "category_name": "New Category"
    }
    ```
    Responses: 

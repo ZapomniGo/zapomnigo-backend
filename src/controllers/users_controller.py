@@ -1,14 +1,18 @@
+import json
+import os
+from tempfile import gettempdir
 from typing import Tuple, Dict, Any
 
-from flask import request, make_response, Response
+from celery.result import AsyncResult
+from flask import request, make_response, Response, send_file
 from flask_bcrypt import generate_password_hash, check_password_hash
 from jwt import decode
 
+from src.celery_task_queue.tasks.data_exporter import export_user_data_task
 from src.config import SECRET_KEY
 from src.controllers.utility_controller import UtilityController
 from src.controllers.verification_controller import VerificationController
-from src.database.database_transaction_handlers import handle_database_session_transaction_async, \
-    handle_database_session_transaction
+from src.database.database_transaction_handlers import handle_database_session_transaction
 from src.database.repositories.common_repository import CommonRepository
 from src.database.repositories.users_repository import UsersRepository
 from src.functionality.auth.auth_functionality import AuthFunctionality
@@ -21,8 +25,8 @@ from src.utilities.parsers import validate_json_body
 class UsersController:
 
     @classmethod
-    @handle_database_session_transaction_async
-    async def register_user(cls) -> Tuple[Dict[str, Any], int]:
+    @handle_database_session_transaction
+    def register_user(cls) -> Tuple[Dict[str, Any], int]:
         json_data = request.get_json()
 
         if validation_errors := validate_json_body(json_data, RegistrationModel):
@@ -31,7 +35,7 @@ class UsersController:
         user = UsersFunctionality.create_user(RegistrationModel(**json_data))
         CommonRepository.add_object_to_db(user)
 
-        await MailingFunctionality.send_verification_email(user.email, user.username)
+        MailingFunctionality.send_verification_email(user.email, user.username)
         return {"message": "user added to db"}, 200
 
     @classmethod
@@ -109,12 +113,11 @@ class UsersController:
         return {"message": "Your password has been changed"}, 200
 
     @classmethod
-    @handle_database_session_transaction_async
-    async def edit_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
-        # As this is an async func we cannot use the jwt_required decorator
+    @handle_database_session_transaction
+    def edit_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No auth token provided"}, 499
+            return {"message": "Username is not provided in the auth token"}, 499
 
         if result := UtilityController.check_user_access(username):
             return result
@@ -144,20 +147,19 @@ class UsersController:
             UsersRepository.change_verified_status(user, False)
 
         CommonRepository.edit_object(user, user_update_fields)
-        await UsersFunctionality.send_emails(user, user_update_fields)
+        UsersFunctionality.send_emails(user, user_update_fields)
 
         return {"message": "user updated"}, 200
 
     @classmethod
-    @handle_database_session_transaction_async
-    async def delete_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
+    @handle_database_session_transaction
+    def delete_user(cls, user_id: str) -> Tuple[Dict[str, Any], int]:
         """This method deletes a user from the database along with all the sets, folders and flashcards they have
         created."""
 
-        # As this is an async func we cannot use the jwt_required decorator
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No auth token provided"}, 499
+            return {"message": "Username is not provided in the auth token"}, 499
 
         if result := UtilityController.check_user_access(username):
             return result
@@ -167,7 +169,7 @@ class UsersController:
             return {"message": "user doesn't exist"}, 404
 
         CommonRepository.delete_object_from_db(user)
-        await MailingFunctionality.send_delete_user_email(user.email, user.username)
+        MailingFunctionality.send_delete_user_email(user.email, user.username)
 
         return {"message": "user deleted"}, 200
 
@@ -180,5 +182,39 @@ class UsersController:
         if result := UtilityController.check_user_access(user.username):
             return result
 
-        return {"user_info": UsersFunctionality.export_user_data(user)}, 200
-        # user_data = UsersFunctionality.export_user_data(user)
+        # The arguments passed need to be JSON serializable, so we can't pass the user object directly.
+        # This is because the celery worker might be on a different machine and the args need to be serialized
+        # in order to be sent over the network.
+        export_user_data_task.apply_async(args=[user_id], expires=86400)
+        return {"message": "Export user data task has started. "
+                           "The user will receive an email with their data on task success!"}, 202
+
+    @classmethod
+    def get_export_user_data_task_status(cls, user_id: str, task_id: str) -> Tuple[Dict[str, Any], int] | Response:
+        user = UsersRepository.get_user_by_ulid(user_id)
+        if not user:
+            return {"message": "user doesn't exist"}, 404
+
+        if result := UtilityController.check_user_access(user.username):
+            return result
+
+        task = AsyncResult(task_id)
+        if task.state == "SUCCESS":
+            temp_dir = gettempdir()
+            user_data_dir = os.path.join(temp_dir, 'users_data_exports', user_id)
+            os.makedirs(user_data_dir, exist_ok=True)
+
+            user_data_file = os.path.join(user_data_dir, f'{user.username}.json')
+            with open(user_data_file, 'w') as f:
+                json.dump(task.result, f)
+
+            return send_file(user_data_file, mimetype='application/json', as_attachment=True)
+
+        elif task.state == "FAILURE":
+            return {"message": "User export data task failed"}, 500
+
+        elif task.state == "PENDING" and task.result is None:
+            return {"message": "Such task does not exist"}, 404
+
+        else:
+            return {"message": "Task is still processing"}, 202

@@ -77,6 +77,8 @@ class FlashcardsController:
             return {"validation errors": validation_errors}, 422
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+        if not user_id:
+            return {"message": "user_id is not provided in the auth token"}, 499
 
         # Here it's just faster to get the user_id from the raw json instead through the pydantic model
         if result := ReviewsFlashcardsRepository.get_review_by_flashcard_id(flashcard_id, user_id):

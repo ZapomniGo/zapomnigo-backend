@@ -10,8 +10,8 @@ users_bp = Blueprint("users", __name__)
 
 
 @users_bp.post("/register")
-async def register() -> Tuple[Dict[str, Any], int]:
-    return await c.register_user()
+def register() -> Tuple[Dict[str, Any], int]:
+    return c.register_user()
 
 
 @users_bp.post("/login")
@@ -35,17 +35,25 @@ def reset_password_route():
 
 
 @users_bp.put("/users/<user_id>")
-async def edit_user(user_id: str):
-    return await c.edit_user(user_id)
+@jwt_required
+def edit_user(user_id: str):
+    return c.edit_user(user_id)
 
 
 @users_bp.delete("/users/<user_id>")
-async def delete_user(user_id: str):
-    return await c.delete_user(user_id)
+@jwt_required
+def delete_user(user_id: str):
+    return c.delete_user(user_id)
 
 
 @users_bp.get("/users/<user_id>")
+@limiter.limit("1/7 days")
 @jwt_required
-@limiter.limit("1/week")
 def export_user_data(user_id: str):
     return c.export_user_data(user_id)
+
+
+@users_bp.get("/users/<user_id>/data/<task_id>")
+@jwt_required
+def get_export_user_data_task_status(user_id: str, task_id: str):
+    return c.get_export_user_data_task_status(user_id, task_id)

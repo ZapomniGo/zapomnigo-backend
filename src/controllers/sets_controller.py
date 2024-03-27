@@ -33,6 +33,8 @@ class SetsController:
         json_data = request.get_json()
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+        if not user_id:
+            return {"message": "user_id is not provided in the auth token"}, 499
 
         if validation_errors := validate_json_body(json_data, SetsModel):
             return {"validation errors": validation_errors}, 422
@@ -163,11 +165,15 @@ class SetsController:
         if not set_obj:
             return {"message": "set with such id doesn't exist"}, 404
 
+        user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+        if not user_id:
+            return {"message": "user_id is not provided in the auth token"}, 499
+
         new_set_obj = Sets(set_id=str(ULID()), set_name=set_obj.set_name,
                            set_description=set_obj.set_description,
                            set_modification_date=str(datetime.now()),
                            set_category=set_obj.set_category,
-                           user_id=AuthFunctionality.get_session_username_or_user_id(request, get_username=False),
+                           user_id=user_id,
                            organization_id=None)
 
         flashcards = FlashcardsRepository.get_flashcards_by_set_id(set_id)
@@ -189,9 +195,13 @@ class SetsController:
             page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
 
             user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+            if not user_id:
+                return {"message": "user_id is not provided in the auth token"}, 499
+
             flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
                                                                           user_id=user_id, is_study=True,
-                                                                          sort_by_date=sort_by_date, ascending=ascending)
+                                                                          sort_by_date=sort_by_date,
+                                                                          ascending=ascending)
 
             return {"flashcards": SetsFunctionality.display_study_info(flashcards), 'total_pages': flashcards.pages,
                     'current_page': flashcards.page,
@@ -210,6 +220,8 @@ class SetsController:
             return {"message": "set with such id doesn't exist"}, 404
 
         user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+        if not user_id:
+            return {"message": "user_id is not provided in the auth token"}, 499
 
         studied_set = ReviewsSets(review_set_id=str(ULID()), user_id=user_id, set_id=set_id,
                                   review_date=str(datetime.now()))
@@ -218,11 +230,10 @@ class SetsController:
         return {"message": "studied set successfully created"}, 200
 
     @classmethod
-    async def report_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        # As this is an async func we cannot use the jwt_required decorator
+    def report_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         username = AuthFunctionality.get_session_username_or_user_id(request)
         if not username:
-            return {"message": "No auth token provided"}, 499
+            return {"message": "Username is not provided in the auth token"}, 499
 
         json_data = request.get_json()
 
@@ -238,7 +249,7 @@ class SetsController:
             f"{datetime.now(tz=timezone(timedelta(hours=2))).strftime('%Y-%m-%d %H:%M:%S')} поради следната "
             f"причина:\n{json_data['reason']}")
 
-        await MailingFunctionality.send_report_email(ADMIN_EMAIL, report_body)
+        MailingFunctionality.send_report_email(ADMIN_EMAIL, report_body)
 
         return {"message": "Report sent successfully"}, 200
 
