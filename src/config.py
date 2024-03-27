@@ -26,16 +26,17 @@ else:
     SECRET_KEY = getenv("PROD_SECRET_KEY")
 
 
-# This is done so that I can connect to the dev or prod db using poetry run start and having IS_OFFLINE=True
+# This is done so that I can connect to the dev or prod db using poetry run start and having the
+# other services running locally IS_OFFLINE=True is a requirement for this to work.
 class DevConfig:
     SECRET_KEY = SECRET_KEY
     if not IS_OFFLINE:
-        SQLALCHEMY_DATABASE_URI = getenv("DEV_DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
+        SQLALCHEMY_DATABASE_URI = getenv("DEV_DATABASE_URL")
         CELERY_BROKER_URL = getenv("PROD_CELERY_BROKER_URL")
         CELERY_RESULT_BACKEND = getenv("PROD_CELERY_RESULT_BACKEND")
         RATELIMIT_STORAGE_URI = getenv("PROD_RATELIMIT_STORAGE_URI")
     else:
-        SQLALCHEMY_DATABASE_URI = getenv("DEV_DATABASE_URL").replace("postgres:", "postgresql+psycopg2:")
+        SQLALCHEMY_DATABASE_URI = getenv("DEV_DATABASE_URL")
         CELERY_BROKER_URL = getenv("LOCAL_CELERY_BROKER_URL")
         CELERY_RESULT_BACKEND = getenv("LOCAL_CELERY_RESULT_BACKEND")
         RATELIMIT_STORAGE_URI = getenv("LOCAL_RATELIMIT_STORAGE_URI")
@@ -53,12 +54,12 @@ class LocalConfig:
 class ProdConfig:
     SECRET_KEY = SECRET_KEY
     if not IS_OFFLINE:
-        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgresql:", "postgresql+psycopg2:")
+        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL")
         CELERY_BROKER_URL = getenv("PROD_CELERY_BROKER_URL")
         CELERY_RESULT_BACKEND = getenv("PROD_CELERY_RESULT_BACKEND")
         RATELIMIT_STORAGE_URI = getenv("PROD_RATELIMIT_STORAGE_URI")
     else:
-        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL").replace("postgresql:", "postgresql+psycopg2:")
+        SQLALCHEMY_DATABASE_URI = getenv("PROD_DATABASE_URL")
         CELERY_BROKER_URL = getenv("LOCAL_CELERY_BROKER_URL")
         CELERY_RESULT_BACKEND = getenv("LOCAL_CELERY_RESULT_BACKEND")
         RATELIMIT_STORAGE_URI = getenv("LOCAL_RATELIMIT_STORAGE_URI")
