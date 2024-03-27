@@ -18,8 +18,8 @@ migrate = Migrate(directory="database/migrations")
 
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
-    CORS(app, resources={r"/api/v1/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173",
-                                                    "https://dev-client-zapomnigo-192299046f7f.herokuapp.com",
+    CORS(app, resources={r"/api/v1/*": {"origins": ["http://localhost:5173",
+                                                    "http://127.0.0.1:5173",
                                                     "https://prod-client-zapomnigo-3d223494b86d.herokuapp.com",
                                                     "https://www.zapomnigo.com",
                                                     "https://zapomnigo.com",
