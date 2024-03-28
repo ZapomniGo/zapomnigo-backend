@@ -27,6 +27,7 @@ WORKDIR /app
 COPY shared ./shared
 COPY src ./src
 COPY data ./data
+COPY resources ./resources
 COPY .env ./
 
 EXPOSE 8000
