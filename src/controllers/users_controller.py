@@ -185,6 +185,9 @@ class UsersController:
         # The arguments passed need to be JSON serializable, so we can't pass the user object directly.
         # This is because the celery worker might be on a different machine and the args need to be serialized
         # in order to be sent over the network.
+
+        # TODO: The task should write the data to a file and then send the file to the user via email.
+        #  After the data is written to a file the task result should be deleted from REDIS
         export_user_data_task.apply_async(args=[user_id], expires=86400)
         return {"message": "Export user data task has started. "
                            "The user will receive an email with their data on task success!"}, 202
