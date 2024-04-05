@@ -43,9 +43,9 @@ async def send_email():
         return {"message": "user doesn't exist"}, 404
 
     if is_verification:
-        await MailingFunctionality.send_verification_email(user.email, user.username)
+        MailingFunctionality.send_verification_email(user.email, user.username)
 
     else:
-        await MailingFunctionality.send_reset_password_email(user.email, user.username)
+        MailingFunctionality.send_reset_password_email(user.email, user.username)
 
     return {"message": f"Email send to {user.email}"}, 200
