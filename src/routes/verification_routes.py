@@ -20,7 +20,7 @@ def verify_user_route():
 
 
 @verification_bp.post("/send-email")
-@limiter.limit("60/hour")
+@limiter.limit("6/hour")
 async def send_email():
     is_verification = request.args.get("verification")
     if not is_verification:
