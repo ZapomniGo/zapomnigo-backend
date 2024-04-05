@@ -8,12 +8,12 @@ from src.pydantic_models.common import NAME, PASSWORD, ID, AGE
 USER_ROLES = Literal["Student", "Parent", "Teacher"]
 
 class RegistrationModel(BaseModel):
-    name: NAME
+    name: Optional[NAME] = None
     username: NAME
     email: EmailStr
     password: PASSWORD
-    age: AGE
-    gender: Literal["M", "F", "O"]
+    age: Optional[AGE] = None
+    gender: Optional[Literal["M", "F", "O"]] = None
     role: USER_ROLES
     organization: Optional[ID] = None
     privacy_policy: bool
