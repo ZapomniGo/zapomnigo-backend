@@ -46,7 +46,7 @@ class MailingFunctionality:
         if IS_OFFLINE:
             return "http://localhost:5173"
         if IS_DEV:
-            return "https://dev-client-zapomnigo-192299046f7f.herokuapp.com"
+            return "https://dev.zapomnigo.com"
         elif IS_PROD:
             return "https://zapomnigo.com"
 
