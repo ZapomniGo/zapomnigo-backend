@@ -17,6 +17,8 @@ RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 # The runtime image, used to just run the code provided its virtual environment
 FROM python:3.11-slim-buster as runtime
 
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 
@@ -29,6 +31,9 @@ COPY src ./src
 COPY data ./data
 COPY resources ./resources
 COPY .env ./
+COPY health_check.sh ./
+
+RUN chmod +x health_check.sh
 
 EXPOSE 8000
 
