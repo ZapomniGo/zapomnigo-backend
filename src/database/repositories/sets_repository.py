@@ -33,7 +33,8 @@ class SetsRepository:
         """
         return db.session.query(
             Sets.set_id, Sets.set_name, Sets.set_description, Sets.set_modification_date,
-            Categories.category_name, Subcategories.subcategory_name, Users.username, Sets.verified
+            Categories.category_name, Categories.category_id, Subcategories.subcategory_name,
+            Subcategories.subcategory_id, Users.username, Sets.verified
         ).outerjoin(Categories, Categories.category_id == Sets.set_category) \
             .outerjoin(Subcategories, Subcategories.subcategory_id == Sets.set_subcategory) \
             .join(Users, Users.user_id == Sets.user_id)
