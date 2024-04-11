@@ -51,7 +51,7 @@ class FoldersController:
             if not UsersRepository.get_user_by_ulid(user_id):
                 return {"message": "user doesn't exist"}, 404
 
-        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+        page, size, sort_by_date, ascending, _ = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
         subcategory_id = request.args.get('subcategory_id', type=str)
         search_terms = request.args.get("search", type=str)
@@ -73,14 +73,16 @@ class FoldersController:
 
     @classmethod
     def get_sets_in_folder(cls, folder_id: str) -> Tuple[Dict[str, Any], int]:
-        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+        page, size, sort_by_date, ascending, exclude_user_sets = CommonFunctionality.get_pagination_params(request)
 
         folder = FoldersRepository.get_folder_info(folder_id)
         if not folder:
             return {"message": "Folder with such id doesn't exist"}, 404
         folder_info = FoldersFunctionality.display_folders_info(folder)[0]
 
-        sets = SetsRepository.get_all_sets(page=page, size=size, folder_id=folder_id, sort_by_date=sort_by_date)
+        sets = SetsRepository.get_all_sets(page=page, size=size, folder_id=folder_id, sort_by_date=sort_by_date,
+                                           ascending=ascending,
+                                           exclude_user_sets=exclude_user_sets)
         sets_list = SetsFunctionality.display_sets_info(sets)
 
         if not sets_list:

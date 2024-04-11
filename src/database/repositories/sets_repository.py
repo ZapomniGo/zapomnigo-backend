@@ -60,6 +60,7 @@ class SetsRepository:
             sort_by_date: bool = True,
             ascending: bool = False,
             search_terms: str | None = None,
+            exclude_user_sets: bool = False
     ) -> Pagination:
         """
         Retrieve a paginated list of sets from the database based on passed params for filtering and sorting
@@ -74,6 +75,7 @@ class SetsRepository:
             sort_by_date (bool): If True (default), the sets are ordered by creation date.
             ascending (bool): If True, the sets are ordered in ascending order, else in descending order.
             search_terms (str): If provided, fetch sets that match the search terms (default is None).
+            exclude_user_sets (bool): If True, exclude sets created by the user (default is False).
 
         Returns:
             Pagination: A paginated result containing sets based on the specified parameters.
@@ -88,8 +90,11 @@ class SetsRepository:
             query = query.filter(
                 and_(Categories.category_id == category_id, Subcategories.subcategory_id == subcategory_id))
 
-        if user_id:
+        if user_id and not exclude_user_sets:
             query = query.filter(Users.user_id == user_id)
+
+        if exclude_user_sets and user_id:
+            query = query.filter(Users.user_id != user_id)
 
         if folder_id:
             query = cls._sets_in_folder_query(folder_id)

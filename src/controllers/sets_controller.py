@@ -64,14 +64,20 @@ class SetsController:
     def get_all_sets(cls, user_id: str = "") -> Tuple[Dict[str, Any], int]:
         """If a user_id is passed it gets the sets for a given user"""
 
-        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+        page, size, sort_by_date, ascending, exclude_user_sets = CommonFunctionality.get_pagination_params(request)
         category_id = request.args.get('category_id', type=str)
         subcategory_id = request.args.get('subcategory_id', type=str)
         search_terms = request.args.get("search", type=str)
 
+        if exclude_user_sets:
+            user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
+            if not user_id:
+                return {"message": "user_id is not provided in the auth token"}, 499
+
         result = SetsRepository.get_all_sets(page=page, size=size, user_id=user_id, category_id=category_id,
                                              subcategory_id=subcategory_id, sort_by_date=sort_by_date,
-                                             ascending=ascending, search_terms=search_terms)
+                                             ascending=ascending, search_terms=search_terms,
+                                             exclude_user_sets=exclude_user_sets)
         if search_terms:
             return CommonFunctionality.search_format_results([], result), 200
 
@@ -85,7 +91,7 @@ class SetsController:
 
     @classmethod
     def get_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
-        page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+        page, size, sort_by_date, ascending, _ = CommonFunctionality.get_pagination_params(request)
 
         if result := SetsRepository.get_set_info(set_id):
             flashcards = FlashcardsRepository.paginate_flashcards_for_set(set_id=set_id, page=page, size=size,
@@ -192,7 +198,7 @@ class SetsController:
     @classmethod
     def study_set(cls, set_id: str) -> Tuple[Dict[str, Any], int]:
         if result := SetsRepository.get_set_info(set_id):
-            page, size, sort_by_date, ascending = CommonFunctionality.get_pagination_params(request)
+            page, size, sort_by_date, ascending, _ = CommonFunctionality.get_pagination_params(request)
 
             user_id = AuthFunctionality.get_session_username_or_user_id(request, get_username=False)
             if not user_id:

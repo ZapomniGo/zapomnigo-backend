@@ -41,7 +41,7 @@
 
 - 404: `{"message": "No folders found"}`
 
-2. `GET /folders/<folder_id>/sets`
+2. `GET /folders/<folder_id>`
 
    This endpoint is used to get a specific folder and the sets in it.
 

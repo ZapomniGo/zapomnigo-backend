@@ -50,7 +50,7 @@ class FoldersRepository:
             user_id: str = "",
             sort_by_date: bool = True,
             ascending: bool = False,
-            search_terms: str | None = None
+            search_terms: str | None = None,
     ) -> Pagination:
         """
         Retrieve a paginated list of folders from the database based on passed params for filtering and sorting
@@ -63,6 +63,7 @@ class FoldersRepository:
             user_id (str): If provided, fetch folders associated with the specified user (default is an empty string).
             sort_by_date (bool): If True (default), the folders are ordered by creation date.
             ascending (bool): If True, the folders are ordered in ascending order, else in descending order.
+            search_terms (str): If provided, search for folders containing the search terms.
 
         Returns:
             Pagination: A paginated result containing folders based on the specified parameters.
@@ -79,6 +80,9 @@ class FoldersRepository:
 
         if user_id:
             query = query.filter(Users.user_id == user_id)
+
+        if exclude_user_folders:
+            query = query.filter(Users.user_id != user_id)
 
         if sort_by_date:
             order_by_clause = (

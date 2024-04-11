@@ -13,7 +13,8 @@
     * sort_by_date (bool): If True (default), the sets are ordered by creation date.
     * ascending (bool): If True, the sets are ordered in ascending order, else in descending order.
     * search_terms (str): If provided, fetch sets that match the search terms (default is None).
-
+    * exclude_user_sets (bool): If True, exclude sets created by the logged-in user (default is False).
+  
     * if sort_by_date=true&ascending=false - Order items by creation date (from last to first created)
     * if sort_by_date=true&ascending=true - Order items by creation date (from first to last created)
     * if sort_by_date=false&ascending=true - Order items by alphabetical order (from A-Z)

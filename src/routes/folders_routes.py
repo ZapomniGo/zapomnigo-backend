@@ -32,7 +32,7 @@ def get_all_folders() -> Tuple[Dict[str, Any], int]:
     return c.get_all_folders()
 
 
-@folders_bp.get("/folders/<folder_id>/sets")
+@folders_bp.get("/folders/<folder_id>")
 def get_sets_for_folder(folder_id: str) -> Tuple[Dict[str, Any], int]:
     return c.get_sets_in_folder(folder_id)
 
