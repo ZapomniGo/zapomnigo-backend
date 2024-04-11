@@ -30,7 +30,8 @@ class FoldersRepository:
         """
         return db.session.query(
             Folders.folder_id, Folders.folder_title, Folders.folder_description, Folders.folder_modification_date,
-            Categories.category_name, Subcategories.subcategory_name, Users.username, Folders.verified
+            Categories.category_name, Categories.category_id, Subcategories.subcategory_name,
+            Subcategories.subcategory_id, Users.username, Folders.verified
         ).outerjoin(Categories, Categories.category_id == Folders.category_id) \
             .outerjoin(Subcategories, Subcategories.subcategory_id == Folders.subcategory_id) \
             .join(Users, Users.user_id == Folders.user_id)

@@ -38,7 +38,9 @@ class FoldersFunctionality:
                 'folder_description': row.folder_description,
                 'folder_modification_date': row.folder_modification_date,
                 'category_name': row.category_name,
+                'category_id': row.category_id,
                 "subcategory_name": row.subcategory_name,
+                "subcategory_id": row.subcategory_id,
                 'username': row.username,
                 'verified': row.verified
             }
