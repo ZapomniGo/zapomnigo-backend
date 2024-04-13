@@ -28,15 +28,15 @@ class CommonRepository:
     def edit_object(cls, obj, json_data: BaseModel, fields_to_drop: List[str] | None = None) -> None:
 
         fields_to_be_updated = json_data.model_dump()
-
+        print(fields_to_be_updated)
         if fields_to_drop is None:
             fields_to_drop = []
 
         # As the fields which are not passed in the body are None,
         # we should drop them from the update
-        for key, value in fields_to_be_updated.items():
-            if value is None:
-                fields_to_drop.append(key)
+        # for key, value in fields_to_be_updated.items():
+        #     if value is None:
+        #         fields_to_drop.append(key)
 
         # This filed is dropped from the req body as it is not part of the original SQLAlchemy obj
         for field in fields_to_drop:
