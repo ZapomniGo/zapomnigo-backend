@@ -81,9 +81,6 @@ class FoldersRepository:
         if user_id:
             query = query.filter(Users.user_id == user_id)
 
-        if exclude_user_folders:
-            query = query.filter(Users.user_id != user_id)
-
         if sort_by_date:
             order_by_clause = (
                 case((Folders.verified == True, 1), else_=0).desc(),
